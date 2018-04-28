@@ -8,11 +8,10 @@
     "start": "node app.js"
   },
   "author": "Rxsto",
-  "license": "Apache License 2.0",
+  "license": "Apache-2.0",
   "dependencies": {
     "bluebird": "^3.5.1",
     "bufferutil": "^3.0.4",
-    "crashcollector": "^1.0.1",
     "discord.js": "^11.3.2",
     "discord.js-lavalink": "^2.0.2",
     "snekfetch": "^3.6.4",
