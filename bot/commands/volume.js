@@ -3,7 +3,7 @@ const fs = require("fs");
 const isPatron = require("../util/isPatron.js");
 const checkDJ = require("../util/checkDJ.js");
 
-exports.run = async (Client, guilds, Embed, msg, args) => {
+module.exports.run = async (Client, guilds, Embed, msg, args) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
 

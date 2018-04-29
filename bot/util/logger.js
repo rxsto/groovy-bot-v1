@@ -1,5 +1,3 @@
-const Main = require('../main');
-
 exports.error = (content) => {
     var time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '').split(" ")[1];
     content.split('\n').forEach(s => {

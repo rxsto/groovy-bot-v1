@@ -5,7 +5,7 @@ const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
 
 const dbl = new DBL(config.LIST_ORG);
 
-exports.run = (Client, guilds, Embed, msg, args) => {
+module.exports.run = (Client, guilds, Embed, msg, args) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
 

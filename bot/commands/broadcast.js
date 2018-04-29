@@ -3,7 +3,7 @@ const Long = require("long");
 
 const main = require("../main.js");
 
-exports.run = (Client, guilds, Embed, msg, args) => {    
+module.exports.run = (Client, guilds, Embed, msg, args) => {    
     if(msg.author.id != "254892085000405004") return;
 
     g = Client.guilds.array();

@@ -3,7 +3,7 @@ const fs = require("fs");
 const checkDJ = require("../util/checkDJ.js");
 const playing = require("../commands/play.js");
 
-exports.run = (Client, guilds, Embed, msg, args) => {
+module.exports.run = (Client, guilds, Embed, msg, args) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
 
@@ -19,7 +19,7 @@ exports.run = (Client, guilds, Embed, msg, args) => {
             Embed.createEmbed(msg.channel, texts.bot_stay, texts.error_title);
         } else {
             Client.playermanager.leave(msg.guild.id);
-            playing.pauseProcessInterval();
+            clearInterval(guilds[msg.guild.id].interval);
             guilds[msg.guild.id].queue = [];
             guilds[msg.guild.id].votes = 0;
             guilds[msg.guild.id].process = 0;

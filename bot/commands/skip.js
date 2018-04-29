@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-exports.run = (Client, guilds, Embed, msg, args, info) => {
+module.exports.run = (Client, guilds, Embed, msg, args, info) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
 

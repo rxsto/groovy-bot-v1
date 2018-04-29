@@ -4,9 +4,7 @@ const getSong = require("../audio/getSong.js");
 
 const config = JSON.parse(fs.readFileSync('./bot/json/config.json', 'utf8'));
 
-var curr_process;
-
-exports.run = async (Client, guilds, Embed, msg, args) => {
+module.exports.run = async (Client, guilds, Embed, msg, args) => {
 
     var texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
 
@@ -70,7 +68,7 @@ exports.run = async (Client, guilds, Embed, msg, args) => {
 
         player.play(guilds[msg.guild.id].queue[0].track);
         guilds[msg.guild.id].isPlaying = true;
-        curr_process = setInterval(function(){ guilds[msg.guild.id].process++ }, 1000);
+        guilds[msg.guild.id].interval = setInterval(function(){ guilds[msg.guild.id].process++ }, 1000);
 
         if(guilds[msg.guild.id].announceSongs) {
             Embed.createEmbed(msg.channel, ":musical_note: " + texts.audio_playsong_now_playing_text1 + guilds[msg.guild.id].queue[0].info.title + texts.audio_playsong_now_playing_text2, texts.audio_playsong_now_playing_title);
@@ -80,7 +78,7 @@ exports.run = async (Client, guilds, Embed, msg, args) => {
         player.once("end", data => {
             if (data.reason === "REPLACED") return;
 
-            clearInterval(curr_process);
+            clearInterval(guilds[msg.guild.id].interval);
 
             guilds[msg.guild.id].votes = 0;
             guilds[msg.guild.id].process = 0;
@@ -131,15 +129,5 @@ exports.run = async (Client, guilds, Embed, msg, args) => {
                 }
             }
         });
-    }    
-
-    module.exports = {
-        pauseProcessInterval() {
-            clearInterval(curr_process);
-        },
-
-        resumeProcessInterval() {
-            curr_process = setInterval(function(){ guilds[msg.guild.id].process++ }, 1000);
-        }
     }
 }

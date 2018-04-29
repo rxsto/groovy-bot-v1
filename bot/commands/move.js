@@ -2,7 +2,7 @@ var fs;
 
 const checkDJ = require("../util/checkDJ.js");
 
-exports.run = (Client, guilds, Embed, msg, args) => {
+module.exports.run = (Client, guilds, Embed, msg, args) => {
 
     fs = require('fs');
 

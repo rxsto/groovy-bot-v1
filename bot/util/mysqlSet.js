@@ -27,7 +27,8 @@ module.exports.run = (Client, guilds, guild, prefix, color) => {
             defaultVolume: 100,
             language: "en",
 
-            process: 0
+            process: 0,
+            interval: null
         }
     }
 

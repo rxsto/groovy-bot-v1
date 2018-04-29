@@ -30,10 +30,11 @@ class musicBotClient extends Discord.Client {
         super(options);
         this.config = require("./json/config.json");
         this.embed = require("./util/createEmbed.js");
+        this.log = require("./util/logger.js");
         this.playermanager = null;
         this.mysql = null;
         this.voted = {};
-        this.log = require("./util/logger.js");
+        this.commands = new Discord.Collection();
     }
 }
 
@@ -55,6 +56,25 @@ const init = async () => {
     });
     await SetUp.run(Client);
     await postServerCount.run(Client.guilds.size);
+    try {
+        readdir("./bot/commands/", (err, files) => {
+            if(err) Client.log.error("[Core] " + err);
+
+            var jsfiles = files.filter(f => f.split(".").pop() === "js");
+            
+            Client.log.info("[Core] " + jsfiles.length + " commands found!");
+
+            jsfiles.forEach((f, i) => {
+                var cmd = require(`./commands/${f}`);
+                Client.log.info("[Core] Command " + f + " loading...");
+                var name = f.split(".")[0];
+                Client.commands.set(name, cmd);
+            });
+        });
+    } catch (error) {
+        Client.log.error("[Core] " + error);
+    }
+
     try {
         Client.on("guildCreate", guild => {
             Client.log.info(`[GuildHandler] New guild joined: ${guild.name} (id: ${guild.id}) with ${guild.memberCount} members!`);

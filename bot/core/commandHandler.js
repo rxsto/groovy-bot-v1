@@ -46,9 +46,7 @@ module.exports.run = async (Client, guilds, Embed, msg) => {
     if(!msg.guild) return;
 
     if(!guilds[msg.guild.id]) {
-        Embed.createEmbed(msg.channel, ":warning: Initialising the bot! Please be patient!", "Initialising");
         await checkGuild.run(Client, guilds, msg.guild, config.PREFIX, msg.guild.me.displayColor);
-        Embed.createEmbed(msg.channel, ":white_check_mark: The bot is ready to use!", "Ready");
     }
 
     var texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
@@ -58,19 +56,12 @@ module.exports.run = async (Client, guilds, Embed, msg) => {
         return;
     }
 
-    if(msg.channel.type == "text" && msg.content.startsWith(guilds[msg.guild.id].prefix)) {
+    if(!msg.channel.type == "text" && msg.content.startsWith(guilds[msg.guild.id].prefix)) return;
 
-        var invoke = msg.content.split(' ')[0].substr(guilds[msg.guild.id].prefix.length);
-        var args   = msg.content.split(' ').slice(1);
-        
-        if(invoke in commands) {
-            let commandFile = require(`../commands/${commands[invoke]}.js`);
-            try {
-                commandFile.run(Client, guilds, Embed, msg, args, true);
-            } catch (error) {
-                console.log(error);
-                Embed.createEmbed(msg.channel, error.message, texts.error_title);
-            }
-        }
-    }    
+    var invoke = msg.content.split(' ')[0].substr(guilds[msg.guild.id].prefix.length);
+    var args   = msg.content.split(' ').slice(1);
+
+    var cmd = Client.commands.get(invoke);
+
+    if (cmd) cmd.run(Client, guilds, Embed, msg, args, true);
 }

@@ -2,7 +2,7 @@ const fs = require("fs");
 
 const checkDJ = require("../util/checkDJ.js");
 
-exports.run = (Client, guilds, Embed, msg, args) => {
+module.exports.run = (Client, guilds, Embed, msg, args) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
 

@@ -2,9 +2,7 @@ const fs = require("fs");
 
 const checkDJ = require("../util/checkDJ.js");
 
-const playing = require("../commands/play.js");
-
-exports.run = async (Client, guilds, Embed, msg, args, info) => {
+module.exports.run = async (Client, guilds, Embed, msg, args, info) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
 
@@ -20,7 +18,7 @@ exports.run = async (Client, guilds, Embed, msg, args, info) => {
         if (!player) return Embed.createEmbed(msg.channel, texts.audio_no_player, texts.error_title);
         await player.pause(true);
         guilds[msg.guild.id].isPaused = true;
-        playing.pauseProcessInterval();
+        clearInterval(guilds[msg.guild.id].interval);
         if(info) {
             Embed.createEmbed(msg.channel, texts.paused_text, texts.paused_title);
         }
