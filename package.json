@@ -12,8 +12,10 @@
   "dependencies": {
     "bluebird": "^3.5.1",
     "bufferutil": "^3.0.4",
+    "dblapi.js": "^2.0.1",
     "discord.js": "^11.3.2",
-    "discord.js-lavalink": "^2.0.2",
+    "discord.js-lavalink": "^2.0.1",
+    "long": "^4.0.0",
     "snekfetch": "^3.6.4",
     "superagent": "^3.8.2",
     "sync-mysql": "^3.0.1",

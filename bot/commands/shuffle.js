@@ -3,7 +3,7 @@ const fs = require("fs");
 const isPatron = require("../util/isPatron.js");
 const checkDJ = require("../util/checkDJ.js");
 
-exports.run = (Client, guilds, Embed, msg, args) => {
+exports.run = (Client, guilds, Embed, msg, args, info) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
 
@@ -18,9 +18,13 @@ exports.run = (Client, guilds, Embed, msg, args) => {
 
     if(guilds[msg.guild.id].isShuffling) {
         guilds[msg.guild.id].isShuffling = false;
-        Embed.createEmbed(msg.channel, texts.shuffle_deactivated_text, texts.shuffle_deactivated_title);
+        if(info) {
+            Embed.createEmbed(msg.channel, texts.shuffle_deactivated_text, texts.shuffle_deactivated_title);
+        }
     } else {
         guilds[msg.guild.id].isShuffling = true;
-        Embed.createEmbed(msg.channel, texts.shuffle_activated_text, texts.shuffle_activated_title);
+        if(info) {
+            Embed.createEmbed(msg.channel, texts.shuffle_activated_text, texts.shuffle_activated_title);            
+        }
     }
 }

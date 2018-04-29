@@ -25,6 +25,7 @@ exports.run = (help, guilds, msg) => {
     help.push("▫️ `" + prefix + "info` - " + texts.help_info);
     help.push("▫️ `" + prefix + "support` - " + texts.help_support);
     help.push("▫️ `" + prefix + "donate` - " + texts.help_donate);
+    help.push("▫️ `" + prefix + "vote` - " + texts.help_vote);
     help.push("▫️ `" + prefix + "invite` - " + texts.help_invite);
     help.push("▫️ `" + prefix + "stats` - " + texts.help_stats);
     help.push("▫️ `" + prefix + "settings` - " + texts.help_settings);

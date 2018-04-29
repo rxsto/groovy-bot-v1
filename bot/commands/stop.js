@@ -4,7 +4,7 @@ const checkDJ = require("../util/checkDJ.js");
 
 const playing = require("../commands/play.js");
 
-exports.run = (Client, guilds, Embed, msg, args) => {
+exports.run = (Client, guilds, Embed, msg, args, info) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
 
@@ -23,7 +23,9 @@ exports.run = (Client, guilds, Embed, msg, args) => {
         guilds[msg.guild.id].process = 0;
         playing.pauseProcessInterval();
         player.stop();
-        Embed.createEmbed(msg.channel, texts.stop_text, texts.stop_title);
+        if(info) {
+            Embed.createEmbed(msg.channel, texts.stop_text, texts.stop_title);
+        }
     } else {
         Embed.createEmbed(msg.channel, texts.same_channel, texts.error_title);
     }

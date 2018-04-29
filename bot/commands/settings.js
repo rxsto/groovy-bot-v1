@@ -11,7 +11,7 @@ exports.run = (Client, guilds, Embed, msg, args) => {
     if(!args[0]) {
         var emb_stats =  {
             embed: {
-                color: msg.channel.guild.me.highestRole.color, title: "musicBot - Settings",
+                color: msg.channel.guild.me.highestRole.color, title: "Groovy - Settings",
                 fields: [
                     {
                         name: ":exclamation: " + texts.prefix,
@@ -191,6 +191,7 @@ exports.run = (Client, guilds, Embed, msg, args) => {
 
             case "lang":
             case "language":
+            return;
             if(args[1] == "en" || args[1] == "de" || args[1] == "fr" || args[1] == "es") {
                 Client.mysql.executeQuery(`UPDATE guilds SET language = '${args[1]}' WHERE id = '${msg.guild.id}'`);
                 guilds[msg.guild.id].language = args[1];

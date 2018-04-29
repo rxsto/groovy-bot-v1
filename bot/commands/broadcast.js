@@ -1,4 +1,5 @@
 const { RichEmbed } = require('discord.js');
+const Long = require("long");
 
 const main = require("../main.js");
 

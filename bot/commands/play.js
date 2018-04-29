@@ -8,14 +8,6 @@ var curr_process;
 
 exports.run = async (Client, guilds, Embed, msg, args) => {
 
-    exports.pauseProcessInterval = function() {
-        clearInterval(curr_process);
-    }
-
-    exports.resumeProcessInterval = function() {
-        curr_process = setInterval(function(){ guilds[msg.guild.id].process++ }, 1000);
-    }
-
     var texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
 
     var vc = msg.member.voiceChannel;
@@ -50,14 +42,8 @@ exports.run = async (Client, guilds, Embed, msg, args) => {
     track = track.join(" ");
 
     //ADD PLAYLIST AND SOUNDCLOUD SUPPORT
-
-    if(args[0] == "sc" || args[0] == "scs" || args[0] == "soundcloud") {
-        const [song] = await getSong.run("scsearch: " + track, config.PASS);
-    } else if(args[0] == "yt" || args[0] == "yts" || args[0] == "youtube") {
-        const [song] = await getSong.run("ytsearch: " + track, config.PASS);
-    } else {
-        const [song] = await getSong.run("ytsearch: " + track, config.PASS);
-    }
+    
+    const [song] = await getSong.run("ytsearch: " + track, config.PASS);
 
     const player = await Client.playermanager.join({
         guild: msg.guild.id,
@@ -83,6 +69,7 @@ exports.run = async (Client, guilds, Embed, msg, args) => {
     function play() {
 
         player.play(guilds[msg.guild.id].queue[0].track);
+        guilds[msg.guild.id].isPlaying = true;
         curr_process = setInterval(function(){ guilds[msg.guild.id].process++ }, 1000);
 
         if(guilds[msg.guild.id].announceSongs) {
@@ -144,5 +131,15 @@ exports.run = async (Client, guilds, Embed, msg, args) => {
                 }
             }
         });
+    }    
+
+    module.exports = {
+        pauseProcessInterval() {
+            clearInterval(curr_process);
+        },
+
+        resumeProcessInterval() {
+            curr_process = setInterval(function(){ guilds[msg.guild.id].process++ }, 1000);
+        }
     }
 }

@@ -1,9 +1,11 @@
 const messageHandler = require("../worker_handling/messages.js");
 const workerCrashes = {};
 
+const log = require("../bot/util/logger.js");
+
 module.exports = async worker => {
 	worker.on("online", () => {
-		console.log(`Worker ${worker.id} started (hosting ${worker.shardRange})`);
+		log.info(`[ShardManager] Worker ${worker.id} started (hosting ${worker.shardRange})`);
 		worker.send({
 			type: "startup",
 			shardRange: worker.shardRange,

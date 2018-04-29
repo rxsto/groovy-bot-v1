@@ -13,16 +13,12 @@ exports.run = (Client, Embed, guilds, role, id, msg) => {
         var member = members.get(id);
         var roles = member.roles;
 
-        if(roles.find("name", role)) {
+        if(roles.find("name", role) || roles.find("name", "Friend")) {
             to_return = true;
         } else {
-            Embed.createEmbed(msg.channel, texts.no_patron, texts.error_title);
+            Embed.createEmbed(msg.channel, texts.no_patron1 + guilds[msg.guild.id].prefix + texts.no_patron2, texts.error_title);
             to_return = false;
         }
-
-        if(roles.find("name", "Friend")) {
-            to_return = true;
-        } 
     } else {
         Embed.createEmbed(msg.channel, texts.not_server, texts.error_title);
         to_return = false;

@@ -2,7 +2,7 @@ const fs = require("fs");
 
 const checkDJ = require("../util/checkDJ.js");
 
-exports.run = (Client, guilds, Embed, msg, args) => {
+exports.run = (Client, guilds, Embed, msg, args, info) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
 
@@ -13,9 +13,13 @@ exports.run = (Client, guilds, Embed, msg, args) => {
 
     if(guilds[msg.guild.id].loopSong) {
         guilds[msg.guild.id].loopSong = false;
-        Embed.createEmbed(msg.channel, texts.loop_deactivated_text, texts.loop_deactivated_title);
+        if(info) {
+            Embed.createEmbed(msg.channel, texts.loop_deactivated_text, texts.loop_deactivated_title);
+        }
     } else {
         guilds[msg.guild.id].loopSong = true;
-        Embed.createEmbed(msg.channel, texts.loop_activated_text, texts.loop_activated_title);
+        if(info) {
+            Embed.createEmbed(msg.channel, texts.loop_activated_text, texts.loop_activated_title);            
+        }
     }
 }

@@ -2,6 +2,8 @@ const snekfetch = require('snekfetch');
 const superagent = require('superagent');
 const fs = require("fs");
 
+const log = require("./logger.js");
+
 const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
 
 exports.run = async (server_count) => {
@@ -21,7 +23,7 @@ exports.run = async (server_count) => {
             "server_count": server_count
         })
         .then()
-        .catch(err => console.error(`Whoops something went wrong: ${err}`));
+        .catch(err => log.error("[PostServerCount] " + err));
 
     snekfetch.post("https://botlist.space/api/bots/402116404301660181")
         .set("Authorization", config.LIST_SPACE)
@@ -30,7 +32,7 @@ exports.run = async (server_count) => {
             "server_count": server_count
         })
         .then()
-        .catch(err => console.error(`Whoops something went wrong: ${err}`));
+        .catch(err => log.error("[PostServerCount] " + err));
 
     snekfetch.post("https://bots.discord.pw/api/bots/402116404301660181/stats")
         .set("Authorization", config.LIST_PW)
@@ -39,5 +41,7 @@ exports.run = async (server_count) => {
             "server_count": server_count
         })
         .then()
-        .catch(err => console.error(`Whoops something went wrong: ${err}`));
+        .catch(err => log.error("[PostServerCount] " + err));
+
+    log.info("[PostServerCount] Successfully posted current server-count");
 }

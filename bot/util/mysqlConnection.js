@@ -1,6 +1,7 @@
 const MySqlMod = require('mysql');
 const syncSQL = require('sync-mysql');
 const fs = require('fs');
+const log = require("./logger.js");
 
 class MySql {
     constructor(host, user, password, database) {
@@ -27,9 +28,9 @@ class MySql {
     connect() {
         this.con.connect((err) => {
             if (err)
-                console.log('Failed connecting to MySql database');
+                log.error("[MySQL] Failed connecting to MySql database");
             else
-                console.log ('Successfully connected to MySql database');
+                log.info("[MySQL] Successfully connected to MySql database");
         })  
     }
 
@@ -39,7 +40,7 @@ class MySql {
 
     executeQuery(query) {
         if (this.connected === false)
-            return console.log('You first need to connect to database');
+            return log.error("[MySQL] You first need to connect to database");
         this.con.query(query, (err, result) => {
             if (err) throw err;
         });
@@ -47,9 +48,9 @@ class MySql {
 
     executeQuery(query, values) {
         if (this.connected === false)
-            return console.log('You first need to connect to database');
+            return log.error("[MySQL] You first need to connect to database");
         if (!values instanceof Array)
-            return console.log('Need Array as Values');
+            return log.error("[MySQL] Need values as Array");
         this.con.query(query, values, (err, result) => {
             if (err) throw err;
         });

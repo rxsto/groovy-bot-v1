@@ -4,7 +4,7 @@ const checkDJ = require("../util/checkDJ.js");
 
 const playing = require("../commands/play.js");
 
-exports.run = async (Client, guilds, Embed, msg, args) => {
+exports.run = async (Client, guilds, Embed, msg, args, info) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
 
@@ -21,6 +21,8 @@ exports.run = async (Client, guilds, Embed, msg, args) => {
         await player.pause(false);
         guilds[msg.guild.id].isPaused = false;
         playing.resumeProcessInterval();
-        Embed.createEmbed(msg.channel, texts.resumed_text, texts.resumed_title);
+        if(info) {
+            Embed.createEmbed(msg.channel, texts.resumed_text, texts.resumed_title);
+        }
     }
 }

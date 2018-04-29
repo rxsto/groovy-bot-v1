@@ -1,6 +1,7 @@
 const fs = require("fs");
 
 const checkGuild = require("../util/checkGuild.js");
+const getGeneral = require("../util/getGeneral.js");
 
 const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
 
@@ -12,6 +13,7 @@ const commands = {
     donate: "donate",
     stats: "stats",
     ping: "ping",
+    vote: "vote",
 
     play: "play", p: "play", add: "play",
     join: "join",
@@ -44,7 +46,9 @@ module.exports.run = async (Client, guilds, Embed, msg) => {
     if(!msg.guild) return;
 
     if(!guilds[msg.guild.id]) {
+        Embed.createEmbed(msg.channel, ":warning: Initialising the bot! Please be patient!", "Initialising");
         await checkGuild.run(Client, guilds, msg.guild, config.PREFIX, msg.guild.me.displayColor);
+        Embed.createEmbed(msg.channel, ":white_check_mark: The bot is ready to use!", "Ready");
     }
 
     var texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
@@ -62,7 +66,7 @@ module.exports.run = async (Client, guilds, Embed, msg) => {
         if(invoke in commands) {
             let commandFile = require(`../commands/${commands[invoke]}.js`);
             try {
-                commandFile.run(Client, guilds, Embed, msg, args);
+                commandFile.run(Client, guilds, Embed, msg, args, true);
             } catch (error) {
                 console.log(error);
                 Embed.createEmbed(msg.channel, error.message, texts.error_title);

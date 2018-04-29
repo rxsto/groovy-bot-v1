@@ -3,7 +3,7 @@ const fs = require("fs");
 const isPatron = require("../util/isPatron.js");
 const checkDJ = require("../util/checkDJ.js");
 
-exports.run = (Client, guilds, Embed, msg, args) => {
+exports.run = (Client, guilds, Embed, msg, args, info) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));    
 
@@ -18,9 +18,13 @@ exports.run = (Client, guilds, Embed, msg, args) => {
 
     if(guilds[msg.guild.id].loopQueue) {
         guilds[msg.guild.id].loopQueue = false;
-        Embed.createEmbed(msg.channel, texts.loopqueue_deactivated_text, texts.loopqueue_deactivated_title);
+        if(info) {
+            Embed.createEmbed(msg.channel, texts.loopqueue_deactivated_text, texts.loopqueue_deactivated_title);
+        }
     } else {
         guilds[msg.guild.id].loopQueue = true;
-        Embed.createEmbed(msg.channel, texts.loopqueue_activated_text, texts.loopqueue_activated_title);
+        if(info) {
+            Embed.createEmbed(msg.channel, texts.loopqueue_activated_text, texts.loopqueue_activated_title);            
+        }
     }
 }
