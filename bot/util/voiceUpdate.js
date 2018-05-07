@@ -1,35 +1,20 @@
 const fs = require("fs");
 
-var playing;
+exports.run = (Client, guilds, Embed, mold, mnew) => {
 
-exports.run = async (Client, guilds, Embed, mold, mnew) => {
-    playing = require("../commands/play.js");
-    var guild = mold.guild;
+    if(mold == mold.guild.me || mnew == mold.guild.me) return;
+    if(!mold.voiceChannel) return;
+    if(!mold.guild.me.voiceChannel) return;
+    if(!guilds[mold.guild.id]) return;
+    if(mold.voiceChannel.members.size < 1 || mold.voiceChannel.members.size > 1) return;
+    if(mold.voiceChannel.id == "404312098970140672") return;
+    if(mold.voiceChannel == mold.guild.me.voiceChannel && mold.guild.me.voiceChannel.members.size < 2) leave();
 
-    if(mold.voiceChannel != guild.me.voiceChannel && mnew.voiceChannel != guild.me.voiceChannel) {
-        return;
-    }
-
-    if(!guild.me.voiceChannel) return;
-    var members = guild.me.voiceChannel.members.array();
-
-    if(members.length < 2) {
-        if(!guilds[mold.guild.id].isPaused) {
-            const player = Client.playermanager.get(mold.guild.id);
-            if (!player) return Embed.createEmbed(mold.channel, texts.audio_no_player, texts.error_title);
-            await player.pause(true);
-            guilds[mold.guild.id].isPaused = true;
-            playing.pauseProcessInterval();
-        }
-    } else if(members.length > 1) {
-        if(guilds[mold.guild.id].isPaused) {
-            const player = Client.playermanager.get(mold.guild.id);
-            if (!player) return Embed.createEmbed(mold.channel, texts.audio_no_player, texts.error_title);
-            await player.pause(false);
-            guilds[mold.guild.id].isPaused = false;
-            playing.resumeProcessInterval();
-        }
-    } else {
-        return;
+    function leave() {
+        Client.playermanager.leave(mold.guild.id);
+        clearInterval(guilds[mold.guild.id].interval);
+        guilds[mold.guild.id].queue = [];
+        guilds[mold.guild.id].votes = 0;
+        guilds[mold.guild.id].process = 0;
     }
 }

@@ -8,24 +8,18 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
 
     var servers = Client.guilds.size;
-
-    var playing = 0;
-    var connected = 0;
-
-    g = Client.guilds.array();
-
-    g.forEach(guild => {
-        if(guild.me.voiceChannel) {
-            playing++;
-        }
-    });
-
     var members = Client.users.size;
-    var channels = Client.channels.size;
+    var connections = Client.playermanager.size;
+    
+    var playing = 0;
+    var players = Client.playermanager.array();
+    players.forEach(player => {
+        if(player.playing) playing++;
+    });
 
     var emb_stats =  {
         embed: {
-            color: msg.channel.guild.me.highestRole.color, title: texts.stats_title,
+            color: msg.channel.guild.me.displayColor, title: texts.stats_title,
             thumbnail: {
               url: Client.user.avatarURL
             },
@@ -46,8 +40,8 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
                     inline: true
                 },
                 {
-                    name: texts.stats_channels,
-                    value: channels,
+                    name: texts.stats_connections,
+                    value: connections,
                     inline: true
                 }
             ]    

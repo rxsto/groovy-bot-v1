@@ -1,5 +1,6 @@
 const botHandler = require("./worker_handling/bot");
 const superagent = require("superagent");
+const fs = require("fs");
 
 var shardAmount = null;
 
@@ -13,13 +14,14 @@ Object.defineProperty(cluster, "onlineWorkers", {
 		.filter(work => work.isConnected())
 });
 
-const config = require(`./bot/json/config.json`);
+const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
 
 async function init() {
-	const { body: { shards: totalShards } } = await superagent.get("https://discordapp.com/api/gateway/bot")
-		.set("Authorization",config.TOKEN);
-	process.totalShards = totalShards;
+	console.log("Groovy");
+	
+	const { body: { shards: totalShards } } = await superagent.get("https://discordapp.com/api/gateway/bot").set("Authorization", config.TOKEN);
 
+	process.totalShards = totalShards;
 	shardAmount = totalShards;
 
 	let shardsPerWorker;

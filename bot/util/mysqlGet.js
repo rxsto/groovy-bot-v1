@@ -36,7 +36,6 @@ module.exports.run = (Client, guilds, id, color, results) => {
             queue: [],
 
             prefix: prefix,
-            color: color,
 
             isPlaying: false,
             isPaused: false,
@@ -55,7 +54,7 @@ module.exports.run = (Client, guilds, id, color, results) => {
             language: language,
 
             process: 0,
-            interval: null
+            interval: 0,
         }
     }
 }

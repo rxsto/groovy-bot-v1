@@ -1,0 +1,40 @@
+module.exports.list = {
+    // GENERAL
+
+    help: "help.js",
+    info: "info.js",
+    partner: "partner.js",
+    invite: "invite.js",
+    support: "support.js",
+    donate: "donate.js",
+    stats: "stats.js",
+    shard: "shard.js",
+    ping: "ping.js",
+    vote: "vote.js",
+
+    // MUSIC
+
+    play: "play.js", p: "play.js", add: "play.js",
+    join: "join.js",
+    pause: "pause.js",
+    resume: "resume.js", r: "resume.js",
+    loop: "loop.js",
+    loopqueue: "loopqueue.js", loopq: "loopqueue.js", lq: "loopqueue.js",
+    np: "np.js", nowplaying: "np.js", player: "np.js", control: "np.js", cp: "np.js",
+    seek: "seek.js",
+    forward: "forward.js",
+    rewind: "rewind.js",
+    shuffle: "shuffle.js", sh: "shuffle.js",
+    skip: "skip.js", s: "skip.js",
+    remove: "remove.js", rm: "remove.js",
+    removedupes: "removedupes.js", rd: "removedupes.js",
+    leavecleanup: "leavecleanup.js", lc: "leavecleanup.js",
+    move: "move.js", mv: "move.js",
+    reset: "reset.js",
+    stop: "stop.js", st: "stop.js",
+    leave: "leave.js", l: "leave.js",
+    clear: "clear.js", cl: "clear.js",
+    volume: "volume.js", vol: "volume.js",
+    queue: "queue.js", q: "queue.js",
+    settings: "settings.js", set: "settings.js",
+}

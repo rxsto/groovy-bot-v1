@@ -14,22 +14,19 @@ module.exports = async worker => {
 			totalShards: worker.totalShards,
 			processType: "bot"
 		});
-
 	});
 
 	worker.on("exit", (code, signal) => {
 		if(signal) {
-			return;
+			log.error(`Worker ${worker.id} was killed by signal: ${signal}`);
 		} else if(code === 0) {
-			console.info(`Worker ${worker.id} killed successfully ` +
+			log.info(`Worker ${worker.id} killed successfully ` +
 				`(hosted shards ${worker.shardStart}-${worker.shardEnd}).`);
-
 		} else if(workerCrashes[worker.shardRange] >= 5) {
-			console.error(`Worker ${worker.id} killed due to restart loop with ` +
+			log.error(`Worker ${worker.id} killed due to restart loop with ` +
 					`exit code: ${code} (hosted ${worker.shardRange}).`);
-
 		} else {
-			console.warn(`Worker ${worker.id} died with exit code ${code} ` +
+			log.error(`Worker ${worker.id} died with exit code ${code} ` +
 				`(hosted ${worker.shardRange}). Respawning new process...`);
 			const newWorker = cluster.fork();
 			Object.assign(newWorker, {

@@ -1,7 +1,6 @@
 const fs = require("fs");
 
 const checkDJ = require("../util/checkDJ.js");
-const playing = require("../commands/play.js");
 
 module.exports.run = async (Client, guilds, Embed, msg, args) => {
 
@@ -15,11 +14,11 @@ module.exports.run = async (Client, guilds, Embed, msg, args) => {
     const player = Client.playermanager.get(msg.guild.id);
     if (!player) return Embed.createEmbed(msg.channel, texts.audio_no_player, texts.error_title);
 
-    playing.pauseProcessInterval();    
+    clearInterval(guilds[msg.guild.id].interval);
     guilds[msg.guild.id].process = 0;
 
     try {
-        await player.play(guilds[msg.guild.id].queue[0]);        
+        await player.play(guilds[msg.guild.id].queue[0].track);
     } catch (error) {
         console.log(error);
     }

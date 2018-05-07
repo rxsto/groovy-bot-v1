@@ -56,7 +56,7 @@ module.exports.run = (Client, guilds, Embed, msg, args, info) => {
                     }
                 } else {                    
                     if(info) {
-                        Embed.createEmbed(msg.channel, texts.skip_no_number, texts.error_title);
+                        Embed.createEmbed(msg.channel, texts.no_number, texts.error_title);
                     }
                 }
             }

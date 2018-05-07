@@ -13,10 +13,9 @@ module.exports.run = async (Client, guilds, Embed, msg, args) => {
         return;
     }
 
-    if(!vc) {
-        Embed.createEmbed(msg.channel, texts.no_channel, texts.error_title);
-        return;
-    }
+    if(vc == msg.guild.me.voiceChannel) return Embed.createEmbed(msg.channel, texts.is_same_vc, texts.error_title);
+
+    if(!vc) return Embed.createEmbed(msg.channel, texts.no_channel, texts.error_title);
 
     if (!vc.joinable) {
         return Embed.createEmbed(msg.channel, texts.no_perms_connect, texts.error_title);
@@ -29,4 +28,6 @@ module.exports.run = async (Client, guilds, Embed, msg, args) => {
         channel: msg.member.voiceChannelID,
         host: "127.0.0.1"
     });
+
+    Embed.createEmbed(msg.channel, texts.joined_text, texts.joined_title);
 }

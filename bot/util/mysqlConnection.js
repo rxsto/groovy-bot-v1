@@ -3,32 +3,37 @@ const syncSQL = require('sync-mysql');
 const fs = require('fs');
 const log = require("./logger.js");
 
+const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
+
 class MySql {
     constructor(host, user, password, database) {
+        log.info("[MySQL] Initializing MySQL-Connection");
 
         this.con = MySqlMod.createConnection({
-            host:     host,
-            user:     user,
-            password: password,
-            database: database
+            host:     "127.0.0.1",
+            user:     "bot",
+            password: config.GLOBAL_PASS,
+            database: "bot",
+            supportBigNumbers: true,
+            bigNumberStrings: true
         });
 
         this.scon = new syncSQL({
-            host:     host,
-            user:     user,
-            password: password,
-            database: database
+            host:     "127.0.0.1",
+            user:     "bot",
+            password: config.GLOBAL_PASS,
+            database: "bot"
         });
 
         this.connect({
-            charset: 'utf8mb4'
+            charset: 'utf8_general_ci'
         });
     }
 
     connect() {
         this.con.connect((err) => {
             if (err)
-                log.error("[MySQL] Failed connecting to MySql database");
+                log.info("[MySQL] Failed connecting to MySql database");
             else
                 log.info("[MySQL] Successfully connected to MySql database");
         })  

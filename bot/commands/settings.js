@@ -99,10 +99,11 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
             return;
         }
     } else if(args[1]) {
-        if(args[1].includes("'")) {
-            Embed.createEmbed(msg.channel, "```'``` is invalid!", texts.error_title);
-            return;
-        }
+
+        if(!msg.member.hasPermission("MANAGE_GUILD")) return Embed.createEmbed(msg.channel, texts.no_manage_permissions, texts.error_title);
+
+        if(args[1].includes("'")) return Embed.createEmbed(msg.channel, "```'``` is invalid!", texts.error_title);
+
         switch(args[0]) {
             case "prefix":
             if(args[1].length > 10) {

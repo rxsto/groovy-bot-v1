@@ -14,7 +14,6 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
         Embed.createEmbed(msg.channel, texts.vote_text1 + guilds[msg.guild.id].prefix + texts.vote_text2, texts.vote_title);
         break;
 
-
         case 1:
         if(args[0] == "check") {
             if(!Client.voted[msg.author.id]) {
@@ -48,7 +47,6 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
             });
         }
         break;
-
 
         default:
         return;
