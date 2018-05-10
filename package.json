@@ -2,6 +2,13 @@
   "name": "groovy",
   "version": "1.0.1",
   "description": "Groovy package",
+  "keywords": [
+    "groovybot",
+    "groovy",
+    "bot",
+    "discord"
+  ],
+  "homepage": "https://rxsto.github.io/Groovy/",
   "main": "app.js",
   "scripts": {
     "test": "node app.js debug",
