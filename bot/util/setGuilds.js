@@ -1,7 +1,6 @@
 const Discord = require("discord.js");
 
 module.exports.run = async (Client, guilds) => {
-    Client.user.setPresence({ game: { name: "Initializing..." }, status: "dnd" });
 
     var results = await Client.mysql.executeSelect(`SELECT * FROM guilds`);
     var guilds_client = Client.guilds.array();

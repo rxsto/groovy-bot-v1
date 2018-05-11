@@ -46,6 +46,7 @@ const Client = new musicBotClient({ messageCacheMaxSize: 50, messageCacheLifetim
 const init = async () => {
     await Client.login(token).then(Client.log.info("[Core] Successfully connected to Discord API"));
     Client.mysql = await new MySql("127.0.0.1", "bot", config.GLOBAL_PASS, "bot");
+    await Init.run(Client, guilds);
     Client.playermanager = await new PlayerManager(Client, nodes, {
         user: Client.user.id,
         shards: 1
@@ -57,7 +58,6 @@ const init = async () => {
             Client.log.error("[Core] " + error);
         }
     });
-    await Init.run(Client, guilds);
     await SetUp.run(Client, token);
     if(token == config.TOKEN) await postServerCount.run(Client.guilds.size);
     try {
@@ -74,12 +74,10 @@ const init = async () => {
             Object.keys(jsaliases).forEach(a => {
                 var cmd = require(`./commands/${jsaliases[a]}`);
                 Client.commands.set(a, cmd);
-                Client.log.info("[Core] Alias " + a + " is added...");
             });
 
-            jsfiles.forEach((f, i) => {
-                Client.log.info("[Core] Command " + f + " is loading...");
-            });
+            Client.log.info("[Core] All aliases were added!");
+            Client.log.info("[Core] All commands were loaded!");
         });
     } catch (error) {
         Client.log.error("[Core] " + error);
@@ -132,10 +130,10 @@ const init = async () => {
             voiceUpdate.run(Client, guilds, Embed, mold, mnew);
         });
     } catch (error) {
-        Client.log.error("[Core] " + error);
+        Client.log.error("[VoiceStateUpdate] " + error);
     }
 };
 
 init();
 
-process.on("unhandledRejection", error => console.log(`unhandledRejection:\n${error.stack}`)).on("uncaughtException", error => console.log(`uncaughtException:\n${error.stack}`)).on("error", error => console.log(`Error:\n${error.stack}`)).on("warn", error => console.log(`Warning:\n${error.stack}`));
+process.on("unhandledRejection", error => logger.error(`unhandledRejection:\n${error.stack}`)).on("uncaughtException", error => logger.error(`uncaughtException:\n${error.stack}`)).on("error", error => logger.error(`Error:\n${error.stack}`)).on("warn", error => logger.error(`Warning:\n${error.stack}`));

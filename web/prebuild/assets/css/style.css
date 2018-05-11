@@ -1,0 +1,38 @@
+body {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    background-color: #2e3141;
+    background-image: linear-gradient(to top, rgba(46, 49, 65, 0.8), rgba(46, 49, 65, 0.8)), url("../../assets/img/bg.png");
+    background-size: auto, cover;
+    background-attachment: fixed, fixed;
+    background-position: center, center;
+}
+  
+main {
+    flex: 1 0 auto;
+}
+
+#footer {
+    display: block;
+}
+
+.copyright {
+    border-top: solid 2px rgba(255, 255, 255, 0.125);
+    list-style: none;
+    margin: 4em 0 2em 0;
+    padding: 2em 0 0 0;
+    width: 90%;
+}
+
+.copyright li {
+    border-left: solid 2px rgba(255, 255, 255, 0.125);
+    color: rgba(255, 255, 255, 0.35);
+    display: inline-block;
+    font-size: 0.9em;
+    line-height: 1;
+    margin-left: 1em;
+    padding: 0;
+    padding-left: 0px;
+    padding-left: 1em;
+}

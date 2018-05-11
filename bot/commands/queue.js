@@ -1,102 +1,82 @@
 const fs = require("fs");
+const Discord = require("discord.js");
 
-const { RichEmbed } = require('discord.js');
-
-module.exports.run = (Client, guilds, Embed, msg, args) => {
-
+module.exports.run = async (Client, guilds, Embed, msg, args) => {
+    
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
 
-    if(guilds[msg.guild.id].queue.length <= 0) {
-        Embed.createEmbed(msg.channel, texts.queue_nothing, texts.error_title);        
-    } else {
+    if(guilds[msg.guild.id].queue.length == 0) return Embed.createEmbed(msg.channel, texts.queue_nothing, texts.error_title); 
 
-        if(!args[0]) {        
-            return getQueue(0);
-        }
+    var page = 1;
+    var pages = Math.ceil(guilds[msg.guild.id].queue.length / 10);
+    var titles = [];
+
+    var loading_emb = new Discord.RichEmbed().setColor(msg.guild.me.displayColor).setFooter("Loading...").setDescription("");
+
+    guilds[msg.guild.id].queue.forEach(song => {
+        titles.push(song.info.title);
+    });
+
+    const embed = new Discord.RichEmbed()
+        .setColor(msg.guild.me.displayColor)
+        .setFooter(`Page ${page} of ${pages}`)
+        .setDescription(generateContent());
     
-        if(isNaN(args[0])) {
-            Embed.createEmbed(msg.channel, texts.no_number, texts.error_title);
-        }
-
-        switch(args[0]) {
-            case "1":
-            getQueue(0);
-            break;
-            case "2":
-            if(guilds[msg.guild.id].queue.length < 10) {
-                return Embed.createEmbed(msg.channel, texts.queue_nothing_site, texts.error_title);
-            }
-            getQueue(10);
-            break;
-            case "3":
-            if(guilds[msg.guild.id].queue.length < 20) {
-                return Embed.createEmbed(msg.channel, texts.queue_nothing_site, texts.error_title);
-            }
-            getQueue(20);
-            break;
-            case "4":
-            if(guilds[msg.guild.id].queue.length < 30) {
-                return Embed.createEmbed(msg.channel, texts.queue_nothing_site, texts.error_title);
-            }
-            getQueue(30);
-            break;
-            case "5":
-            if(guilds[msg.guild.id].queue.length < 40) {
-                return Embed.createEmbed(msg.channel, texts.queue_nothing_site, texts.error_title);
-            }
-            getQueue(40);
-            break;
-            default:
-            return;
-        }
-
+    msg.channel.send(embed).then(async message => {
+    
+        await message.react('⏪');
+        await message.react('⏩');
         
+        const backwardsFilter = (reaction, user) => reaction.emoji.name === '⏪' && user.id === msg.author.id;
+        const forwardsFilter = (reaction, user) => reaction.emoji.name === '⏩' && user.id === msg.author.id; 
+        
+        const backwards = message.createReactionCollector(backwardsFilter, { time: 600000 });
+        const forwards = message.createReactionCollector(forwardsFilter, { time: 600000 });
+        
+        backwards.on('collect', async r => {
+            clearReaction(r);
+            if (page === 1) return;
+            page--;
+            await message.edit(loading_emb).then(msg_time => {
+                setTimeout(async  () => {
+                    await embed.setDescription(generateContent());
+                    await embed.setFooter(`Page ${page} of ${pages}`);
+                    await message.edit(embed);
+                }, 1000);
+            });
+        });
+        
+        forwards.on('collect', async r => {
+            clearReaction(r);
+            if (page === pages) return;
+            page++;
+            await message.edit(loading_emb).then(msg_time => {
+                setTimeout(async  () => {
+                    await embed.setDescription(generateContent());
+                    await embed.setFooter(`Page ${page} of ${pages}`);
+                    await message.edit(embed);
+                }, 1000);
+            });
+        });    
+    });
+
+    function clearReaction(reaction) {
+        reaction.fetchUsers().then((users) => {
+            user_array = users.array();
+
+            user_array.forEach(user => {
+                if(user.id != msg.guild.me.user.id) {
+                    reaction.remove(user);
+                }
+            });
+        });
     }
 
-    function getQueue(start) {
-        var len = guilds[msg.guild.id].queue.length;
-
-        var sites;
-        if(len >= 1 && len <= 10) {
-            sites = 1;
-        } else if(len >= 11 && len <= 20) {
-            sites = 2;
-        } else if(len >= 21 && len <= 30) {
-            sites = 3;            
-        } else if(len >= 31 && len <= 40) {
-            sites = 4;            
-        } else if(len >= 41 && len <= 50) {
-            sites = 5;            
-        } else {
-            return;
+    function generateContent() {
+        var content = [];
+        for (var i = page * 10 - 9; i <= page * 10; i++) {
+            if(titles[i - 1]) content.push(`:white_small_square: **${i}:** ` + titles[i - 1]);
         }
-        var current_site = Math.floor((start / 10) + 1);
-
-        var message = "";
-        var end;
-
-        if(guilds[msg.guild.id].queue.length < (start + 10)) {
-            end = guilds[msg.guild.id].queue.length;
-        } else {
-            end = start + 10;
-        }
-
-        for (var i = start; i < end; i++) {
-            var temp = (i === 0 ? "\n**" + texts.queue_current + "**\n" : "") + (i === 1 ? "\n**" + texts.queue_upnext + "**\n" : "") + "▫️ **" + (i + 1) + ":** " + guilds[msg.guild.id].queue[i].info.title + "\n";
-            
-            if ((message + temp).length <= 2000 - 3) {
-                message += temp;
-            } else {
-                msg.channel.send(message);
-            }
-        }
-
-        var emb = new RichEmbed();
-        
-        emb.setDescription(message);
-        emb.setColor(msg.channel.guild.me.displayColor);
-        emb.setTitle(texts.queue_title);
-        emb.setFooter(len + " Songs | " + current_site + "/" + sites, Client.user.avatarURL);
-        msg.channel.send('', emb);;
+        return content;
     }
 }

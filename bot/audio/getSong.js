@@ -1,9 +1,12 @@
 const snekfetch = require("snekfetch");
+const fs = require("fs");
 
-exports.run = async (string, password) => {
+const config = JSON.parse(fs.readFileSync('./bot/json/config.json', 'utf8'));
+
+exports.run = async (string) => {
     const res = await snekfetch.get(`http://localhost:2333/loadtracks`)
         .query({ identifier: string })
-        .set("Authorization", password)
+        .set("Authorization", config.PASS1)
         .catch(err => {
             console.error(err);
             return null;

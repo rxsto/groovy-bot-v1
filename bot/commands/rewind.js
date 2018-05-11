@@ -48,6 +48,7 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
     const player = Client.playermanager.get(msg.guild.id);
     if (!player) return Embed.createEmbed(msg.channel, texts.audio_no_player, texts.error_title);
 
+    guilds[msg.guild.id].process = guilds[msg.guild.id].process + amount;
     var jumpto = (guilds[msg.guild.id].process - amount) * 1000;
 
     player.seek(jumpto);

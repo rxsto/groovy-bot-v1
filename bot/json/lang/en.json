@@ -157,5 +157,8 @@
     "leavecleanup_title": "Removed absent users songs",
     "shard_text1": "Shard-ID: ",
     "shard_text2": "Total Shards: ",
-    "shard_title": "Shard-Info"
+    "shard_title": "Shard-Info",
+    "not_whole_playlist": ":warning: It was not added the whole playlist, because it is longer than you are permitted to! If you want to be able to add longer playlists you should consider [donating](https://patreon.com/rxsto) -  it would help us a lot!",
+    "playlist_added_successfully_title": "Successfully added a playlist",
+    "playlist_added_successfully_text": ":white_check_mark: The playlist was added successfully!"
 }

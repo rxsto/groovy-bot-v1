@@ -7,7 +7,7 @@ module.exports.run = (Client, guilds, Embed, msg, args, info) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));    
 
-    if(!isPatron.run(Client, Embed, guilds, "Special", msg.author.id, msg)) {
+    if(!isPatron.run(Client, Embed, guilds, "Special", msg.author.id, msg, true)) {
         return;
     }
 
