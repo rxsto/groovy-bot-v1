@@ -137,6 +137,7 @@ module.exports.run = async (Client, Embed, msg, args) => {
 
         guild.check = setInterval(async function() {
             var users = 0;
+            if(msg.guild.me.voiceChannel == null) clearInterval(guild.check);
             var members = msg.guild.me.voiceChannel.members.array();
 
             await members.forEach(member => {

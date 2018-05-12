@@ -109,6 +109,8 @@ const init = async () => {
     });
 
     Client.on('message', async msg => {
+        if(msg.channel.type == "dm" || msg.channel.type == "group") return;
+        if(msg.guild == null) return;
         if(Client.servers.has(msg.guild.id)) {
             if(msg.content.startsWith(Client.servers.get(msg.guild.id).prefix) || msg.content.startsWith('<@'+Client.user.id+'>') || msg.content.startsWith('<@!'+Client.user.id+'>')) {
                 await commandHandler.run(Client, Embed, await msg);
