@@ -3,9 +3,11 @@ const fs = require("fs");
 const { RichEmbed } = require('discord.js');
 const Embed = require('../util/createEmbed.js');
 
-module.exports.run = (Client, guilds, Embed, msg, args) => {
+module.exports.run = (Client, Embed, msg, args) => {
 
-    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
+    var guild = Client.servers.get(msg.guild.id);
+
+    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
     var servers = Client.guilds.size;
     var members = Client.users.size;

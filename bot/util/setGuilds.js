@@ -3,7 +3,6 @@ const Discord = require("discord.js");
 module.exports.run = async (Client, guilds) => {
 
     var results = await Client.mysql.executeSelect(`SELECT * FROM guilds`);
-    var guilds_client = Client.guilds.array();
     var check = 1;
 
     results.forEach(row => {
@@ -24,8 +23,8 @@ module.exports.run = async (Client, guilds) => {
             queueLength = row.queueLength;
             defaultVolume = row.defaultVolume;
             language = row.language;
-    
-            guilds[row.id] = {
+
+            var guild = {
                 queue: [],
     
                 prefix: prefix,
@@ -37,9 +36,9 @@ module.exports.run = async (Client, guilds) => {
                 loopSong: false,
                 loopQueue: false,
     
-                djMode: false,
+                djMode: djMode,
                 djRole: djRole,
-                votes: 0,
+                votes: new Discord.Collection(),
     
                 announceSongs: announceSongs,
                 queueLength: queueLength,
@@ -48,8 +47,10 @@ module.exports.run = async (Client, guilds) => {
     
                 process: 0,
                 interval: 0,
+                check: null,
             }
 
+            Client.servers.set(row.id, guild);
             Client.log.info("[Init] Initialized guild " + row.name + " - Number " + check);
             check++;
         } else {

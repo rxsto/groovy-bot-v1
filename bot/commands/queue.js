@@ -1,63 +1,83 @@
 const fs = require("fs");
-const Discord = require("discord.js");
+const { RichEmbed, ReactionCollector } = require('discord.js');
 
-module.exports.run = async (Client, guilds, Embed, msg, args) => {
+const reactions = {
+    backwards: "⏪",
+    forwards: "⏩",
+}
+
+var collector;
+
+module.exports.run = async (Client, Embed, msg, args) => {
+
+    var guild = Client.servers.get(msg.guild.id);
     
-    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
+    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
-    if(guilds[msg.guild.id].queue.length == 0) return Embed.createEmbed(msg.channel, texts.queue_nothing, texts.error_title); 
+    if(guild.queue.length == 0) return Embed.createEmbed(msg.channel, texts.queue_nothing, texts.error_title);
 
     var page = 1;
-    var pages = Math.ceil(guilds[msg.guild.id].queue.length / 10);
+    var pages = Math.ceil(guild.queue.length / 10);
     var titles = [];
 
-    var loading_emb = new Discord.RichEmbed().setColor(msg.guild.me.displayColor).setFooter("Loading...").setDescription("");
+    var loading_emb = new RichEmbed().setColor(msg.guild.me.displayColor).setTitle("Queue").setFooter("Loading...").setDescription("");
 
-    guilds[msg.guild.id].queue.forEach(song => {
+    guild.queue.forEach(song => {
         titles.push(song.info.title);
     });
 
-    const embed = new Discord.RichEmbed()
+    const embed = new RichEmbed()
         .setColor(msg.guild.me.displayColor)
+        .setTitle("Queue")
         .setFooter(`Page ${page} of ${pages}`)
         .setDescription(generateContent());
+
+    var collector = null;
     
     msg.channel.send(embed).then(async message => {
-    
-        await message.react('⏪');
-        await message.react('⏩');
-        
-        const backwardsFilter = (reaction, user) => reaction.emoji.name === '⏪' && user.id === msg.author.id;
-        const forwardsFilter = (reaction, user) => reaction.emoji.name === '⏩' && user.id === msg.author.id; 
-        
-        const backwards = message.createReactionCollector(backwardsFilter, { time: 600000 });
-        const forwards = message.createReactionCollector(forwardsFilter, { time: 600000 });
-        
-        backwards.on('collect', async r => {
-            clearReaction(r);
-            if (page === 1) return;
-            page--;
-            await message.edit(loading_emb).then(msg_time => {
-                setTimeout(async  () => {
-                    await embed.setDescription(generateContent());
-                    await embed.setFooter(`Page ${page} of ${pages}`);
-                    await message.edit(embed);
-                }, 1000);
-            });
-        });
-        
-        forwards.on('collect', async r => {
-            clearReaction(r);
-            if (page === pages) return;
-            page++;
-            await message.edit(loading_emb).then(msg_time => {
-                setTimeout(async  () => {
-                    await embed.setDescription(generateContent());
-                    await embed.setFooter(`Page ${page} of ${pages}`);
-                    await message.edit(embed);
-                }, 1000);
-            });
-        });    
+        var cache_message = message;
+
+        await resetReactions(message);
+
+        const reaction_filter = (reaction, user) => reaction.emoji.name === reactions.backwards || reaction.emoji.name === reactions.forwards && msg.guild.members.get(user.id).voiceChannel === msg.guild.me.voiceChannel;
+
+        collector = new ReactionCollector(message, reaction_filter);
+
+        collector.on("collect", async r => {
+            switch(r.emoji.name) {
+                case reactions.backwards:
+
+                clearReaction(r);
+                if (page === 1) return;
+                page--;
+                await message.edit(loading_emb).then(msg_time => {
+                    setTimeout(async  () => {
+                        await embed.setDescription(generateContent());
+                        await embed.setFooter(`Page ${page} of ${pages}`);
+                        await message.edit(embed);
+                    }, 1000);
+                });
+                break;
+
+
+                case reactions.forwards:
+
+                clearReaction(r);
+                if (page === pages) return;
+                page++;
+                await message.edit(loading_emb).then(msg_time => {
+                    setTimeout(async  () => {
+                        await embed.setDescription(generateContent());
+                        await embed.setFooter(`Page ${page} of ${pages}`);
+                        await message.edit(embed);
+                    }, 1000);
+                });
+                break;
+
+                default:
+                return;
+            }
+        }); 
     });
 
     function clearReaction(reaction) {
@@ -75,8 +95,22 @@ module.exports.run = async (Client, guilds, Embed, msg, args) => {
     function generateContent() {
         var content = [];
         for (var i = page * 10 - 9; i <= page * 10; i++) {
-            if(titles[i - 1]) content.push(`:white_small_square: **${i}:** ` + titles[i - 1]);
+            if(titles[i - 1]) content.push(`:white_small_square: **${i}:** ` + titles[i - 1] + " " + guild.queue[i -1 ].info.member.user);
         }
         return content;
+    }
+
+    async function resetReactions(msg_to_reset) {
+        var message_to_delete;
+        msg_to_reset.channel.send(texts.np_setting_emojis).then((m) => {
+            message_to_delete = m;
+        });
+
+        await msg_to_reset.clearReactions();
+    
+        await msg_to_reset.react('⏪');
+        await msg_to_reset.react('⏩');
+
+        await message_to_delete.delete();
     }
 }

@@ -2,14 +2,16 @@ const fs = require("fs");
 
 const checkDJ = require("../util/checkDJ.js");
 
-module.exports.run = async (Client, guilds, Embed, msg, args) => {
+module.exports.run = async (Client, Embed, msg, args) => {
 
-    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
+    var guild = Client.servers.get(msg.guild.id);
+
+    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
     var vc = msg.member.voiceChannel;
 
-    if(checkDJ.run(Embed, guilds, msg) == false) {
-        Embed.createEmbed(msg.channel, texts.no_dj + "`" + guilds[msg.guild.id].djRole + "`!", texts.error_title);
+    if(checkDJ.run(Embed, guild, msg) == false) {
+        Embed.createEmbed(msg.channel, texts.no_dj + "`" + guild.djRole + "`!", texts.error_title);
         return;
     }
 

@@ -4,9 +4,11 @@ const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
 
 const { RichEmbed } = require('discord.js');
 
-module.exports.run = (Client, guilds, Embed, msg, args) => {
+module.exports.run = (Client, Embed, msg, args) => {
 
-    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
+    var guild = Client.servers.get(msg.guild.id);
+
+    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
     if(!args[0]) {
         var emb_stats =  {
@@ -15,37 +17,37 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
                 fields: [
                     {
                         name: ":exclamation: " + texts.prefix,
-                        value: "`" + guilds[msg.guild.id].prefix + "`",
+                        value: "`" + guild.prefix + "`",
                         inline: true
                     },
                     {
                         name: ":notes: " + texts.queue_length,
-                        value: "`" + guilds[msg.guild.id].queueLength + "`",
+                        value: "`" + guild.queueLength + "`",
                         inline: true
                     },
                     {
                         name: ":headphones: " + texts.dj_mode,
-                        value: "`" + guilds[msg.guild.id].djMode + "`",
+                        value: "`" + guild.djMode + "`",
                         inline: true
                     },
                     {
                         name: ":mega: " + texts.announce_songs,
-                        value: "`" + guilds[msg.guild.id].announceSongs + "`",
+                        value: "`" + guild.announceSongs + "`",
                         inline: true
                     },
                     {
                         name: ":loud_sound: " + texts.default_volume,
-                        value: "`" + guilds[msg.guild.id].defaultVolume + "`",
+                        value: "`" + guild.defaultVolume + "`",
                         inline: true
                     },
                     {
                         name: ":microphone: " + texts.dj_role,
-                        value: "`" + guilds[msg.guild.id].djRole + "`",
+                        value: "`" + guild.djRole + "`",
                         inline: true
                     },
                     {
                         name: texts.settings_help_internal_title,
-                        value: texts.settings_help_internal_text1 + guilds[msg.guild.id].prefix + texts.settings_help_internal_text2,
+                        value: texts.settings_help_internal_text1 + guild.prefix + texts.settings_help_internal_text2,
                         inline: false
                     }
                 ]    
@@ -54,44 +56,44 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
     } else if(args[0] && !args[1]) {
         switch(args[0]) {
             case "prefix":
-            Embed.createEmbed(msg.channel, ":exclamation: " + texts.prefix + ": `" + guilds[msg.guild.id].prefix + "`", texts.prefix);
+            Embed.createEmbed(msg.channel, ":exclamation: " + texts.prefix + ": `" + guild.prefix + "`", texts.prefix);
             break;
 
 
             case "length":
             case "queue-length":
-            Embed.createEmbed(msg.channel, ":notes: " + texts.queue_length + ": `" + guilds[msg.guild.id].queueLength + "`", texts.prefix);
+            Embed.createEmbed(msg.channel, ":notes: " + texts.queue_length + ": `" + guild.queueLength + "`", texts.prefix);
             break;
 
 
             case "mode":
             case "dj":
             case "dj-mode":
-            Embed.createEmbed(msg.channel, ":headphones: " + texts.dj_mode + ": `" + guilds[msg.guild.id].djMode + "`", texts.prefix);
+            Embed.createEmbed(msg.channel, ":headphones: " + texts.dj_mode + ": `" + guild.djMode + "`", texts.prefix);
             break;
 
 
             case "role":
             case "dj-role":
-            Embed.createEmbed(msg.channel, ":microphone: " + texts.dj_role + ": `" + guilds[msg.guild.id].djRole + "`", texts.prefix);
+            Embed.createEmbed(msg.channel, ":microphone: " + texts.dj_role + ": `" + guild.djRole + "`", texts.prefix);
             break;
 
 
             case "announce":
             case "announce-songs":
-            Embed.createEmbed(msg.channel, ":mega: " + texts.announce_songs + ": `" + guilds[msg.guild.id].announceSongs + "`", texts.prefix);
+            Embed.createEmbed(msg.channel, ":mega: " + texts.announce_songs + ": `" + guild.announceSongs + "`", texts.prefix);
             break;
 
 
             case "default":
             case "default-volume":
-            Embed.createEmbed(msg.channel, ":loud_sound: " + texts.default_volume + ": `" + guilds[msg.guild.id].defaultVolume + "`", texts.prefix);
+            Embed.createEmbed(msg.channel, ":loud_sound: " + texts.default_volume + ": `" + guild.defaultVolume + "`", texts.prefix);
             break;
 
 
             case "lang":
             case "language":
-            Embed.createEmbed(msg.channel, ":capital_abcd: " + texts.language + ": `" + guilds[msg.guild.id].language + "`", texts.prefix);
+            Embed.createEmbed(msg.channel, ":capital_abcd: " + texts.language + ": `" + guild.language + "`", texts.prefix);
             break;
 
 
@@ -111,7 +113,7 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
                 return;
             }
             Client.mysql.executeQuery(`UPDATE guilds SET prefix = '${args[1]}' WHERE id = '${msg.guild.id}'`);
-            guilds[msg.guild.id].prefix = args[1];
+            guild.prefix = args[1];
             Embed.createEmbed(msg.channel, texts.settings_prefix_success + " `" + args[1] + "`", texts.settings_success);
             break;
 
@@ -126,7 +128,7 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
                 return;
             }
             Client.mysql.executeQuery(`UPDATE guilds SET queueLength = '${args[1]}' WHERE id = '${msg.guild.id}'`);
-            guilds[msg.guild.id].queueLength = args[1];
+            guild.queueLength = args[1];
             Embed.createEmbed(msg.channel, texts.settings_queue_length_success + " `" + args[1] + "`", texts.settings_success);
             break;
 
@@ -136,11 +138,11 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
             case "dj-mode":
             if(args[1] == "true") {
                 Client.mysql.executeQuery(`UPDATE guilds SET djMode = '1' WHERE id = '${msg.guild.id}'`);
-                guilds[msg.guild.id].djMode = true;
+                guild.djMode = true;
                 Embed.createEmbed(msg.channel, texts.settings_dj_mode_success + " `" + args[1] + "`", texts.settings_success);
             } else if(args[1] == "false") {
                 Client.mysql.executeQuery(`UPDATE guilds SET djMode = '0' WHERE id = '${msg.guild.id}'`);
-                guilds[msg.guild.id].djMode = false;
+                guild.djMode = false;
                 Embed.createEmbed(msg.channel, texts.settings_dj_mode_success + " `" + args[1] + "`", texts.settings_success);
             } else {
                 return;
@@ -155,7 +157,7 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
                 return;
             }
             Client.mysql.executeQuery(`UPDATE guilds SET djRole = '${args[1]}' WHERE id = '${msg.guild.id}'`);
-            guilds[msg.guild.id].djRole = args[1];
+            guild.djRole = args[1];
             Embed.createEmbed(msg.channel, texts.settings_role_success + " `" + args[1] + "`", texts.settings_success);
             break;
 
@@ -164,11 +166,11 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
             case "announce-songs":
             if(args[1] == "true") {
                 Client.mysql.executeQuery(`UPDATE guilds SET announceSongs = '1' WHERE id = '${msg.guild.id}'`);
-                guilds[msg.guild.id].announceSongs = true;
+                guild.announceSongs = true;
                 Embed.createEmbed(msg.channel, texts.settings_announce_success + " `" + args[1] + "`", texts.settings_success);
             } else if(args[1] == "false") {
                 Client.mysql.executeQuery(`UPDATE guilds SET announceSongs = '0' WHERE id = '${msg.guild.id}'`);
-                guilds[msg.guild.id].announceSongs = false;
+                guild.announceSongs = false;
                 Embed.createEmbed(msg.channel, texts.settings_announce_success + " `" + args[1] + "`", texts.settings_success);
             } else {
                 return;
@@ -185,7 +187,7 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
                 return;
             }
             Client.mysql.executeQuery(`UPDATE guilds SET defaultVolume = '${args[1]}' WHERE id = '${msg.guild.id}'`);
-            guilds[msg.guild.id].defaultVolume = args[1];
+            guild.defaultVolume = args[1];
             Embed.createEmbed(msg.channel, texts.settings_volume_success + " `" + args[1] + "`", texts.settings_success);
             break;
 
@@ -195,7 +197,7 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
             return;
             if(args[1] == "en" || args[1] == "de" || args[1] == "fr" || args[1] == "es") {
                 Client.mysql.executeQuery(`UPDATE guilds SET language = '${args[1]}' WHERE id = '${msg.guild.id}'`);
-                guilds[msg.guild.id].language = args[1];
+                guild.language = args[1];
                 Embed.createEmbed(msg.channel, texts.settings_volume_success + " `" + args[1] + "`", texts.settings_success);
             } else {
                 Embed.createEmbed(msg.channel, texts.not_a_language, texts.error_title);

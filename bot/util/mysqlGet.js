@@ -1,8 +1,9 @@
+const Discord = require("discord.js");
 const fs = require("fs");
 
 const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
 
-module.exports.run = (Client, guilds, id, color, results) => {
+module.exports.run = (Client, id, color, results) => {
     var name;
     var prefix;
     var djMode;
@@ -31,30 +32,31 @@ module.exports.run = (Client, guilds, id, color, results) => {
         language = row.language;
     });
 
-    if(!guilds[id]) {
-        guilds[id] = {
-            queue: [],
+    var guild = {
+        queue: [],
 
-            prefix: prefix,
+        prefix: prefix,
 
-            isPlaying: false,
-            isPaused: false,
-            isShuffling: false,
+        isPlaying: false,
+        isPaused: false,
+        isShuffling: false,
 
-            loopSong: false,
-            loopQueue: false,
+        loopSong: false,
+        loopQueue: false,
 
-            djMode: false,
-            djRole: djRole,
-            votes: 0,
+        djMode: djMode,
+        djRole: djRole,
+        votes: new Discord.Collection(),
 
-            announceSongs: announceSongs,
-            queueLength: queueLength,
-            defaultVolume: defaultVolume,
-            language: language,
+        announceSongs: announceSongs,
+        queueLength: queueLength,
+        defaultVolume: defaultVolume,
+        language: language,
 
-            process: 0,
-            interval: 0,
-        }
+        process: 0,
+        interval: 0,
+        check: null,
     }
+
+    Client.servers.set(id, guild);
 }

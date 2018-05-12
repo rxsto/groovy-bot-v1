@@ -5,13 +5,15 @@ const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
 
 const dbl = new DBL(config.LIST_ORG);
 
-module.exports.run = (Client, guilds, Embed, msg, args) => {
+module.exports.run = (Client, Embed, msg, args) => {
 
-    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
+    var guild = Client.servers.get(msg.guild.id);
+
+    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
     switch(args.length) {
         case 0:
-        Embed.createEmbed(msg.channel, texts.vote_text1 + guilds[msg.guild.id].prefix + texts.vote_text2, texts.vote_title);
+        Embed.createEmbed(msg.channel, texts.vote_text1 + guild.prefix + texts.vote_text2, texts.vote_title);
         break;
 
         case 1:

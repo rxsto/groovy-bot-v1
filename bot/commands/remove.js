@@ -2,12 +2,14 @@ const fs = require("fs");
 
 const checkDJ = require("../util/checkDJ.js");
 
-module.exports.run = (Client, guilds, Embed, msg, args) => {
+module.exports.run = (Client, Embed, msg, args) => {
 
-    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
+    var guild = Client.servers.get(msg.guild.id);
 
-    if(checkDJ.run(Embed, guilds, msg) == false) {
-        Embed.createEmbed(msg.channel, texts.no_dj + "`" + guilds[msg.guild.id].djRole + "`!", texts.error_title);
+    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
+
+    if(checkDJ.run(Embed, guild, msg) == false) {
+        Embed.createEmbed(msg.channel, texts.no_dj + "`" + guild.djRole + "`!", texts.error_title);
         return;
     }
     
@@ -19,8 +21,8 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
         if(isNaN(args[0])) return Embed.createEmbed(msg.channel, texts.removed_no_number, texts.error_title);
         if(args.join(" ") == 1) return Embed.createEmbed(msg.channel, texts.removed_first_number, texts.error_title);
         var pos = args - 1;
-        if(guilds[msg.guild.id].queue[pos]) {
-            guilds[msg.guild.id].queue.splice(pos, 1);
+        if(guild.queue[pos]) {
+            guild.queue.splice(pos, 1);
             Embed.createEmbed(msg.channel, texts.removed_successfully + args + ".", texts.removed_title);
         } else {
             Embed.createEmbed(msg.channel, texts.removed_no_song, texts.error_title);

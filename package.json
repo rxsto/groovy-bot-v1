@@ -23,11 +23,11 @@
     "discord.js": "^11.3.2",
     "discord.js-lavalink": "2.0.1",
     "libsodium": "^0.7.3",
-    "libsodium-wrappers": "^0.7.3",
     "long": "^4.0.0",
     "snekfetch": "^3.6.4",
     "superagent": "^3.8.3",
     "sync-mysql": "^3.0.1",
+    "utf-8-validate": "^4.0.2",
     "uws": "^9.148.0"
   }
 }

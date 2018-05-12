@@ -2,25 +2,27 @@ const fs = require("fs");
 
 const checkDJ = require("../util/checkDJ.js");
 
-module.exports.run = (Client, guilds, Embed, msg, args, info) => {
+module.exports.run = async (Client, Embed, msg, args, info) => {
 
-    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
+    var guild = Client.servers.get(msg.guild.id);
 
-    if(checkDJ.run(Embed, guilds, msg) == false) {
-        Embed.createEmbed(msg.channel, texts.no_dj + "`" + guilds[msg.guild.id].djRole + "`!", texts.error_title);
+    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
+
+    if(checkDJ.run(Embed, guild, msg) == false) {
+        Embed.createEmbed(msg.channel, texts.no_dj + "`" + guild.djRole + "`!", texts.error_title);
         return;
     }
     
     if(!msg.member.voiceChannel) return;
 
     if(msg.member.voiceChannel == msg.guild.me.voiceChannel) {
-        const player = Client.playermanager.get(msg.guild.id);
+        const player = await Client.playermanager.get(msg.guild.id);
         if (!player) return Embed.createEmbed(msg.channel, texts.audio_no_player, texts.error_title);
-        guilds[msg.guild.id].queue = [];
-        guilds[msg.guild.id].votes = 0;
-        guilds[msg.guild.id].process = 0;
-        clearInterval(guilds[msg.guild.id].interval);
-        player.stop();
+        guild.queue = [];
+        await guild.votes.clear();
+        guild.process = 0;
+        clearInterval(guild.interval);
+        await player.stop();
         if(info) {
             Embed.createEmbed(msg.channel, texts.stop_text, texts.stop_title);
         }

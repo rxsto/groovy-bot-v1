@@ -1,11 +1,12 @@
+const Discord = require("discord.js");
 const fs = require("fs");
 
 const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
 
-module.exports.run = (Client, guilds, guild, prefix, color) => {
+module.exports.run = (Client, guild, prefix, color) => {
 
-    if(!guilds[guild.id]) {
-        guilds[guild.id] = {
+    if(!Client.guilds.has(guild.id)) {
+        var set_guild = {
             queue: [],
 
             prefix: config.PREFIX,
@@ -19,7 +20,7 @@ module.exports.run = (Client, guilds, guild, prefix, color) => {
 
             djMode: false,
             djRole: "DJ",
-            votes: 0,
+            votes: new Discord.Collection(),
 
             announceSongs: true,
             queueLength: 25,
@@ -28,17 +29,15 @@ module.exports.run = (Client, guilds, guild, prefix, color) => {
 
             process: 0,
             interval: 0,
+            check: null,
         }
+
+        Client.servers.set(guild.id, set_guild);
     }
 
-    if(!guild) return;
-    if(!guild.id) return;
-    if(!guild.name) return;
+    var name = guild.name.replace("'", " ");
 
-    var name = guild.name;
-    var push_name = name.replace("'", " ");
-
-    var sql = `INSERT INTO guilds (id, name, prefix, djMode, djRole, announceSongs, queueLength, defaultVolume, language) VALUES ('${guild.id}', '${push_name}', '${config.PREFIX}', '0', 'DJ', '1', '50', '100', 'en')`;
+    var sql = `INSERT INTO guilds (id, name, prefix, djMode, djRole, announceSongs, queueLength, defaultVolume, language) VALUES ('${guild.id}', '${name}', '${config.PREFIX}', '0', 'DJ', '1', '50', '100', 'en')`;
     
     try {    
         Client.mysql.executeQuery(sql);

@@ -1,22 +1,27 @@
+const Discord = require("discord.js");
 const fs = require("fs");
 
 const checkDJ = require("../util/checkDJ.js");
 
-module.exports.run = (Client, guilds, Embed, msg, args, info) => {
+module.exports.run = (Client, Embed, msg, args, info) => {
 
-    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
+    var guild = Client.servers.get(msg.guild.id);
 
-    if(checkDJ.run(Embed, guilds, msg) == false) {
-        Embed.createEmbed(msg.channel, texts.no_dj + "`" + guilds[msg.guild.id].djRole + "`!", texts.error_title);
+    var seen = new Discord.Collection();
+
+    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
+
+    if(checkDJ.run(Embed, guild, msg) == false) {
+        Embed.createEmbed(msg.channel, texts.no_dj + "`" + guild.djRole + "`!", texts.error_title);
         return;
     }
 
-    for (var song = 0; song < guilds[msg.guild.id].queue.length; song++) {
-        var member_to_test = guilds[msg.guild.id].queue[song].info.member;
-        if(member_to_test.voiceChannel != msg.guild.me.voiceChannel) {
-            guilds[msg.guild.id].queue.splice(check, 1);
-        }
-    }
+    guild.queue.forEach(song => {
+        if(song.track == guild.queue[0].track) return seen.set(song.track, song);
+        if(msg.guild.me.voiceChannel.members.has(song.info.member.user.id)) seen.set(song.track, song);
+    });
+
+    guild.queue = seen.array();
 
     Embed.createEmbed(msg.channel, texts.leavecleanup_text, texts.leavecleanup_title);
 }

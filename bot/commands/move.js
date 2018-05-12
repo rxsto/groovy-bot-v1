@@ -2,14 +2,15 @@ var fs;
 
 const checkDJ = require("../util/checkDJ.js");
 
-module.exports.run = (Client, guilds, Embed, msg, args) => {
+module.exports.run = (Client, Embed, msg, args) => {
 
-    fs = require('fs');
+    var guild = Client.servers.get(msg.guild.id);    
 
-    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
+    fs = require("fs");
+    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
-    if(checkDJ.run(Embed, guilds, msg) == false) {
-        Embed.createEmbed(msg.channel, texts.no_dj + "`" + guilds[msg.guild.id].djRole + "`!", texts.error_title);
+    if(checkDJ.run(Embed, guild, msg) == false) {
+        Embed.createEmbed(msg.channel, texts.no_dj + "`" + guild.djRole + "`!", texts.error_title);
         return;
     }
 
@@ -19,7 +20,7 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
         Embed.createEmbed(msg.channel, texts.to_many_arguments, texts.error_title);
     } else {
         var first_song = args[0], second_song = args[1];
-        var len = guilds[msg.guild.id].queue.length;
+        var len = guild.queue.length;
 
         if(first_song > len || second_song > len || first_song < 1 || second_song < 1) {
             Embed.createEmbed(msg.channel, texts.check_arguments, texts.error_title);
@@ -35,11 +36,11 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
                     return;
                 }
                 
-                var first_id = guilds[msg.guild.id].queue[fs];
+                var first_id = guild.queue[fs];
 
-                guilds[msg.guild.id].queue.splice(fs, 1);
+                guild.queue.splice(fs, 1);
 
-                var len_after = guilds[msg.guild.id].queue.length;
+                var len_after = guild.queue.length;
 
                 var loop_number = len_after - ss + 1;
 
@@ -48,7 +49,7 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
 
                 do {
 
-                    guilds[msg.guild.id].queue[ind] = guilds[msg.guild.id].queue[set];
+                    guild.queue[ind] = guild.queue[set];
 
                     ind--;
                     set--;
@@ -57,11 +58,11 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
 
                 } while(loop_number > 0);
 
-                guilds[msg.guild.id].queue[ss] = first_id;
+                guild.queue[ss] = first_id;
 
                 var after_splice = len_after + 1;
 
-                guilds[msg.guild.id].queue.splice(after_splice, 1);
+                guild.queue.splice(after_splice, 1);
 
                 Embed.createEmbed(msg.channel, texts.moved_text, texts.moved_title);
             }

@@ -19,39 +19,42 @@ var reactions = {
     skip: "⏭",
     loopqueue: "🔁",
     loop: "🔂",
-    shuffle: "🔀"
+    shuffle: "🔀",
 }
 
-module.exports.run = (Client, guilds, Embed, msg, args) => {
+module.exports.run = (Client, Embed, msg, args) => {
 
-    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guilds[msg.guild.id].language + ".json", 'utf8'));
+    var guild = Client.servers.get(msg.guild.id);    
 
-    if(!guilds[msg.guild.id].queue[0]) {
+    texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
+
+    if(!guild.queue[0]) {
         Embed.createEmbed(msg.channel, texts.np_nothing, texts.np_title);
         return;
     }
 
-    var pr = guilds[msg.guild.id].process;
-    var ln = (guilds[msg.guild.id].queue[0].info.length / 1000);
+    if(!msg.guild.me.permissionsIn(msg.channel).has("ADD_REACTIONS")) return;
+
+    var pr = guild.process;
+    var ln = (guild.queue[0].info.length / 1000);
     var go = (pr / ln) * 10;
 
     var percentage = Math.floor(go);
 
-
     var stopped_embed = new RichEmbed();
-
     stopped_embed.setDescription(texts.np_nothing);
     stopped_embed.setTitle(texts.np_title);
     stopped_embed.setColor(msg.guild.me.highestRole.color);
 
     var playing_embed = new RichEmbed();
-
-    playing_embed.setDescription(((!guilds[msg.guild.id].isPaused ? ":arrow_forward: " : ":pause_button: ") + getpercentage(percentage) + " `[" + new Date(guilds[msg.guild.id].process * 1000).toISOString().substr(11, 8) + "/" + new Date(guilds[msg.guild.id].queue[0].info.length).toISOString().substr(11, 8) + "]`"  + (guilds[msg.guild.id].loopSong ? " :repeat_one:" : "") + (guilds[msg.guild.id].loopQueue ? " :repeat:" : "") + (guilds[msg.guild.id].isShuffling ? " :twisted_rightwards_arrows:" : "") + " :loud_sound:"));
-    playing_embed.setTitle(guilds[msg.guild.id].queue[0].info.title);
+    playing_embed.setDescription(((!guild.isPaused ? ":arrow_forward: " : ":pause_button: ") + getpercentage(percentage) + " `[" + new Date(guild.process * 1000).toISOString().substr(11, 8) + "/" + new Date(guild.queue[0].info.length).toISOString().substr(11, 8) + "]`"  + (guild.loopSong ? " :repeat_one:" : "") + (guild.loopQueue ? " :repeat:" : "") + (guild.isShuffling ? " :twisted_rightwards_arrows:" : "") + " :loud_sound:"));
+    playing_embed.setTitle(guild.queue[0].info.title);
     playing_embed.setColor(msg.guild.me.highestRole.color);
 
+    var collector = null;
 
     msg.channel.send('', playing_embed).then(async (message) => {
+        var cache_message = message;
         if(interval) { try { clearInterval(interval); } catch (error) { console.log(error); } }
 
         const reaction_filter = (reaction) => reaction.emoji.name === reactions.playpause || reaction.emoji.name === reactions.stop || reaction.emoji.name === reactions.skip || reaction.emoji.name === reactions.loopqueue || reaction.emoji.name === reactions.loop || reaction.emoji.name === reactions.shuffle;
@@ -78,31 +81,31 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
 
             switch(reaction.emoji.name) {
                 case reactions.playpause:
-                    if(guilds[msg.guild.id].isPaused) {
-                        fileResume.run(Client, guilds, Embed, msg, args, false);
+                    if(guild.isPaused) {
+                        fileResume.run(Client, Embed, msg, args, false);
                     } else {
-                        filePause.run(Client, guilds, Embed, msg, args, false);
+                        filePause.run(Client, Embed, msg, args, false);
                     }
                     break;
 
                 case reactions.stop:
-                    fileStop.run(Client, guilds, Embed, msg, args, false);
+                    fileStop.run(Client, Embed, msg, args, false);
                     break;
 
                 case reactions.skip:
-                    fileSkip.run(Client, guilds, Embed, msg, args, false);
+                    fileSkip.run(Client, Embed, msg, args, false);
                     break;                            
                 
                 case reactions.loopqueue:
-                    fileLoopqueue.run(Client, guilds, Embed, msg, args, false);
+                    fileLoopqueue.run(Client, Embed, msg, args, false);
                     break;
                 
                 case reactions.loop:
-                    fileLoop.run(Client, guilds, Embed, msg, args, false);
+                    fileLoop.run(Client, Embed, msg, args, false);
                     break;
                 
                 case reactions.shuffle:
-                    fileShuffle.run(Client, guilds, Embed, msg, args, false);
+                    fileShuffle.run(Client, Embed, msg, args, false);
                     break;
 
                 default:
@@ -113,20 +116,20 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
         });
 
         interval = setInterval( () => {
-            if(!guilds[msg.guild.id].queue[0]) {
+            if(!guild.queue[0]) {
                 clearInterval(interval);
                 message.edit("", stopped_embed);
                 message.clearReactions();
             } else {
-                var pr = guilds[msg.guild.id].process;
-                var ln = (guilds[msg.guild.id].queue[0].info.length / 1000);
+                var pr = guild.process;
+                var ln = (guild.queue[0].info.length / 1000);
                 var go = (pr / ln) * 10;
                 var percentage = Math.floor(go);
 
                 var second_embed = new RichEmbed();
             
-                second_embed.setDescription(((!guilds[msg.guild.id].isPaused ? ":arrow_forward: " : ":pause_button: ") + getpercentage(percentage) + " `[" + new Date(guilds[msg.guild.id].process * 1000).toISOString().substr(11, 8) + "/" + new Date(guilds[msg.guild.id].queue[0].info.length).toISOString().substr(11, 8) + "]`"  + (guilds[msg.guild.id].loopSong ? " :repeat_one:" : "") + (guilds[msg.guild.id].loopQueue ? " :repeat:" : "") + (guilds[msg.guild.id].isShuffling ? " :twisted_rightwards_arrows:" : "") + " :loud_sound:"));
-                second_embed.setTitle(guilds[msg.guild.id].queue[0].info.title);
+                second_embed.setDescription(((!guild.isPaused ? ":arrow_forward: " : ":pause_button: ") + getpercentage(percentage) + " `[" + new Date(guild.process * 1000).toISOString().substr(11, 8) + "/" + new Date(guild.queue[0].info.length).toISOString().substr(11, 8) + "]`"  + (guild.loopSong ? " :repeat_one:" : "") + (guild.loopQueue ? " :repeat:" : "") + (guild.isShuffling ? " :twisted_rightwards_arrows:" : "") + " :loud_sound:"));
+                second_embed.setTitle(guild.queue[0].info.title);
                 second_embed.setColor(msg.guild.me.highestRole.color);
 
                 message.edit("", second_embed);
@@ -139,7 +142,6 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
             user_array = users.array();
 
             user_array.forEach(user => {
-                console.log(user.id + " + " + msg.guild.me.user.id);
                 if(user.id == msg.guild.me.user.id) {
                     return true;
                 } else {
@@ -204,5 +206,3 @@ module.exports.run = (Client, guilds, Embed, msg, args) => {
         }
     }
 }
-
-//Embed.createEmbed(msg.channel, ((!guilds[msg.guild.id].isPaused ? ":arrow_forward: " : ":pause_button: ") + getpercentage(percentage) + " `[" + new Date(guilds[msg.guild.id].process * 1000).toISOString().substr(11, 8) + "/" + new Date(guilds[msg.guild.id].queue[0].info.length).toISOString().substr(11, 8) + "]`"  + (guilds[msg.guild.id].loopSong ? " :repeat_one:" : "") + (guilds[msg.guild.id].loopQueue ? " :repeat:" : "") + (guilds[msg.guild.id].isShuffling ? " :twisted_rightwards_arrows:" : "") + " :loud_sound:"), guilds[msg.guild.id].queue[0].info.title);
