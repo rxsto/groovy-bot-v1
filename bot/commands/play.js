@@ -7,7 +7,7 @@ const isPatron = require("../util/isPatron.js");
 
 const config = JSON.parse(fs.readFileSync('./bot/json/config.json', 'utf8'));
 
-module.exports.run = async (Client, Embed, msg, args) => {
+module.exports.run = async (Client, Embed, msg, args, action) => {
 
     var guild = Client.servers.get(msg.guild.id);
 
@@ -20,10 +20,10 @@ module.exports.run = async (Client, Embed, msg, args) => {
 
     if(guild.isPaused) {
         const player = Client.playermanager.get(msg.guild.id);
-        if (!player) return Embed.createEmbed(msg.channel, texts.audio_no_player, texts.error_title);
+        if (!player) return;
         await player.pause(false);
         guild.isPaused = false;
-        return Embed.createEmbed(msg.channel, texts.resumed_text, texts.resumed_title);        
+        return Embed.createEmbed(msg.channel, texts.resumed_text, texts.resumed_title);
     }
     
     if (!args[0]) return Embed.createEmbed(msg.channel, texts.no_arguments, texts.error_title);
@@ -137,7 +137,7 @@ module.exports.run = async (Client, Embed, msg, args) => {
 
         guild.check = setInterval(async function() {
             var users = 0;
-            if(msg.guild.me.voiceChannel == null) clearInterval(guild.check);
+            if(msg.guild.me.voiceChannel == null) return clearInterval(guild.check);
             var members = msg.guild.me.voiceChannel.members.array();
 
             await members.forEach(member => {
@@ -170,7 +170,7 @@ module.exports.run = async (Client, Embed, msg, args) => {
             await clearInterval(guild.interval);
             await clearInterval(guild.check);
 
-            await guild.votes.clear();
+            guild.votes.clear();
             guild.process = 0;
 
             if(!guild.queue[0]) {
@@ -233,6 +233,8 @@ module.exports.run = async (Client, Embed, msg, args) => {
         await clearInterval(guild.interval);
         guild.queue = [];
         await guild.votes.clear();
+        guild.isPaused = false;
+        guild.isPlaying = false;
         guild.process = 0;
     }
 

@@ -14,7 +14,6 @@ module.exports.run = (Client, guild, prefix, color) => {
             isPlaying: false,
             isPaused: false,
             isShuffling: false,
-
             loopSong: false,
             loopQueue: false,
 

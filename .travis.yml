@@ -12,3 +12,6 @@ jobs:
 cache:
   directories:
 - node_modules
+ignore:
+  - *.md
+  - bot/json/config.json

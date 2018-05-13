@@ -15,6 +15,8 @@ module.exports.list = {
     // MUSIC
 
     play: "play.js", p: "play.js", add: "play.js",
+    //playskip: "playskip.js",
+    //playtop: "playtop.js",
     join: "join.js",
     pause: "pause.js",
     resume: "resume.js", r: "resume.js",

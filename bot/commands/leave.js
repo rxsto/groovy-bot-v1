@@ -22,6 +22,8 @@ module.exports.run = async (Client, Embed, msg, args) => {
         guild.queue = [];
         guild.votes.clear();
         guild.process = 0;
+        guild.isPaused = false;
+        guild.isPlaying = false;
         Embed.createEmbed(msg.channel, texts.left_text, texts.left_title);
     } else {
         Embed.createEmbed(msg.channel, texts.same_channel, texts.error_title);

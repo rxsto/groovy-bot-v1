@@ -40,7 +40,6 @@ module.exports.run = (Client, id, color, results) => {
         isPlaying: false,
         isPaused: false,
         isShuffling: false,
-
         loopSong: false,
         loopQueue: false,
 

@@ -117,8 +117,7 @@ const init = async () => {
             }
         } else {
             await checkGuild.run(Client, msg.guild, config.PREFIX, msg.guild.me.displayColor);
-        }
-        
+        }        
     });
 };
 

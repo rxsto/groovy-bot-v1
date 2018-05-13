@@ -21,6 +21,8 @@ module.exports.run = async (Client, Embed, msg, args, info) => {
         guild.queue = [];
         await guild.votes.clear();
         guild.process = 0;
+        guild.isPaused = false;
+        guild.isPlaying = false;
         clearInterval(guild.interval);
         await player.stop();
         if(info) {
