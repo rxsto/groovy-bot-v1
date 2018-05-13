@@ -1,9 +1,11 @@
-# Groovy
+<img src="https://rxsto.github.io/Groovy/images/githubbg.png" href="https://rxsto.github.io/Groovy/" />
 
 [![Uptime Robot status](https://img.shields.io/uptimerobot/status/m780420889-1994e45ecaac05d5792e25b5.svg?longCache=true&style=flat-square)](https://stats.uptimerobot.com/780420889)
 [![Uptime Robot ratio](https://img.shields.io/uptimerobot/ratio/m780420889-1994e45ecaac05d5792e25b5.svg?longCache=true&style=flat-square)](https://stats.uptimerobot.com/780420889)
 [![Build Status](https://david-dm.org/rxsto/Groovy.svg?longCache=true&style=flat-square)](https://david-dm.org/rxsto/Groovy)
 [![Discord](https://discordapp.com/api/guilds/403882830225997825/widget.png)](https://discord.gg/5s5TsW2)
+
+---
 
 ## About
 
@@ -13,6 +15,8 @@ Groovy is a feature-rich [Discord](https://discordapp.com) Bot. His main-feature
 
 This is quite easy, just invite the bot [here](https://rxsto.github.io/Groovy/invite/) and start using it with [these commands](https://rxsto.github.io/Groovy/commands.html).
 If there is any problem or question check out Groovys [official server](https://rxsto.github.io/Groovy/support/).
+
+---
 
 ## Commands
 
@@ -151,23 +155,29 @@ If there is any problem or question check out Groovys [official server](https://
     </tbody>
 </table>
 
+---
+
 ## Dependencies
 
-bluebird: "^3.5.1",
-bufferutil: "^3.0.5",
-dblapi.js: "^2.0.1",
-discord.js: "^11.3.2",
-discord.js-lavalink: "2.0.1",
-libsodium: "^0.7.3",
-long: "^4.0.0",
-snekfetch: "^3.6.4",
-superagent: "^3.8.3",
-sync-mysql: "^3.0.1",
-utf-8-validate: "^4.0.2",
-uws: "^9.148.0"
+bluebird: ^3.5.1<br />
+bufferutil: ^3.0.5<br />
+dblapi.js: ^2.0.1<br />
+discord.js: ^11.3.2<br />
+discord.js-lavalink: 2.0.1<br />
+libsodium: ^0.7.3<br />
+long: ^4.0.0<br />
+snekfetch: ^3.6.4<br />
+superagent: ^3.8.3<br />
+sync-mysql: ^3.0.1<br />
+utf-8-validate: ^4.0.2<br />
+uws: ^9.148.0
+
+---
 
 ## Want to support?
 
 We'd love to hear about that! You are able to support with money by donating on [patreon](https://patreon.com/rxsto), that would help us a lot, but you are able to support without money by voting for Groovy [here](https://rxsto.github.io/Groovy/vote)! Thank you so much <3
+
+---
 
 ## [License](LICENSE)
