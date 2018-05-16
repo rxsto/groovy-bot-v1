@@ -1,7 +1,7 @@
 <img src="https://rxsto.github.io/Groovy/images/githubbg.png" href="https://rxsto.github.io/Groovy/" />
 
-[![Uptime Robot status](https://img.shields.io/uptimerobot/status/m780420889-1994e45ecaac05d5792e25b5.svg?longCache=true&style=flat-square)](https://stats.uptimerobot.com/780420889)
-[![Uptime Robot ratio](https://img.shields.io/uptimerobot/ratio/m780420889-1994e45ecaac05d5792e25b5.svg?longCache=true&style=flat-square)](https://stats.uptimerobot.com/780420889)
+[![Uptime Robot status](https://img.shields.io/uptimerobot/status/m780420889-1994e45ecaac05d5792e25b5.svg?longCache=true&style=flat-square)](https://stats.uptimerobot.com/WQmEMS4YY)
+[![Uptime Robot ratio](https://img.shields.io/uptimerobot/ratio/m780420889-1994e45ecaac05d5792e25b5.svg?longCache=true&style=flat-square)](https://stats.uptimerobot.com/WQmEMS4YY)
 [![Build Status](https://david-dm.org/rxsto/Groovy.svg?longCache=true&style=flat-square)](https://david-dm.org/rxsto/Groovy)
 [![Discord](https://discordapp.com/api/guilds/403882830225997825/widget.png)](https://discord.gg/5s5TsW2)
 
