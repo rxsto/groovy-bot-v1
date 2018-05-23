@@ -16,8 +16,12 @@ module.exports.run = async (Client, Embed, msg, args, action) => {
     var vc = msg.member.voiceChannel;
     var search = args.join(" ");
 
-    if (!vc) return Embed.createEmbed(msg.channel, texts.no_channel, texts.error_title);
-
+    if (!vc) return Embed.createEmbed(msg.channel, texts.no_channel, texts.error_title);    
+    if (!args[0]) return Embed.createEmbed(msg.channel, texts.no_arguments, texts.error_title);
+    if (!vc.joinable) return Embed.createEmbed(msg.channel, texts.no_perms_connect, texts.error_title);
+    if (!vc.speakable) return Embed.createEmbed(msg.channel, texts.no_perms_speak, texts.error_title);
+    if(!msg.guild.me.permissionsIn(msg.channel).has("SEND_MESSAGES")) return;
+    
     if(guild.isPaused) {
         const player = Client.playermanager.get(msg.guild.id);
         if (!player) return;
@@ -25,12 +29,6 @@ module.exports.run = async (Client, Embed, msg, args, action) => {
         guild.isPaused = false;
         return Embed.createEmbed(msg.channel, texts.resumed_text, texts.resumed_title);
     }
-    
-    if (!args[0]) return Embed.createEmbed(msg.channel, texts.no_arguments, texts.error_title);
-
-    if (!vc.joinable) return Embed.createEmbed(msg.channel, texts.no_perms_connect, texts.error_title);
-    if (!vc.speakable) return Embed.createEmbed(msg.channel, texts.no_perms_speak, texts.error_title);
-    if(!msg.guild.me.permissionsIn(msg.channel).has("SEND_MESSAGES")) return;
 
     var url;
     var track;
@@ -51,10 +49,10 @@ module.exports.run = async (Client, Embed, msg, args, action) => {
             if (!body.items[0]) return Embed.createEmbed(msg.channel, texts.error_nothing_found, texts.error_title);
             const songData = await getSong.run(args.join(" "));
             if (!songData) return Embed.createEmbed(msg.channel, texts.error_nothing_found, texts.error_title);
-            var limit = 25;
-            if(isPatron.run(Client, Embed, guild, "Donator", msg.author.id, msg) == true) limit = 50;
-            if(isPatron.run(Client, Embed, guild, "Super Donator", msg.author.id, msg) == true) limit = 100;
-            if(isPatron.run(Client, Embed, guild, "Special", msg.author.id, msg) == true) limit = 150;
+            var limit = 50;
+            if(isPatron.run(Client, Embed, guild, "Donator", msg.author.id, msg) == true) limit = 100;
+            if(isPatron.run(Client, Embed, guild, "Super Donator", msg.author.id, msg) == true) limit = 200;
+            if(isPatron.run(Client, Embed, guild, "Special", msg.author.id, msg) == true) limit = 350;
             if(isPatron.run(Client, Embed, guild, "Insane", msg.author.id, msg) == true) limit = 1000;
 
             if(songData.length >= limit) Embed.createEmbed(msg.channel, texts.not_whole_playlist, texts.error_title);
@@ -137,7 +135,7 @@ module.exports.run = async (Client, Embed, msg, args, action) => {
 
         guild.check = setInterval(async function() {
             var users = 0;
-            if(msg.guild.me.voiceChannel == null) return clearInterval(guild.check);
+            if(!msg.guild.me.voiceChannel) return clearInterval(guild.check);
             var members = msg.guild.me.voiceChannel.members.array();
 
             await members.forEach(member => {
@@ -146,7 +144,7 @@ module.exports.run = async (Client, Embed, msg, args, action) => {
 
             if(users == 0) {
                 if(guild.isPaused) {
-                    Client.playermanager.leave(msg.guild.id);
+                    if(msg.guild.id != "403882830225997825") Client.playermanager.leave(msg.guild.id);
                 } else {
                     const player = Client.playermanager.get(msg.guild.id);
                     if (!player) return;

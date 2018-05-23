@@ -1,5 +1,7 @@
 const fs = require("fs");
 
+const { RichEmbed, ReactionCollector } = require('discord.js');
+
 module.exports.run = async (Client, Embed, msg, args, info) => {
 
     var guild = Client.servers.get(msg.guild.id);
@@ -21,7 +23,55 @@ module.exports.run = async (Client, Embed, msg, args, info) => {
                 if(guild.votes.has(msg.author.id)) return Embed.createEmbed(msg.channel, texts.skip_vote_already, texts.error_title);
                 guild.votes.set(msg.author.id, msg.author);
                 if(Math.floor(guild.votes.size / members) >= 1) return await skip();
-                Embed.createEmbed(msg.channel, texts.skip_vote_text + "`" + guild.votes.size + "`!", texts.skip_vote_title);
+
+                var emb = new RichEmbed();
+                emb.setDescription(texts.skip_vote_text + "`" + guild.votes.size + "`!");
+                emb.setColor(msg.channel.guild.me.displayColor);
+                emb.setTitle(texts.skip_vote_title)
+
+                msg.channel.send(emb).then(async message => {
+                    await resetReactions(message);
+
+                    const reaction_filter = (reaction, user) => reaction.emoji.name === "⬆" && msg.guild.members.get(user.id).voiceChannel === msg.guild.me.voiceChannel;
+
+                    guild.collector = new ReactionCollector(message, reaction_filter, { time: 600000 });
+                    
+                    guild.collector.on("collect", async r => {
+                        switch(r.emoji.name) {
+                            case "⬆":
+
+                            var user;
+
+                            for (let index = 0; index < message.reactions.first().users.array().length; index++) {
+                                if(message.reactions.first().users.array()[index] != Client.user) {
+                                    user = message.reactions.first().users.array()[index];
+                                }
+                            }
+
+                            if(!user) return;
+
+                            await clearReaction(r);
+
+                            if(guild.votes.has(user.id)) return;
+                            guild.votes.set(user.id, user);
+                            if(Math.floor(guild.votes.size / members) >= 1) {
+                                return await skip();
+                            } else {
+                                var emb = new RichEmbed();        
+                                emb.setDescription(texts.skip_vote_text + "`" + guild.votes.size + "`!");
+                                emb.setColor(msg.channel.guild.me.displayColor);
+                                emb.setTitle(texts.skip_vote_title);
+                                message.edit(new_emb);
+                            }
+
+                            break;
+
+                            default:
+                            return;
+
+                        }
+                    });
+                });
             }
         } else {
             await skip();
@@ -75,5 +125,30 @@ module.exports.run = async (Client, Embed, msg, args, info) => {
                 }
             }
         }     
+    }
+
+    function clearReaction(reaction) {
+        reaction.fetchUsers().then((users) => {
+            user_array = users.array();
+
+            user_array.forEach(user => {
+                if(user.id != msg.guild.me.user.id) {
+                    reaction.remove(user);
+                }
+            });
+        });
+    }
+
+    async function resetReactions(msg_to_reset) {
+        var message_to_delete;
+        await msg_to_reset.channel.send(texts.np_setting_emojis).then((m) => {
+            message_to_delete = m;
+        });
+
+        await msg_to_reset.clearReactions();
+    
+        await msg_to_reset.react('⬆');
+
+        await message_to_delete.delete();
     }
 }

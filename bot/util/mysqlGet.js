@@ -55,6 +55,7 @@ module.exports.run = (Client, id, color, results) => {
         process: 0,
         interval: 0,
         check: null,
+        collector: null,
     }
 
     Client.servers.set(id, guild);

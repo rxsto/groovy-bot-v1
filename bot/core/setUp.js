@@ -14,6 +14,16 @@ exports.run = async (Client, token) => {
         });
     }
 
+    Client.appInfo = await Client.fetchApplication();
+    setInterval( async () => {
+        Client.appInfo = await Client.fetchApplication();
+    }, 60000);
+
     Client.log.info("[Setup] Successfully connected to Groovys official server");
     Client.user.setPresence({ game: { name: "" }, status: "online" });
+
+    if(Client.token === config.TOKEN) {
+        var channel = Client.channels.get("411177077014790147");
+        Client.embed.createEmbed(channel, ":white_check_mark: Groovy started!", "Started");
+    }
 }

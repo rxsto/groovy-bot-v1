@@ -30,6 +30,10 @@ module.exports.run = async (Client, Embed, msg) => {
     
         if(cmd) {
             Client.log.info("[CommandHandler] \"" + invoke + "\" was executed by " + msg.author.username + "#" +  msg.author.discriminator + " on guild \"" + msg.guild.name + "\" (" + msg.guild.id + ") " + (invoke == "play" ? "- Queue: " + guild.queue.length : ""));
+            if(guild.collector) {
+                if(guild.collector.message) guild.collector.message.clearReactions();
+                guild.collector.stop();
+            }
             try { await cmd.run(Client, Embed, msg, args, true); } catch(error) { console.log(error); }
         }
     }

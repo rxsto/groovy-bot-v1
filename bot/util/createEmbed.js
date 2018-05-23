@@ -20,11 +20,11 @@ module.exports = {
         
         function random_emb() {
             var vote_embed = new RichEmbed();
-            vote_embed.setDescription(":mega: You want to get access to Patrons-only features? You can test them daily for 2 hours by upvoting Groovy! Check the vote command!");
+            vote_embed.setDescription(":mega: You want to get access to Patrons-only features? You can test them daily for 2 hours by upvoting Groovy! You need to upvote [here](https://discordbots.org/bot/402116404301660181/vote) and check the vote command!");
             vote_embed.setColor(channel.guild.me.displayColor);
             vote_embed.setTitle("Patrons-only features! Vote up!");
     
-            var check = Math.floor((Math.random() * 50) + 1);
+            var check = Math.floor((Math.random() * 100) + 1);
     
             if(check == 42) channel.send("", vote_embed);
         }

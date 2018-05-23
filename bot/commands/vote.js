@@ -20,6 +20,7 @@ module.exports.run = (Client, Embed, msg, args) => {
         if(args[0] == "check") {
             if(!Client.voted[msg.author.id]) {
                 Client.voted[msg.author.id] = {
+                    premium: false,
                     voted: false
                 }
             }
@@ -30,13 +31,13 @@ module.exports.run = (Client, Embed, msg, args) => {
                         Embed.createEmbed(msg.channel, texts.vote_not_member, texts.error_title);
                     } else {
                         var member = guild.members.get(msg.author.id);
-                        if(member.roles.has("437546966713630722")) return Embed.createEmbed(msg.channel, texts.vote_already, texts.error_title);
+                        if(Client.voted[msg.author.id].premium == true) return Embed.createEmbed(msg.channel, texts.vote_already, texts.error_title);
                         if(Client.voted[msg.author.id].voted == true) return Embed.createEmbed(msg.channel, texts.vote_wait, texts.error_title);
-                        member.addRole("437546966713630722");
+                        Client.voted[msg.author.id].premium = true;
                         Embed.createEmbed(msg.channel, texts.vote_success_text, texts.vote_success_title);
                         Client.voted[msg.author.id].voted = true;
                         setTimeout( () => {
-                            member.removeRole("437546966713630722");
+                            Client.voted[msg.author.id].premium = false;
                             member.user.send(texts.vote_end);
                             setTimeout( () => {
                                 Client.voted[msg.author.id].voted = false;

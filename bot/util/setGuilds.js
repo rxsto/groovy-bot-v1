@@ -2,6 +2,11 @@ const Discord = require("discord.js");
 
 module.exports.run = async (Client, guilds) => {
 
+    // add loop, loopqueue, shuffle, pause, process etc
+    // join if entry
+    // setup queue and player
+    // ! start check
+
     var results = await Client.mysql.executeSelect(`SELECT * FROM guilds`);
     var check = 1;
 
@@ -48,14 +53,17 @@ module.exports.run = async (Client, guilds) => {
                 process: 0,
                 interval: 0,
                 check: null,
+                collector: null,
             }
 
             Client.servers.set(row.id, guild);
-            Client.log.info("[Init] Initialized guild " + row.name + " - Number " + check);
+            //Client.log.info("[Init] Initialized guild " + row.name + " - Number " + check);
             check++;
         } else {
             Client.mysql.executeQuery(`DELETE FROM guilds WHERE id = '${row.id}'`);
             Client.log.info("[Init] Removed guild " + row.name);
         }
     });
+
+    Client.log.info("[Init] Initialized " + check + " guilds!");
 }

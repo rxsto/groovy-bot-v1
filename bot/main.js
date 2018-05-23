@@ -1,5 +1,7 @@
 const Discord = require("discord.js");
 const fs = require("fs");
+const superagent = require("superagent");
+const Long = require("long");
 
 const readdir = require("util").promisify(require("fs").readdir);
 
@@ -18,6 +20,7 @@ const SetUp = require("./core/setUp.js");
 const commandHandler = require("./core/commandHandler.js");
 
 const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
+const texts = JSON.parse(fs.readFileSync("./bot/json/lang/en.json", "utf8"));
 const token = config.TEST;
 
 const nodes = [
@@ -32,6 +35,7 @@ class Groovy extends Discord.Client {
         super(options);
         this.embed = require("./util/createEmbed.js");
         this.log = require("./util/logger.js");
+        this.config = require("./json/config.js");
         this.commands = new Discord.Collection();
         this.servers = new Discord.Collection();
         this.playermanager = null;
@@ -46,12 +50,13 @@ const init = async () => {
     await Client.login(token).then(Client.log.info("[Core] Successfully connected to Discord API"));
     Client.mysql = await new MySql("127.0.0.1", "bot", config.GLOBAL_PASS, "bot");
     await Init.run(Client);
+    const { body: { shards: totalShards } } = await superagent.get("https://discordapp.com/api/gateway/bot").set("Authorization", token);
     Client.playermanager = await new PlayerManager(Client, nodes, {
         user: Client.user.id,
-        shards: 1
+        shards: totalShards
     });
     await SetUp.run(Client, token);
-    if(token == config.TOKEN) await postServerCount.run(Client.guilds.size);
+    if(token == config.TOKEN) await postServerCount.run(Client, Client.guilds.size);
     
     readdir("./bot/commands/", (err, files) => {
         if(err) Client.log.error("[Core] " + err);
@@ -65,7 +70,7 @@ const init = async () => {
 
         Object.keys(jsaliases).forEach(a => {
             var cmd = require(`./commands/${jsaliases[a]}`);
-            Client.commands.set(a, cmd);
+            Client.commands.set(a, cmd);    
         });
 
         Client.log.info("[Core] All aliases were added!");
@@ -73,6 +78,10 @@ const init = async () => {
     });
     
     Client.log.info(`[Setup] The bot has started, with ${Client.users.size} users, in ${Client.channels.size} channels of ${Client.guilds.size} guilds.`);
+    process.Client = Client;
+
+    require("./modules/dailyStats.js");
+    //require("./modules/webDashboard.js")(Client);
     
     Client.playermanager.nodes.get(config.HOST1).on("disconnect", reason => {
         try {
@@ -86,20 +95,29 @@ const init = async () => {
         Client.log.info(`[GuildHandler] New guild joined: ${guild.name} (id: ${guild.id}) with ${guild.memberCount} members!`);
         const log_channel = Client.channels.get("411177077014790147");
         Embed.createEmbed(log_channel, `:white_check_mark: New guild joined: **${guild.name}** (id: ${guild.id}). This guild has **${guild.memberCount}** members!`, "Created");
-        postServerCount.run(Client.guilds.size);
+        postServerCount.run(Client, Client.guilds.size);
 
         try {
             setGuild.run(Client, guild, config.PREFIX, guild.me.displayColor);
         } catch (error) {
             Client.log.error("[Core] " + error);
         }
+
+        var channel = guild.channels
+        .filter(c => c.type === "text" &&
+          c.permissionsFor(guild.me).has("SEND_MESSAGES"))
+        .sort((a, b) => a.position - b.position ||
+          Long.fromString(a.id).sub(Long.fromString(b.id)).toNumber())
+        .first();
+
+        Embed.createEmbed(channel, texts.first_join, texts.first_join_title);
     });
 
     Client.on("guildDelete", guild => {
         Client.log.info(`[GuildHandler] Removed from: ${guild.name} (id: ${guild.id}) with ${guild.memberCount} members!`);
         const log_channel = Client.channels.get("411177077014790147");
         Embed.createEmbed(log_channel, `:no_entry: I have been removed from: **${guild.name}** (id: ${guild.id})`, "Removed");
-        postServerCount.run(Client.guilds.size);
+        postServerCount.run(Client, Client.guilds.size);
 
         try {    
             Client.mysql.executeQuery(`DELETE FROM guilds WHERE id = '${guild.id}'`);
@@ -117,7 +135,7 @@ const init = async () => {
             }
         } else {
             await checkGuild.run(Client, msg.guild, config.PREFIX, msg.guild.me.displayColor);
-        }        
+        }
     });
 };
 

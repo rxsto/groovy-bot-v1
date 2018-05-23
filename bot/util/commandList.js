@@ -1,7 +1,6 @@
 module.exports.list = {
-    // GENERAL
-
     help: "help.js",
+    aliases: "aliases.js", al: "aliases.js",
     info: "info.js",
     partner: "partner.js",
     invite: "invite.js",
@@ -11,8 +10,6 @@ module.exports.list = {
     shard: "shard.js",
     ping: "ping.js",
     vote: "vote.js",
-
-    // MUSIC
 
     play: "play.js", p: "play.js", add: "play.js",
     //playskip: "playskip.js",
@@ -32,11 +29,14 @@ module.exports.list = {
     removedupes: "removedupes.js", rd: "removedupes.js",
     leavecleanup: "leavecleanup.js", lc: "leavecleanup.js",
     move: "move.js", mv: "move.js",
-    reset: "reset.js",
+    restart: "restart.js",
     stop: "stop.js", st: "stop.js",
     leave: "leave.js", l: "leave.js",
     clear: "clear.js", cl: "clear.js",
     volume: "volume.js", vol: "volume.js",
     queue: "queue.js", q: "queue.js",
     settings: "settings.js", set: "settings.js",
+    language: "language.js", lang: "language.js",
+    reset: "reset.js",
+    update: "update.js",
 }

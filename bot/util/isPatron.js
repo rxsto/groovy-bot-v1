@@ -10,7 +10,7 @@ exports.run = (Client, Embed, guild, role, id, msg, message) => {
         var member = Client.guilds.get("403882830225997825").members.get(id);
         var roles = member.roles;
 
-        if(roles.find("name", role) || roles.find("name", "Friend")) {
+        if(roles.find("name", role) || roles.find("name", "Friend") || roles.find("name", "Staff") || roles.find("name", "Partner")) {
             to_return = true;
         } else {
             if(message) Embed.createEmbed(msg.channel, texts.no_patron1 + guild.prefix + texts.no_patron2, texts.error_title);

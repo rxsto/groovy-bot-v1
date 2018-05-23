@@ -60,3 +60,10 @@ typings/
 # config
 config.json
 application.yml
+config.js
+
+# data
+data
+
+# dashboard
+dashboard

@@ -1,8 +1,8 @@
 const fs = require("fs");
 
-const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
+const { RichEmbed, ReactionCollector, MessageCollector } = require('discord.js');
 
-const { RichEmbed } = require('discord.js');
+const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
 
 module.exports.run = (Client, Embed, msg, args) => {
 
@@ -10,205 +10,555 @@ module.exports.run = (Client, Embed, msg, args) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
-    if(!args[0]) {
-        var emb_stats =  {
-            embed: {
-                color: msg.channel.guild.me.highestRole.color, title: "Groovy - Settings",
-                fields: [
-                    {
-                        name: ":exclamation: " + texts.prefix,
-                        value: "`" + guild.prefix + "`",
-                        inline: true
-                    },
-                    {
-                        name: ":notes: " + texts.queue_length,
-                        value: "`" + guild.queueLength + "`",
-                        inline: true
-                    },
-                    {
-                        name: ":headphones: " + texts.dj_mode,
-                        value: "`" + guild.djMode + "`",
-                        inline: true
-                    },
-                    {
-                        name: ":mega: " + texts.announce_songs,
-                        value: "`" + guild.announceSongs + "`",
-                        inline: true
-                    },
-                    {
-                        name: ":loud_sound: " + texts.default_volume,
-                        value: "`" + guild.defaultVolume + "`",
-                        inline: true
-                    },
-                    {
-                        name: ":microphone: " + texts.dj_role,
-                        value: "`" + guild.djRole + "`",
-                        inline: true
-                    },
-                    {
-                        name: texts.settings_help_internal_title,
-                        value: texts.settings_help_internal_text1 + guild.prefix + texts.settings_help_internal_text2,
-                        inline: false
-                    }
-                ]    
-            }
-        }; msg.channel.send('', emb_stats);
-    } else if(args[0] && !args[1]) {
-        switch(args[0]) {
-            case "prefix":
-            Embed.createEmbed(msg.channel, ":exclamation: " + texts.prefix + ": `" + guild.prefix + "`", texts.prefix);
-            break;
-
-
-            case "length":
-            case "queue-length":
-            Embed.createEmbed(msg.channel, ":notes: " + texts.queue_length + ": `" + guild.queueLength + "`", texts.prefix);
-            break;
-
-
-            case "mode":
-            case "dj":
-            case "dj-mode":
-            Embed.createEmbed(msg.channel, ":headphones: " + texts.dj_mode + ": `" + guild.djMode + "`", texts.prefix);
-            break;
-
-
-            case "role":
-            case "dj-role":
-            Embed.createEmbed(msg.channel, ":microphone: " + texts.dj_role + ": `" + guild.djRole + "`", texts.prefix);
-            break;
-
-
-            case "announce":
-            case "announce-songs":
-            Embed.createEmbed(msg.channel, ":mega: " + texts.announce_songs + ": `" + guild.announceSongs + "`", texts.prefix);
-            break;
-
-
-            case "default":
-            case "default-volume":
-            Embed.createEmbed(msg.channel, ":loud_sound: " + texts.default_volume + ": `" + guild.defaultVolume + "`", texts.prefix);
-            break;
-
-
-            case "lang":
-            case "language":
-            Embed.createEmbed(msg.channel, ":capital_abcd: " + texts.language + ": `" + guild.language + "`", texts.prefix);
-            break;
-
-
-            default:
-            return;
+    var emb =  {
+        embed: {
+            color: msg.channel.guild.me.highestRole.color, title: "Groovy - Settings",
+            fields: [
+                {
+                    name: ":exclamation: " + texts.prefix,
+                    value: "`" + guild.prefix + "`",
+                    inline: true
+                },
+                {
+                    name: ":notes: " + texts.queue_length,
+                    value: "`" + guild.queueLength + "`",
+                    inline: true
+                },
+                {
+                    name: ":headphones: " + texts.dj_mode,
+                    value: "`" + guild.djMode + "`",
+                    inline: true
+                },
+                {
+                    name: ":mega: " + texts.announce_songs,
+                    value: "`" + guild.announceSongs + "`",
+                    inline: true
+                },
+                {
+                    name: ":loud_sound: " + texts.default_volume,
+                    value: "`" + guild.defaultVolume + "`",
+                    inline: true
+                },
+                {
+                    name: ":microphone: " + texts.dj_role,
+                    value: "`" + guild.djRole + "`",
+                    inline: true
+                },
+                {
+                    name: texts.settings_help_internal_title,
+                    value: texts.settings_help_internal_text,
+                    inline: false
+                }
+            ]    
         }
-    } else if(args[1]) {
+    };
+    
+    msg.channel.send(emb).then(async message => {
 
-        if(!msg.member.hasPermission("MANAGE_GUILD")) return Embed.createEmbed(msg.channel, texts.no_manage_permissions, texts.error_title);
+        if(!msg.guild.me.permissionsIn(msg.channel).has("ADD_REACTIONS")) return;
 
-        if(args[1].includes("'")) return Embed.createEmbed(msg.channel, "```'``` is invalid!", texts.error_title);
+        await resetReactions(message);
 
-        switch(args[0]) {
-            case "prefix":
-            if(args[1].length > 10) {
-                Embed.createEmbed(msg.channel, texts.prefix_error, texts.error_title);
+        const reaction_filter = (reaction, user) => reaction.emoji.name === "❗" || reaction.emoji.name === "🎶" || reaction.emoji.name === "🎧" || reaction.emoji.name === "📣" || reaction.emoji.name === "🔊" || reaction.emoji.name === "🎤";
+
+        guild.collector = new ReactionCollector(message, reaction_filter, { time: 600000 });
+        
+        guild.collector.on("collect", async r => {
+
+            if(!msg.member.hasPermission("MANAGE_GUILD")) return Embed.createEmbed(msg.channel, texts.no_manage_permissions, texts.error_title);
+
+            switch(r.emoji.name) {
+                case "❗":
+
+                await clearReaction(r);
+                guild.collector.stop();
+
+                msg.channel.send(texts.settings_prefix_change).then(async collected_message => {
+                    const message_filter = m => m.channel == msg.channel;
+                    guild.collector = await msg.channel.createMessageCollector(message_filter);
+    
+                    guild.collector.on("collect", async m => {
+                        if(m.author == Client.user) return;
+
+                        if(m.content.length > 10) {
+                            await message.clearReactions();
+                            await guild.collector.stop();
+                            return await collected_message.edit(texts.prefix_error);
+                        }
+
+                        guild.prefix = m.content;
+                        await collected_message.edit(texts.settings_prefix_success + " `" + m.content + "`");
+
+                        await m.delete();
+
+                        var new_emb =  {
+                            embed: {
+                                color: msg.channel.guild.me.highestRole.color, title: "Groovy - Settings",
+                                fields: [
+                                    {
+                                        name: ":exclamation: " + texts.prefix,
+                                        value: "`" + guild.prefix + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":notes: " + texts.queue_length,
+                                        value: "`" + guild.queueLength + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":headphones: " + texts.dj_mode,
+                                        value: "`" + guild.djMode + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":mega: " + texts.announce_songs,
+                                        value: "`" + guild.announceSongs + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":loud_sound: " + texts.default_volume,
+                                        value: "`" + guild.defaultVolume + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":microphone: " + texts.dj_role,
+                                        value: "`" + guild.djRole + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: texts.settings_help_internal_title,
+                                        value: texts.settings_help_internal_text,
+                                        inline: false
+                                    }
+                                ]    
+                            }
+                        }; 
+
+                        await message.edit(new_emb);
+                        await message.clearReactions();
+                        await guild.collector.stop();
+
+                        Client.mysql.executeQuery(`UPDATE guilds SET prefix = '${m.content}' WHERE id = '${msg.guild.id}'`);
+                    });
+                });
+
+                break;
+
+
+                case "🎶":
+
+                await clearReaction(r);
+                guild.collector.stop();
+
+                msg.channel.send(texts.settings_queue_change).then(async collected_message => {
+                    const message_filter = m => m.channel == msg.channel;
+                    guild.collector = await msg.channel.createMessageCollector(message_filter);
+    
+                    guild.collector.on("collect", async m => {
+                        if(m.author == Client.user) return;
+
+                        if(isNaN(parseInt(m.content))) return await collected_message.edit(texts.no_number);
+                        if(parseInt(m.content) < 1 || parseInt(m.content) > 50) {
+                            await message.clearReactions();
+                            await guild.collector.stop();
+                            return await collected_message.edit(texts.queue_length_error);
+                        }
+                        guild.queueLength = parseInt(m.content);
+                        Client.mysql.executeQuery(`UPDATE guilds SET queueLength = '${m.content}' WHERE id = '${msg.guild.id}'`);
+                        await collected_message.edit(texts.settings_queue_length_success + " `" + m.content + "`");
+
+                        await m.delete();
+
+                        var new_emb =  {
+                            embed: {
+                                color: msg.channel.guild.me.highestRole.color, title: "Groovy - Settings",
+                                fields: [
+                                    {
+                                        name: ":exclamation: " + texts.prefix,
+                                        value: "`" + guild.prefix + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":notes: " + texts.queue_length,
+                                        value: "`" + guild.queueLength + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":headphones: " + texts.dj_mode,
+                                        value: "`" + guild.djMode + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":mega: " + texts.announce_songs,
+                                        value: "`" + guild.announceSongs + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":loud_sound: " + texts.default_volume,
+                                        value: "`" + guild.defaultVolume + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":microphone: " + texts.dj_role,
+                                        value: "`" + guild.djRole + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: texts.settings_help_internal_title,
+                                        value: texts.settings_help_internal_text,
+                                        inline: false
+                                    }
+                                ]    
+                            }
+                        }; 
+
+                        await message.edit(new_emb);
+                        await message.clearReactions();
+                        await guild.collector.stop();
+                    });
+                });
+
+                break;
+
+
+                case "🎧":
+
+                await clearReaction(r);
+                guild.collector.stop();
+
+                msg.channel.send(texts.settings_mode_change).then(async collected_message => {
+                    const message_filter = m => m.channel == msg.channel;
+                    guild.collector = await msg.channel.createMessageCollector(message_filter);
+    
+                    guild.collector.on("collect", async m => {
+                        if(m.author == Client.user) return;
+                        
+                        if(m.content == "true" || m.content == "on") {
+                            guild.djMode = true;
+                            Client.mysql.executeQuery(`UPDATE guilds SET djMode = '1' WHERE id = '${msg.guild.id}'`);
+                        } else if(m.content == "false" || m.content == "off") {
+                            guild.djMode = false;
+                            Client.mysql.executeQuery(`UPDATE guilds SET djMode = '0' WHERE id = '${msg.guild.id}'`);
+                        } else {
+                            await message.clearReactions();
+                            await guild.collector.stop();
+                            return await collected_message.edit(texts.wrong_args);
+                        }
+
+                        await collected_message.edit(texts.settings_mode_success + " `" + m.content + "`");
+
+                        await m.delete();
+
+                        var new_emb =  {
+                            embed: {
+                                color: msg.channel.guild.me.highestRole.color, title: "Groovy - Settings",
+                                fields: [
+                                    {
+                                        name: ":exclamation: " + texts.prefix,
+                                        value: "`" + guild.prefix + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":notes: " + texts.queue_length,
+                                        value: "`" + guild.queueLength + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":headphones: " + texts.dj_mode,
+                                        value: "`" + guild.djMode + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":mega: " + texts.announce_songs,
+                                        value: "`" + guild.announceSongs + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":loud_sound: " + texts.default_volume,
+                                        value: "`" + guild.defaultVolume + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":microphone: " + texts.dj_role,
+                                        value: "`" + guild.djRole + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: texts.settings_help_internal_title,
+                                        value: texts.settings_help_internal_text,
+                                        inline: false
+                                    }
+                                ]    
+                            }
+                        }; 
+
+                        await message.edit(new_emb);
+                        await message.clearReactions();
+                        await guild.collector.stop();
+                    });
+                });
+
+                break;
+
+
+                case "📣":
+
+                await clearReaction(r);
+                guild.collector.stop();
+
+                msg.channel.send(texts.settings_mode_change).then(async collected_message => {
+                    const message_filter = m => m.channel == msg.channel;
+                    guild.collector = await msg.channel.createMessageCollector(message_filter);
+    
+                    guild.collector.on("collect", async m => {
+                        if(m.author == Client.user) return;
+
+                        if(m.content == "true" || m.content == "on") {
+                            guild.announceSongs = true;
+                            Client.mysql.executeQuery(`UPDATE guilds SET announceSongs = '1' WHERE id = '${msg.guild.id}'`);
+                        } else if(m.content == "false" || m.content == "off") {
+                            guild.announceSongs = false;
+                            Client.mysql.executeQuery(`UPDATE guilds SET announceSongs = '0' WHERE id = '${msg.guild.id}'`);
+                        } else {
+                            return await collected_message.edit(texts.wrong_args);
+                        }
+
+                        await collected_message.edit(texts.settings_mode_success + " `" + m.content + "`");
+
+                        await m.delete();
+
+                        var new_emb =  {
+                            embed: {
+                                color: msg.channel.guild.me.highestRole.color, title: "Groovy - Settings",
+                                fields: [
+                                    {
+                                        name: ":exclamation: " + texts.prefix,
+                                        value: "`" + guild.prefix + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":notes: " + texts.queue_length,
+                                        value: "`" + guild.queueLength + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":headphones: " + texts.dj_mode,
+                                        value: "`" + guild.djMode + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":mega: " + texts.announce_songs,
+                                        value: "`" + guild.announceSongs + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":loud_sound: " + texts.default_volume,
+                                        value: "`" + guild.defaultVolume + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":microphone: " + texts.dj_role,
+                                        value: "`" + guild.djRole + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: texts.settings_help_internal_title,
+                                        value: texts.settings_help_internal_text,
+                                        inline: false
+                                    }
+                                ]    
+                            }
+                        }; 
+
+                        await message.edit(new_emb);
+                        await message.clearReactions();
+                        await guild.collector.stop();
+                    });
+                });
+
+                break;
+
+
+                case "🔊":
+
+                await clearReaction(r);
+                guild.collector.stop();
+
+                msg.channel.send(texts.settings_volume_change).then(async collected_message => {
+                    const message_filter = m => m.channel == msg.channel;
+                    guild.collector = await msg.channel.createMessageCollector(message_filter);
+    
+                    guild.collector.on("collect", async m => {
+                        if(m.author == Client.user) return;
+
+                        if(isNaN(parseInt(m.content))) return await collected_message.edit(texts.no_number);
+                        if(parseInt(m.content) < 1 || parseInt(m.content) > 100) {
+                            await message.clearReactions();
+                            await guild.collector.stop();
+                            return await collected_message.edit(texts.volume_length_error);
+                        }
+                        guild.defaultVolume = parseInt(m.content);
+                        Client.mysql.executeQuery(`UPDATE guilds SET defaultVolume = '${m.content}' WHERE id = '${msg.guild.id}'`);
+                        await collected_message.edit(texts.settings_volume_length_success + " `" + m.content + "`");
+
+                        await m.delete();
+
+                        var new_emb =  {
+                            embed: {
+                                color: msg.channel.guild.me.highestRole.color, title: "Groovy - Settings",
+                                fields: [
+                                    {
+                                        name: ":exclamation: " + texts.prefix,
+                                        value: "`" + guild.prefix + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":notes: " + texts.queue_length,
+                                        value: "`" + guild.queueLength + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":headphones: " + texts.dj_mode,
+                                        value: "`" + guild.djMode + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":mega: " + texts.announce_songs,
+                                        value: "`" + guild.announceSongs + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":loud_sound: " + texts.default_volume,
+                                        value: "`" + guild.defaultVolume + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":microphone: " + texts.dj_role,
+                                        value: "`" + guild.djRole + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: texts.settings_help_internal_title,
+                                        value: texts.settings_help_internal_text,
+                                        inline: false
+                                    }
+                                ]    
+                            }
+                        }; 
+
+                        await message.edit(new_emb);
+                        await message.clearReactions();
+                        await guild.collector.stop();
+                    });
+                });
+
+                break;
+
+
+                case "🎤":
+
+                await clearReaction(r);
+                guild.collector.stop();
+
+                msg.channel.send(texts.settings_role_change).then(async collected_message => {
+                    const message_filter = m => m.channel == msg.channel;
+                    guild.collector = await msg.channel.createMessageCollector(message_filter);
+    
+                    guild.collector.on("collect", async m => {
+                        if(m.author == Client.user) return;
+
+                        if(m.content.length > 25) return await collected_message.edit(texts.settings_role_to_long);
+                        Client.mysql.executeQuery(`UPDATE guilds SET djRole = '${m.content}' WHERE id = '${msg.guild.id}'`);
+                        guild.djRole = m.content;
+
+                        await collected_message.edit(texts.settings_role_success + " `" + m.content + "`");
+
+                        await m.delete();
+
+                        var new_emb =  {
+                            embed: {
+                                color: msg.channel.guild.me.highestRole.color, title: "Groovy - Settings",
+                                fields: [
+                                    {
+                                        name: ":exclamation: " + texts.prefix,
+                                        value: "`" + guild.prefix + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":notes: " + texts.queue_length,
+                                        value: "`" + guild.queueLength + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":headphones: " + texts.dj_mode,
+                                        value: "`" + guild.djMode + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":mega: " + texts.announce_songs,
+                                        value: "`" + guild.announceSongs + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":loud_sound: " + texts.default_volume,
+                                        value: "`" + guild.defaultVolume + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: ":microphone: " + texts.dj_role,
+                                        value: "`" + guild.djRole + "`",
+                                        inline: true
+                                    },
+                                    {
+                                        name: texts.settings_help_internal_title,
+                                        value: texts.settings_help_internal_text,
+                                        inline: false
+                                    }
+                                ]    
+                            }
+                        }; 
+
+                        await message.edit(new_emb);
+                        await message.clearReactions();
+                        await guild.collector.stop();
+                    });
+                });
+
+                break;
+
+                default:
                 return;
             }
-            Client.mysql.executeQuery(`UPDATE guilds SET prefix = '${args[1]}' WHERE id = '${msg.guild.id}'`);
-            guild.prefix = args[1];
-            Embed.createEmbed(msg.channel, texts.settings_prefix_success + " `" + args[1] + "`", texts.settings_success);
-            break;
+        });
+    });
 
+    function clearReaction(reaction) {
+        reaction.fetchUsers().then((users) => {
+            user_array = users.array();
 
-            case "length":
-            case "queue-length":
-            if(isNaN(args[1])) {
-                return;
-            }
-            if(args[1] > 50) {
-                Embed.createEmbed(msg.channel, texts.queue_length_error, texts.error_title);
-                return;
-            }
-            Client.mysql.executeQuery(`UPDATE guilds SET queueLength = '${args[1]}' WHERE id = '${msg.guild.id}'`);
-            guild.queueLength = args[1];
-            Embed.createEmbed(msg.channel, texts.settings_queue_length_success + " `" + args[1] + "`", texts.settings_success);
-            break;
+            user_array.forEach(user => {
+                if(user.id != msg.guild.me.user.id) {
+                    reaction.remove(user);
+                }
+            });
+        });
+    }
 
+    async function resetReactions(msg_to_reset) {
+        var message_to_delete;
+        await msg_to_reset.channel.send(texts.np_setting_emojis).then((m) => {
+            message_to_delete = m;
+        });
 
-            case "mode":
-            case "dj":
-            case "dj-mode":
-            if(args[1] == "true") {
-                Client.mysql.executeQuery(`UPDATE guilds SET djMode = '1' WHERE id = '${msg.guild.id}'`);
-                guild.djMode = true;
-                Embed.createEmbed(msg.channel, texts.settings_dj_mode_success + " `" + args[1] + "`", texts.settings_success);
-            } else if(args[1] == "false") {
-                Client.mysql.executeQuery(`UPDATE guilds SET djMode = '0' WHERE id = '${msg.guild.id}'`);
-                guild.djMode = false;
-                Embed.createEmbed(msg.channel, texts.settings_dj_mode_success + " `" + args[1] + "`", texts.settings_success);
-            } else {
-                return;
-            }
-            break;
+        await msg_to_reset.clearReactions();
+    
+        await msg_to_reset.react('❗');
+        await msg_to_reset.react('🎶');
+        await msg_to_reset.react('🎧');
+        await msg_to_reset.react('📣');
+        await msg_to_reset.react('🔊');
+        await msg_to_reset.react('🎤');
 
-
-            case "role":
-            case "dj-role":
-            if(args[1].length > 30) {
-                Embed.createEmbed(msg.channel, texts.role_error, texts.error_title);
-                return;
-            }
-            Client.mysql.executeQuery(`UPDATE guilds SET djRole = '${args[1]}' WHERE id = '${msg.guild.id}'`);
-            guild.djRole = args[1];
-            Embed.createEmbed(msg.channel, texts.settings_role_success + " `" + args[1] + "`", texts.settings_success);
-            break;
-
-
-            case "announce":
-            case "announce-songs":
-            if(args[1] == "true") {
-                Client.mysql.executeQuery(`UPDATE guilds SET announceSongs = '1' WHERE id = '${msg.guild.id}'`);
-                guild.announceSongs = true;
-                Embed.createEmbed(msg.channel, texts.settings_announce_success + " `" + args[1] + "`", texts.settings_success);
-            } else if(args[1] == "false") {
-                Client.mysql.executeQuery(`UPDATE guilds SET announceSongs = '0' WHERE id = '${msg.guild.id}'`);
-                guild.announceSongs = false;
-                Embed.createEmbed(msg.channel, texts.settings_announce_success + " `" + args[1] + "`", texts.settings_success);
-            } else {
-                return;
-            }
-            break;
-
-
-            case "volume":
-            case "default-volume":
-            if(isNaN(args[1])) {
-                return;
-            }
-            if(args[1] > 100 && args[1] < 1) {
-                return;
-            }
-            Client.mysql.executeQuery(`UPDATE guilds SET defaultVolume = '${args[1]}' WHERE id = '${msg.guild.id}'`);
-            guild.defaultVolume = args[1];
-            Embed.createEmbed(msg.channel, texts.settings_volume_success + " `" + args[1] + "`", texts.settings_success);
-            break;
-
-
-            case "lang":
-            case "language":
-            return;
-            if(args[1] == "en" || args[1] == "de" || args[1] == "fr" || args[1] == "es") {
-                Client.mysql.executeQuery(`UPDATE guilds SET language = '${args[1]}' WHERE id = '${msg.guild.id}'`);
-                guild.language = args[1];
-                Embed.createEmbed(msg.channel, texts.settings_volume_success + " `" + args[1] + "`", texts.settings_success);
-            } else {
-                Embed.createEmbed(msg.channel, texts.not_a_language, texts.error_title);
-            }
-            break;
-
-
-            default:
-            return;
-        }
-    } else {
-        return;
+        await message_to_delete.delete();
     }
 }

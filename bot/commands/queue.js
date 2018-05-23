@@ -6,8 +6,6 @@ const reactions = {
     forwards: "⏩",
 }
 
-var collector;
-
 module.exports.run = async (Client, Embed, msg, args) => {
 
     var guild = Client.servers.get(msg.guild.id);
@@ -31,19 +29,19 @@ module.exports.run = async (Client, Embed, msg, args) => {
         .setTitle("Queue")
         .setFooter(`Page ${page} of ${pages}`)
         .setDescription(generateContent());
-
-    var collector = null;
     
     msg.channel.send(embed).then(async message => {
         var cache_message = message;
+
+        if(!msg.guild.me.permissionsIn(msg.channel).has("ADD_REACTIONS")) return;
 
         await resetReactions(message);
 
         const reaction_filter = (reaction, user) => reaction.emoji.name === reactions.backwards || reaction.emoji.name === reactions.forwards && msg.guild.members.get(user.id).voiceChannel === msg.guild.me.voiceChannel;
 
-        collector = new ReactionCollector(message, reaction_filter);
+        guild.collector = new ReactionCollector(message, reaction_filter, { time: 600000 });
 
-        collector.on("collect", async r => {
+        guild.collector.on("collect", async r => {
             switch(r.emoji.name) {
                 case reactions.backwards:
 
@@ -77,7 +75,11 @@ module.exports.run = async (Client, Embed, msg, args) => {
                 default:
                 return;
             }
-        }); 
+        });
+
+        setTimeout( () => {
+            message.clearReactions();
+        }, 600000);
     });
 
     function clearReaction(reaction) {
@@ -95,7 +97,7 @@ module.exports.run = async (Client, Embed, msg, args) => {
     function generateContent() {
         var content = [];
         for (var i = page * 10 - 9; i <= page * 10; i++) {
-            if(titles[i - 1]) content.push(`:white_small_square: **${i}:** ` + titles[i - 1] + " " + guild.queue[i -1 ].info.member.user);
+            if(titles[i - 1]) content.push(`:white_small_square: **${i}:** ` + titles[i - 1] + " " + guild.queue[i - 1].info.member.user);
         }
         return content;
     }

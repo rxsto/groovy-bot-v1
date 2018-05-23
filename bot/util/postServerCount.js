@@ -6,7 +6,10 @@ const log = require("./logger.js");
 
 const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
 
-exports.run = async (server_count) => {
+const PlexiDevApi = require('plexibotsapi');
+let api = new PlexiDevApi(config.LIST_PLEXI);
+
+exports.run = async (Client, server_count) => {
 
     const { body: { shards: totalShards } } = await superagent.get("https://discordapp.com/api/gateway/bot").set("Authorization",config.TOKEN);
 
@@ -37,13 +40,16 @@ exports.run = async (server_count) => {
         .then()
         .catch(err => log.error("[PostServerCount] 3 " + err));
 
-    /*snekfetch.post("https://botsfordiscord.com/api/v1/bots/402116404301660181")
+    api.postServers(Client.user.id, Client.guilds.size);
+    api.postUsers(Client.user.id, Client.users.size);
+
+    snekfetch.post("https://botsfordiscord.com/api/v1/bots/402116404301660181")
         .set("Authorization", config.LIST_FOR)
         .send({
             "server_count": server_count
         })
         .then()
-        .catch(err => log.error("[PostServerCount] 4 " + err));*/
+        .catch(err => log.error("[PostServerCount] 4 " + err));
 
     log.info("[PostServerCount] Successfully posted current server-count");
 }

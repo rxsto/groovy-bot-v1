@@ -11,7 +11,6 @@ let fileLoop = require("./loop.js");
 let fileShuffle = require("./shuffle.js");
 
 var interval;
-var collector;
 
 var reactions = {
     playpause: "⏯",
@@ -51,14 +50,12 @@ module.exports.run = (Client, Embed, msg, args) => {
     playing_embed.setTitle(guild.queue[0].info.title);
     playing_embed.setColor(msg.guild.me.highestRole.color);
 
-    var collector = null;
-
-    msg.channel.send('', playing_embed).then(async (message) => {
+    msg.channel.send('', playing_embed).then(async message => {
         var cache_message = message;
         if(interval) { try { clearInterval(interval); } catch (error) { console.log(error); } }
 
         const reaction_filter = (reaction) => reaction.emoji.name === reactions.playpause || reaction.emoji.name === reactions.stop || reaction.emoji.name === reactions.skip || reaction.emoji.name === reactions.loopqueue || reaction.emoji.name === reactions.loop || reaction.emoji.name === reactions.shuffle;
-        collector = new ReactionCollector(message, reaction_filter);
+        guild.collector = new ReactionCollector(message, reaction_filter, { time: 3600000 });
 
         var message_warning;
         msg.channel.send(texts.np_setting_emojis).then((m) => {
@@ -75,7 +72,7 @@ module.exports.run = (Client, Embed, msg, args) => {
 
         await message_warning.delete();
 
-        collector.on("collect", async reaction => {
+        guild.collector.on("collect", async reaction => {
             const player = Client.playermanager.get(msg.guild.id);
             if (!player) return;
 
@@ -135,6 +132,10 @@ module.exports.run = (Client, Embed, msg, args) => {
                 message.edit("", second_embed);
             }        
         }, 5000);
+
+        setTimeout( () => {
+            message.clearReactions();
+        }, 3600000);
     });
 
     function checkUsers(reaction) {

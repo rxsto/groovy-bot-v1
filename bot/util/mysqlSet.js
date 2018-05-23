@@ -22,13 +22,14 @@ module.exports.run = (Client, guild, prefix, color) => {
             votes: new Discord.Collection(),
 
             announceSongs: true,
-            queueLength: 25,
+            queueLength: 50,
             defaultVolume: 100,
             language: "en",
 
             process: 0,
             interval: 0,
             check: null,
+            collector: null,
         }
 
         Client.servers.set(guild.id, set_guild);

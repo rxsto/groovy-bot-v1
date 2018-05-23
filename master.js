@@ -17,7 +17,15 @@ Object.defineProperty(cluster, "onlineWorkers", {
 const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
 
 async function init() {
-	console.log("Groovy");
+
+	console.log(" _____                                   ");
+	console.log("|  __ \\                                  ");
+	console.log("| |  \\/ _ __   ___    ___  __   __ _   _ ");
+	console.log("| | __ | '__| / _ \\  / _ \\ \\ \\ / /| | | |");
+	console.log("| |_\\ \\| |   | (_) || (_) | \\ V / | |_| |");
+	console.log(" \\____/|_|    \\___/  \\___/   \\_/   \\__, |");
+	console.log("                                    __/ |");
+	console.log("                                   |___/ ");
 	
 	const { body: { shards: totalShards } } = await superagent.get("https://discordapp.com/api/gateway/bot").set("Authorization", config.TOKEN);
 
