@@ -1,8 +1,8 @@
 const fs = require("fs");
 
-const commandlist = require("../util/commandList.js");
+const commandlist = require("../list/commandList.js");
 
-module.exports.run = async (Client, Embed, msg, args) => {
+module.exports.run = async (Client, msg, args) => {
 
     var guild = Client.servers.get(msg.guild.id);
     var jsaliases = commandlist.list;
@@ -28,5 +28,5 @@ module.exports.run = async (Client, Embed, msg, args) => {
         last_command = command;
     }
 
-    Embed.createEmbed(msg.channel, message, "Aliases");
+    Client.functions.createEmbed(msg.channel, message, "Aliases");
 }

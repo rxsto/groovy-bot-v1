@@ -4,7 +4,7 @@ const { RichEmbed, ReactionCollector, MessageCollector } = require('discord.js')
 
 const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
 
-module.exports.run = (Client, Embed, msg, args) => {
+module.exports.run = (Client, msg, args) => {
 
     var guild = Client.servers.get(msg.guild.id);
 
@@ -65,7 +65,7 @@ module.exports.run = (Client, Embed, msg, args) => {
         
         guild.collector.on("collect", async r => {
 
-            if(!msg.member.hasPermission("MANAGE_GUILD")) return Embed.createEmbed(msg.channel, texts.no_manage_permissions, texts.error_title);
+            if(!msg.member.hasPermission("MANAGE_GUILD")) return Client.functions.createEmbed(msg.channel, texts.no_manage_permissions, texts.error_title);
 
             switch(r.emoji.name) {
                 case "❗":
@@ -85,6 +85,8 @@ module.exports.run = (Client, Embed, msg, args) => {
                             await guild.collector.stop();
                             return await collected_message.edit(texts.prefix_error);
                         }
+
+                        if(m.content.includes("'")) return Client.functions.createEmbed(msg.channel, texts.error_unwanted_char + "`'`", texts.error_title);
 
                         guild.prefix = m.content;
                         await collected_message.edit(texts.settings_prefix_success + " `" + m.content + "`");

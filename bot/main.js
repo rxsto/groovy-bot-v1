@@ -1,106 +1,126 @@
 const Discord = require("discord.js");
+const Lavalink = require("discord.js-lavalink");
 const fs = require("fs");
 const superagent = require("superagent");
 const Long = require("long");
 
-const readdir = require("util").promisify(require("fs").readdir);
-
-const { PlayerManager } = require("discord.js-lavalink");
-const { MySql } = require("./util/mysqlConnection.js");
-
-const Embed = require("./util/createEmbed.js");
-const postServerCount = require("./util/postServerCount.js");
-const setGuild = require("./util/mysqlSet.js"); 
-const checkGuild = require("./util/checkGuild.js");
-const Init = require("./util/setGuilds.js");
+const Connection = require("./util/mysql.js");
 const logger = require("./util/logger.js");
-const commandlist = require("./util/commandList.js");
+
+const commandlist = require("./list/commandList.js");
 
 const SetUp = require("./core/setUp.js");
 const commandHandler = require("./core/commandHandler.js");
 
+const readdir = require("util").promisify(require("fs").readdir);
+
 const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
 const texts = JSON.parse(fs.readFileSync("./bot/json/lang/en.json", "utf8"));
-const token = config.TEST;
+
+const token = config.Test.TOKEN;
 
 const nodes = [
-    { host: config.HOST1, port: config.PORT1, region: "eu", password: config.PASS1 },
-    { host: config.HOST2, port: config.PORT2, region: "eu", password: config.PASS2 },
-    { host: config.HOST3, port: config.PORT3, region: "eu", password: config.PASS3 },
-    { host: config.HOST4, port: config.PORT4, region: "eu", password: config.PASS4 },
+    { host: config.nodes.alfHOST, port: config.nodes.alfPORT, region: "eu", password: config.nodes.alfPASS },
+    { host: config.nodes.zapHOST, port: config.nodes.zapPORT, region: "eu", password: config.nodes.zapPASS },
+    { host: config.nodes.leeHOST, port: config.nodes.leePORT, region: "eu", password: config.nodes.leePASS },
+    { host: config.nodes.yanHOST, port: config.nodes.yanPORT, region: "eu", password: config.nodes.yanPASS },
+    { host: config.nodes.lsgHOST, port: config.nodes.lsgPORT, region: "eu", password: config.nodes.lsgPASS },
 ];
 
 class Groovy extends Discord.Client {
     constructor(options) {
         super(options);
-        this.embed = require("./util/createEmbed.js");
+        this.functions = require("./util/functions.js");
         this.log = require("./util/logger.js");
         this.config = require("./json/config.js");
         this.commands = new Discord.Collection();
         this.servers = new Discord.Collection();
+        this.patrons = new Discord.Collection();
         this.playermanager = null;
+        this.webhook = null;
         this.mysql = null;
+        this.executed = 0;
         this.voted = {};
     }
 }
 
-const Client = new Groovy({ messageCacheMaxSize: 50, messageCacheLifetime: 3600, messageSweepInterval: 3600, disabledEvents: ['TYPING_START'] });
+const Client = new Groovy({ messageCacheMaxSize: 100, messageCacheLifetime: 86400, messageSweepInterval: 86400, disabledEvents: ['TYPING_START'] });
 
 const init = async () => {
     await Client.login(token).then(Client.log.info("[Core] Successfully connected to Discord API"));
-    Client.mysql = await new MySql("127.0.0.1", "bot", config.GLOBAL_PASS, "bot");
-    await Init.run(Client);
-    const { body: { shards: totalShards } } = await superagent.get("https://discordapp.com/api/gateway/bot").set("Authorization", token);
-    Client.playermanager = await new PlayerManager(Client, nodes, {
+    Client.mysql = new Connection.MySql("127.0.0.1", "bot", config.GLOBAL_PASS, "bot");
+    const { body: { shards: totalShards } } = await superagent.get("https://discordapp.com/api/gateway/bot").set("Authorization", config.Groovy.TOKEN);
+    Client.playermanager = await new Lavalink.PlayerManager(Client, nodes, {
         user: Client.user.id,
         shards: totalShards
     });
     await SetUp.run(Client, token);
-    if(token == config.TOKEN) await postServerCount.run(Client, Client.guilds.size);
+    if(token == config.TOKEN) await Client.functions.postcount(Client, Client.guilds.size);
+
+    Client.webhook = new Discord.WebhookClient("450345181053583362", config.webhooks.logs);
+
+    readdir("./bot/list/patrons/", (err, files) => {
+        files.forEach(file => {
+            var id = file.split(".")[0];
+
+            var patron = JSON.parse(fs.readFileSync("./bot/list/patrons/" + file, "utf8"));
+            var name = patron.name;
+            var type = patron.type;
+            var level = patron.level;
+
+            var object = {
+                name: name,
+                type: type,
+                level: level,
+            }
+
+            Client.patrons.set(id, object);
+        });
+    });
     
     readdir("./bot/commands/", (err, files) => {
-        if(err) Client.log.error("[Core] " + err);
+        if(err) Client.log.error("[Shard " + (Client.shard.id + 1) + "] [Core] " + err);
 
         var jsfiles = files.filter(f => f.split(".").pop() === "js");
         var jsaliases = commandlist.list;
         var jsaliases_length = Object.keys(jsaliases).length;
 
-        Client.log.info("[Core] " + jsfiles.length + " commands found!");
-        Client.log.info("[Core] " + jsaliases_length + " aliases found!");
+        Client.log.info("[Shard " + (Client.shard.id + 1) + "] [Core] " + jsfiles.length + " commands found!");
+        Client.log.info("[Shard " + (Client.shard.id + 1) + "] [Core] " + jsaliases_length + " aliases found!");
 
         Object.keys(jsaliases).forEach(a => {
             var cmd = require(`./commands/${jsaliases[a]}`);
             Client.commands.set(a, cmd);    
         });
 
-        Client.log.info("[Core] All aliases were added!");
-        Client.log.info("[Core] All commands were loaded!");
+        Client.log.info("[Shard " + (Client.shard.id + 1) + "] [Core] All aliases were added!");
+        Client.log.info("[Shard " + (Client.shard.id + 1) + "] [Core] All commands were loaded!");
     });
     
-    Client.log.info(`[Setup] The bot has started, with ${Client.users.size} users, in ${Client.channels.size} channels of ${Client.guilds.size} guilds.`);
+    Client.log.info(`[Shard ${(Client.shard.id + 1)}] [Setup] The bot on shard ${Client.shard.id + 1} has started, with ${Client.users.size} users, in ${Client.channels.size} channels of ${Client.guilds.size} guilds.`);
+    Client.setMaxListeners(100);
     process.Client = Client;
 
-    require("./modules/dailyStats.js");
-    //require("./modules/webDashboard.js")(Client);
-    
-    Client.playermanager.nodes.get(config.HOST1).on("disconnect", reason => {
-        try {
-            Client.playermanager.nodes.get(config.HOST1).connect();
-        } catch (error) {
-            Client.log.error("[Core] " + error);
-        }
+    if(Client.token === config.Groovy.TOKEN) {
+        //require("./modules/dailyStats.js");
+        //require("./modules/currentStatistics.js");
+        //require("./modules/webDashboard.js")(Client);
+    }
+
+    Client.on("error", error => {
+        logger.error("[Shard " + (Client.shard.id + 1) + "] [Core] " + error);
     });
 
     Client.on("guildCreate", guild => {
-        Client.log.info(`[GuildHandler] New guild joined: ${guild.name} (id: ${guild.id}) with ${guild.memberCount} members!`);
-        const log_channel = Client.channels.get("411177077014790147");
-        Embed.createEmbed(log_channel, `:white_check_mark: New guild joined: **${guild.name}** (id: ${guild.id}). This guild has **${guild.memberCount}** members!`, "Created");
-        postServerCount.run(Client, Client.guilds.size);
+        Client.log.info(`[Shard ${(Client.shard.id + 1)}] [GuildHandler] New guild joined: ${guild.name} (id: ${guild.id}) with ${guild.memberCount} members!`);
+        var guildlog = Client.functions.returnEmbed(`:white_check_mark: [Shard ${(Client.shard.id + 1)}] New guild joined: **${guild.name}** (id: ${guild.id}). This guild has **${guild.memberCount}** members!`, "Created");
+        Client.webhook.send({ embeds: [guildlog] });
+        Client.functions.postcount(Client);
 
         try {
-            setGuild.run(Client, guild, config.PREFIX, guild.me.displayColor);
+            Client.functions.setGuild(Client, guild, config.PREFIX, guild.me.displayColor);
         } catch (error) {
-            Client.log.error("[Core] " + error);
+            Client.log.error("[Shard " + (Client.shard.id + 1) + "] [Core] " + error);
         }
 
         var channel = guild.channels
@@ -110,19 +130,22 @@ const init = async () => {
           Long.fromString(a.id).sub(Long.fromString(b.id)).toNumber())
         .first();
 
-        Embed.createEmbed(channel, texts.first_join, texts.first_join_title);
+        if(channel == null) return;
+        if(!guild.me.permissionsIn(channel).has("SEND_MESSAGES")) return;
+
+        Client.functions.createEmbed(channel, texts.first_join, texts.first_join_title);
     });
 
     Client.on("guildDelete", guild => {
-        Client.log.info(`[GuildHandler] Removed from: ${guild.name} (id: ${guild.id}) with ${guild.memberCount} members!`);
-        const log_channel = Client.channels.get("411177077014790147");
-        Embed.createEmbed(log_channel, `:no_entry: I have been removed from: **${guild.name}** (id: ${guild.id})`, "Removed");
-        postServerCount.run(Client, Client.guilds.size);
+        Client.log.info(`[Shard ${(Client.shard.id + 1)}] [GuildHandler] Removed from: ${guild.name} (id: ${guild.id}) with ${guild.memberCount} members!`);
+        var guildlog = Client.functions.returnEmbed(`:no_entry: [Shard ${(Client.shard.id + 1)}] I have been removed from: **${guild.name}** (id: ${guild.id})`, "Removed");
+        Client.webhook.send({ embeds: [guildlog] });
+        Client.functions.postcount(Client);
 
         try {    
             Client.mysql.executeQuery(`DELETE FROM guilds WHERE id = '${guild.id}'`);
         } catch (error) {
-            Client.log.error("[Core] " + error);
+            Client.log.error(`[Shard ${(Client.shard.id + 1)}] [Core] ` + error);
         }
     });
 
@@ -131,14 +154,15 @@ const init = async () => {
         if(msg.guild == null) return;
         if(Client.servers.has(msg.guild.id)) {
             if(msg.content.startsWith(Client.servers.get(msg.guild.id).prefix) || msg.content.startsWith('<@'+Client.user.id+'>') || msg.content.startsWith('<@!'+Client.user.id+'>')) {
-                await commandHandler.run(Client, Embed, await msg);
+                await commandHandler.run(Client, await msg);
             }
         } else {
-            await checkGuild.run(Client, msg.guild, config.PREFIX, msg.guild.me.displayColor);
+            await Client.functions.checkGuild(Client, msg.guild, config.PREFIX, msg.guild.me.displayColor);
+            await commandHandler.run(Client, await msg);
         }
     });
 };
 
 init();
 
-process.on("unhandledRejection", error => logger.error(`unhandledRejection:\n${error.stack}`)).on("uncaughtException", error => logger.error(`uncaughtException:\n${error.stack}`)).on("error", error => logger.error(`Error:\n${error.stack}`)).on("warn", error => logger.error(`Warning:\n${error.stack}`));
+process.on("unhandledRejection", error => logger.error(`[Shard ${(Client.shard.id + 1)}] unhandledRejection:\n${error.stack}`)).on("uncaughtException", error => logger.error(`[Shard ${(Client.shard.id + 1)}] uncaughtException:\n${error.stack}`)).on("error", error => logger.error(`[Shard ${(Client.shard.id + 1)}] Error:\n${error.stack}`)).on("warn", error => logger.error(`[Shard ${(Client.shard.id + 1)}] Warning:\n${error.stack}`));

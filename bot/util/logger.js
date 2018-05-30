@@ -1,7 +1,12 @@
 const fs = require("fs");
 
 exports.error = (content) => {
-    var time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '').split(" ")[1];
+    var first = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '').split(" ")[1];
+    var upgrade = first.split(":");
+
+    upgrade[0] = parseInt(upgrade[0]) + 2;
+    var time = upgrade.join(":");
+
     content.split('\n').forEach(s => {
         console.log(`[${time}] ${'[ ERROR ]'} ${s}`);
         write(`[${time}] ${'[ ERROR ]'} ${s}`);
@@ -9,7 +14,12 @@ exports.error = (content) => {
 }
 
 exports.info = (content) => {
-    var time = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '').split(" ")[1];
+    var first = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '').split(" ")[1];
+    var upgrade = first.split(":");
+
+    upgrade[0] = parseInt(upgrade[0]) + 2;
+    var time = upgrade.join(":");
+
     content.split('\n').forEach(s => {
         console.log(`[${time}] ${'[ INFO ]'} ${s}`);
         write(`[${time}] ${'[ INFO ]'} ${s}`);

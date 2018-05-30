@@ -1,9 +1,7 @@
 const Discord = require("discord.js");
 const fs = require("fs");
 
-const checkDJ = require("../util/checkDJ.js");
-
-module.exports.run = (Client, Embed, msg, args, info) => {
+module.exports.run = (Client, msg, args, info) => {
 
     var guild = Client.servers.get(msg.guild.id);
 
@@ -11,10 +9,9 @@ module.exports.run = (Client, Embed, msg, args, info) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
-    if(checkDJ.run(Embed, guild, msg) == false) {
-        Embed.createEmbed(msg.channel, texts.no_dj + "`" + guild.djRole + "`!", texts.error_title);
-        return;
-    }
+    if(msg.member.voiceChannel != msg.guild.me.voiceChannel) return Client.functions.createEmbed(msg.channel, texts.same_channel, texts.error_title);
+
+    if(Client.functions.checkDJ(guild, msg) == false) return Client.functions.createEmbed(msg.channel, texts.no_dj + "`" + guild.djRole + "`!", texts.error_title);
 
     guild.queue.forEach(song => {
         if(song.track == guild.queue[0].track) return seen.set(song.track, song);
@@ -23,5 +20,5 @@ module.exports.run = (Client, Embed, msg, args, info) => {
 
     guild.queue = seen.array();
 
-    Embed.createEmbed(msg.channel, texts.leavecleanup_text, texts.leavecleanup_title);
+    Client.functions.createEmbed(msg.channel, texts.leavecleanup_text, texts.leavecleanup_title);
 }

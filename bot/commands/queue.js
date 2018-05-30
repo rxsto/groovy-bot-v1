@@ -6,13 +6,13 @@ const reactions = {
     forwards: "⏩",
 }
 
-module.exports.run = async (Client, Embed, msg, args) => {
+module.exports.run = async (Client, msg, args) => {
 
     var guild = Client.servers.get(msg.guild.id);
     
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
-    if(guild.queue.length == 0) return Embed.createEmbed(msg.channel, texts.queue_nothing, texts.error_title);
+    if(guild.queue.length == 0) return Client.functions.createEmbed(msg.channel, texts.queue_nothing, texts.error_title);
 
     var page = 1;
     var pages = Math.ceil(guild.queue.length / 10);

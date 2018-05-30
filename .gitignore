@@ -57,6 +57,9 @@ typings/
 # dotenv environment variables file
 .env
 
+# npm lock file
+package-lock.json
+
 # config
 config.json
 application.yml
@@ -67,3 +70,6 @@ data
 
 # dashboard
 dashboard
+
+# patreon
+bot/list/patrons

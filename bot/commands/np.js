@@ -21,14 +21,14 @@ var reactions = {
     shuffle: "🔀",
 }
 
-module.exports.run = (Client, Embed, msg, args) => {
+module.exports.run = (Client, msg, args) => {
 
     var guild = Client.servers.get(msg.guild.id);    
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
     if(!guild.queue[0]) {
-        Embed.createEmbed(msg.channel, texts.np_nothing, texts.np_title);
+        Client.functions.createEmbed(msg.channel, texts.np_nothing, texts.np_title);
         return;
     }
 
@@ -76,33 +76,35 @@ module.exports.run = (Client, Embed, msg, args) => {
             const player = Client.playermanager.get(msg.guild.id);
             if (!player) return;
 
+            if(msg.member.voiceChannel != msg.guild.me.voiceChannel) return Client.functions.createEmbed(msg.channel, texts.same_channel, texts.error_title);
+
             switch(reaction.emoji.name) {
                 case reactions.playpause:
                     if(guild.isPaused) {
-                        fileResume.run(Client, Embed, msg, args, false);
+                        fileResume.run(Client, msg, args, false);
                     } else {
-                        filePause.run(Client, Embed, msg, args, false);
+                        filePause.run(Client, msg, args, false);
                     }
                     break;
 
                 case reactions.stop:
-                    fileStop.run(Client, Embed, msg, args, false);
+                    fileStop.run(Client, msg, args, false);
                     break;
 
                 case reactions.skip:
-                    fileSkip.run(Client, Embed, msg, args, false);
+                    fileSkip.run(Client, msg, args, false);
                     break;                            
                 
                 case reactions.loopqueue:
-                    fileLoopqueue.run(Client, Embed, msg, args, false);
+                    fileLoopqueue.run(Client, msg, args, false);
                     break;
                 
                 case reactions.loop:
-                    fileLoop.run(Client, Embed, msg, args, false);
+                    fileLoop.run(Client, msg, args, false);
                     break;
                 
                 case reactions.shuffle:
-                    fileShuffle.run(Client, Embed, msg, args, false);
+                    fileShuffle.run(Client, msg, args, false);
                     break;
 
                 default:
