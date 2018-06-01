@@ -4,6 +4,7 @@
 [![Uptime Robot ratio](https://img.shields.io/uptimerobot/ratio/m780420889-1994e45ecaac05d5792e25b5.svg?longCache=true&style=flat-square)](https://stats.uptimerobot.com/WQmEMS4YY)
 [![Build Status](https://david-dm.org/rxsto/Groovy.svg?longCache=true&style=flat-square)](https://david-dm.org/rxsto/Groovy)
 [![Discord](https://discordapp.com/api/guilds/403882830225997825/widget.png)](https://discord.gg/5s5TsW2)
+<img src="https://discordbots.org/api/widget/status/402116404301660181.svg?noavatar=true" />
 
 ---
 
