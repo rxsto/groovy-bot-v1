@@ -37,7 +37,16 @@ module.exports.run = async (Client, msg, args) => {
 
         if(users == 0) {
             if(guild.isPaused) {
-                if(msg.guild.id != "403882830225997825") Client.playermanager.leave(msg.guild.id);
+                if(msg.guild.id != "403882830225997825") {
+                    Client.playermanager.leave(msg.guild.id);
+                    clearInterval(guild.interval);
+                    guild.queue = [];
+                    guild.previous = null;
+                    guild.votes.clear();
+                    guild.process = 0;
+                    guild.isPaused = false;
+                    guild.isPlaying = false;
+                }
             } else {
                 const player = Client.playermanager.get(msg.guild.id);
                 if (!player) return;

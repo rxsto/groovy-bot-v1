@@ -1,30 +1,50 @@
-const Client = process.Client;
+module.exports = async (Client, id) => {
+    const guild = Client.guilds.get("403882830225997825");
+    if(!guild) return;
 
-const guild = Client.guilds.get("403882830225997825");
-if(!guild) return;
+    const channel = guild.channels.get(id);
 
-const channel = Client.channels.get("411177077014790147");
+    Client.log.info("[Modules] Daily-Stats was loaded!");
 
-Client.log.info("[Modules] Daily-Stats was loaded!");
+    var servers;
+    var members;
+    var commands;
 
-setTimeout( () => {
+    setTimeout(async () => {
+        await getStats(Client);
+        startModule(Client);
+    }, 60000);
 
-    Client.sharder.fetchClientValues('guilds.size').then(results => {
-        console.log(results);
-        console.log(`${results.reduce((prev, val) => prev + val, 0)} total guilds`);
-    }).catch(console.error);
+    function startModule(Client) {
+        sendStats(members, servers, commands);
+        setInterval(async () => {
+            await getStats(Client);
+            sendStats(members, servers, commands);
+        }, 86400000);
+    }
 
-}, 60000);
+    function sendStats(members_old, servers_old, commands_old) {
+        setTimeout(async () => {
+            await getStats(Client);
+            var dif_servers = servers - servers_old;
+            var dif_members = members - members_old;
+            var dif_commands = commands - commands_old;
+        
+            Client.functions.createEmbed(channel, `:part_alternation_mark: Today Groovy was invited to **${dif_servers}** servers with **${dif_members}** new members! Also today **${dif_commands}** commands were executed!\nSummarizing Groovy is now represented in ${Client.guilds.size} guilds with ${Client.users.size} members!`, "Daily statistics");
+        }, 86399000);
+    }
 
-setInterval( () => {
-    sendStats(Client.users.size, Client.guilds.size);
-}, 86400000);
-
-function sendStats(members, servers) {
-    setTimeout( () => {
-        var dif_servers = Client.guilds.size - servers;
-        var dif_members = Client.users.size - members;
+    async function getStats(Client) {
+        await Client.shard.fetchClientValues('guilds.size').then(results => {
+            servers = results.reduce((prev, val) => prev + val, 0);
+        }).catch(console.error);
     
-        Client.functions.createEmbed(channel, `:part_alternation_mark: Today Groovy was invited to **${dif_servers}** servers with **${dif_members}** new members!\nSummarizing Groovy is now represented in ${Client.guilds.size} guilds with ${Client.users.size} members!`, "Daily statistics");
-    }, 86399000);
+        await Client.shard.fetchClientValues('users.size').then(results => {
+            members = results.reduce((prev, val) => prev + val, 0);
+        }).catch(console.error);
+    
+        await Client.shard.fetchClientValues('executed').then(results => {
+            commands = results.reduce((prev, val) => prev + val, 0);
+        }).catch(console.error);
+    }
 }

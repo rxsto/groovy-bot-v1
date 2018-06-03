@@ -10,7 +10,7 @@ const log = require("./logger.js");
 
 const config = JSON.parse(fs.readFileSync('./bot/json/config.json', 'utf8'));
 
-let api = new PlexiDevApi(config.LIST_PLEXI);
+let api = new PlexiDevApi(config.keys.plexi);
 
 module.exports = {
     async getSong(string) {
@@ -29,11 +29,18 @@ module.exports = {
         await Client.shard.fetchClientValues('guilds.size').then(results => {
             server_count = results.reduce((prev, val) => prev + val, 0);
         }).catch(console.error);
+        var user_count;
+        await Client.shard.fetchClientValues('users.size').then(results => {
+            user_count = results.reduce((prev, val) => prev + val, 0);
+        }).catch(console.error);
+
+        var sql = `UPDATE stats SET (servers, members) = ('${server_count}', '${user_count}') WHERE id = '402116404301660181'`;
+        Client.mysql.executeQuery(sql);
         
         const { body: { shards: totalShards } } = await superagent.get("https://discordapp.com/api/gateway/bot").set("Authorization", config.Groovy.TOKEN);
     
         snekfetch.post(`https://discordbots.org/api/bots/stats`)
-            .set('Authorization', config.LIST_ORG)
+            .set('Authorization', config.keys.dbl)
             .send({
                 "shard_count": totalShards,
                 "server_count": server_count
@@ -42,7 +49,7 @@ module.exports = {
             .catch(err => log.error("[PostServerCount] 1 " + err));
     
         snekfetch.post("https://botlist.space/api/bots/402116404301660181")
-            .set("Authorization", config.LIST_SPACE)
+            .set("Authorization", config.keys.space)
             .send({
                 "shard_count": totalShards,
                 "server_count": server_count
@@ -51,7 +58,7 @@ module.exports = {
             .catch(err => log.error("[PostServerCount] 2 " + err));
     
         snekfetch.post("https://bots.discord.pw/api/bots/402116404301660181/stats")
-            .set("Authorization", config.LIST_PW)
+            .set("Authorization", config.keys.discordpw)
             .send({
                 "shard_count": totalShards,
                 "server_count": server_count
@@ -59,11 +66,11 @@ module.exports = {
             .then()
             .catch(err => log.error("[PostServerCount] 3 " + err));
     
-        api.postServers(Client.user.id, Client.guilds.size);
-        api.postUsers(Client.user.id, Client.users.size);
+        api.postServers(Client.user.id, server_count);
+        api.postUsers(Client.user.id, server_count);
     
         snekfetch.post("https://botsfordiscord.com/api/v1/bots/402116404301660181")
-            .set("Authorization", config.LIST_FOR)
+            .set("Authorization", config.keys.botsfor)
             .send({
                 "server_count": server_count
             })
@@ -85,7 +92,7 @@ module.exports = {
     },
 
     checkPatron(Client, guild, texts, msg, level, info) {
-        if(Client.voted[msg.author.id]) if(Client.voted[msg.author.id].premium == true) return true;
+        if(Client.voted.has(msg.author.id)) if(Client.voted.get(msg.author.id).premium == true) return true;
         var check = false;
 
         if(Client.patrons.has(msg.guild.id)) {
@@ -208,6 +215,7 @@ module.exports = {
     
         var guild = {
             queue: [],
+            previous: null,
     
             prefix: prefix,
     
@@ -240,6 +248,7 @@ module.exports = {
         if(!Client.guilds.has(guild.id)) {
             var set_guild = {
                 queue: [],
+                previous: null,
     
                 prefix: config.PREFIX,
     
@@ -296,6 +305,39 @@ module.exports = {
 
                 Client.patrons.set(id, object);
             });
+        });
+    },
+
+    upvote(Client, id) {
+        Client.log.info("[Vote-System] User with id " + id + " voted for the bot!");
+        if(Client.voted.has(id)) {
+            Client.voted.get(id).premium = true;
+        } else {
+            var user = {
+                premium: true,
+            }
+            Client.voted.set(id, user);
+        }
+
+        console.log(Client.voted);
+        setTimeout( () => {
+            Client.voted.get(id).premium = false;
+        }, 3600000);
+    },
+
+    update(Client) {
+        Client.useable = false;
+
+        var players = Client.playermanager.array();
+
+        players.forEach(async player => {
+            await player.volume(0);
+            setTimeout(async () => {
+                await Client.playermanager.leave(player.id);
+            }, 2000);
+            var guild = Client.guilds.get(player.id);
+            if(!guild.me.lastMessage.channel) return;
+            Client.functions.createEmbed(guild.me.lastMessage.channel, texts.update_text, texts.update_title);
         });
     }
 }

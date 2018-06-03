@@ -123,7 +123,7 @@ module.exports.run = async (Client, msg, args, info) => {
                     Client.functions.createEmbed(msg.channel, texts.skip_no_song, texts.error_title);
                 }
             } else {
-                await player.stop();                
+                await player.stop();
                 if(info) {
                     Client.functions.createEmbed(msg.channel, texts.skip_single_text, texts.skip_single_title);
                 }

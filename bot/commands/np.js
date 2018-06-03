@@ -5,6 +5,7 @@ const fs = require("fs");
 let fileResume = require("./resume.js");
 let filePause = require("./pause.js");
 let fileStop = require("./stop.js");
+let filePrevious = require("./previous.js");
 let fileSkip = require("./skip.js");
 let fileLoopqueue = require("./loopqueue.js");
 let fileLoop = require("./loop.js");
@@ -15,6 +16,7 @@ var interval;
 var reactions = {
     playpause: "⏯",
     stop: "⏹",
+    previous: "⏮",
     skip: "⏭",
     loopqueue: "🔁",
     loop: "🔂",
@@ -65,6 +67,7 @@ module.exports.run = (Client, msg, args) => {
         await message.clearReactions();
         await message.react(reactions.playpause);
         await message.react(reactions.stop);
+        await message.react(reactions.previous);
         await message.react(reactions.skip);
         await message.react(reactions.loop);
         await message.react(reactions.loopqueue);
@@ -90,6 +93,10 @@ module.exports.run = (Client, msg, args) => {
                 case reactions.stop:
                     fileStop.run(Client, msg, args, false);
                     break;
+
+                case reactions.previous:
+                    filePrevious.run(Client, msg, args, false);
+                    break; 
 
                 case reactions.skip:
                     fileSkip.run(Client, msg, args, false);
@@ -175,6 +182,7 @@ module.exports.run = (Client, msg, args) => {
         await msg.clearReactions();
         await msg.react(reactions.playpause);
         await msg.react(reactions.stop);
+        await msg.react(reactions.previous);
         await msg.react(reactions.skip);
         await msg.react(reactions.loop);
         await msg.react(reactions.loopqueue);

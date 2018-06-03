@@ -3,7 +3,7 @@ const snekfetch = require('snekfetch');
 
 const config = JSON.parse(fs.readFileSync('./bot/json/config.json', 'utf8'));
 
-module.exports.run = async (Client, msg, args, action) => {
+module.exports.run = async (Client, msg, args, info, mode) => {
 
     var guild = Client.servers.get(msg.guild.id);
 
@@ -41,7 +41,7 @@ module.exports.run = async (Client, msg, args, action) => {
         const scPlaylist = /https:\/\/?soundcloud.com\/.*\/.*\/.*/.exec(args.join(" "));
 
         if(playlist) {
-            const { body } = await snekfetch.get(`https://www.googleapis.com/youtube/v3/playlists?part=id,snippet&id=${playlist[2]}&key=${config.KEY}`);
+            const { body } = await snekfetch.get(`https://www.googleapis.com/youtube/v3/playlists?part=id,snippet&id=${playlist[2]}&key=${config.keys.ytapi}`);
             if (!body.items[0]) return Client.functions.createEmbed(msg.channel, texts.error_nothing_found, texts.error_title);
             const songData = await Client.functions.getSong(args.join(" "));
             if (!songData) return Client.functions.createEmbed(msg.channel, texts.error_nothing_found, texts.error_title);
@@ -64,14 +64,14 @@ module.exports.run = async (Client, msg, args, action) => {
             Client.functions.createEmbed(msg.channel, texts.playlist_added_successfully_text, texts.playlist_added_successfully_title);
 
             for (let i = 0; i <= limit; i++) {
-                await handle(songData[i], true);
+                await handle(songData[i], true, mode);
             }                
         } else if(YTFull) {
             song = await Client.functions.getSong(YTFull[0]);
-            await handle(song[0], false);            
+            await handle(song[0], false, mode);            
         } else if(YTMini) {
             song = await Client.functions.getSong(YTMini[0]);
-            await handle(song[0], false);               
+            await handle(song[0], false, mode);               
         } else if(soundCloud) {
             Client.functions.createEmbed(msg.channel, texts.not_available, texts.error_title);
         } else if(scPlaylist) {
@@ -79,16 +79,15 @@ module.exports.run = async (Client, msg, args, action) => {
         } else {
             track = args.join(" ");
             song = await Client.functions.getSong("ytsearch: " + track);
-            await handle(song[0], false);
+            await handle(song[0], false, mode);
         }
         } else {
         track = args.join(" ");
         song = await Client.functions.getSong("ytsearch: " + track);
-        await handle(song[0], false);
+        await handle(song[0], false, mode);
     }
 
-    async function handle(song, playlist) {
-        if(!msg.guild.me.permissionsIn(msg.channel).has("SEND_MESSAGES")) return;
+    async function handle(song, playlist, mode) {
         if(song == null) return;
         if (!vc.joinable) return Client.functions.createEmbed(msg.channel, texts.no_perms_connect, texts.error_title);
         const player = await Client.playermanager.join({
@@ -114,8 +113,25 @@ module.exports.run = async (Client, msg, args, action) => {
             if(Client.functions.checkPatron(Client, guild, texts, msg, "3", false) == true) maximum = 1000;
     
             if(guild.queue.length >= maximum) return Client.functions.createEmbed(msg.channel, texts.queue_to_long, texts.error_title);
-    
-            guild.queue.push(song);
+
+            if(mode != null) {
+                if(mode == "playskip") {
+                    var current = guild.queue[0];
+                    guild.queue.shift();
+                    guild.queue.unshift(song);
+                    guild.queue.unshift(current);
+                    const player = await Client.playermanager.get(msg.guild.id);
+                    await player.stop();
+                } else if(mode == "playtop") {
+                    var current = guild.queue[0];
+                    guild.queue.shift();
+                    guild.queue.unshift(song);
+                    guild.queue.unshift(current);
+                }
+            } else {
+                guild.queue.push(song);
+            }    
+            
             if(playlist == false) Client.functions.createEmbed(msg.channel, ":musical_note: " + texts.audio_your_song + " **" + song.info.title + "** " + texts.audio_getid_added_queue_text, texts.audio_getid_added_queue);
         }
     }
@@ -140,7 +156,16 @@ module.exports.run = async (Client, msg, args, action) => {
 
             if(users == 0) {
                 if(guild.isPaused) {
-                    if(msg.guild.id != "403882830225997825") Client.playermanager.leave(msg.guild.id);
+                    if(msg.guild.id != "403882830225997825") {
+                        Client.playermanager.leave(msg.guild.id);
+                        clearInterval(guild.interval);
+                        guild.queue = [];
+                        guild.previous = null;
+                        guild.votes.clear();
+                        guild.process = 0;
+                        guild.isPaused = false;
+                        guild.isPlaying = false;
+                    }
                 } else {
                     const player = Client.playermanager.get(msg.guild.id);
                     if (!player) return;
@@ -163,6 +188,8 @@ module.exports.run = async (Client, msg, args, action) => {
 
             await clearInterval(guild.interval);
             await clearInterval(guild.check);
+
+            guild.previous = guild.queue[0];
 
             guild.votes.clear();
             guild.process = 0;
@@ -223,9 +250,13 @@ module.exports.run = async (Client, msg, args, action) => {
 
     async function leave() {
         if(vc.id == "404312098970140672") return;
+        if(Client.patrons.has(msg.guild.id)) {
+            if(Client.patrons.get(msg.guild.id).level > 0) return;
+        }
         await Client.playermanager.leave(msg.guild.id);
         await clearInterval(guild.interval);
         guild.queue = [];
+        guild.previous = null;
         await guild.votes.clear();
         guild.isPaused = false;
         guild.isPlaying = false;
@@ -237,5 +268,5 @@ module.exports.run = async (Client, msg, args, action) => {
         if (!regexp.test(str)) {
             return false;
         } else { return true; }
-    };
+    }
 }

@@ -18,6 +18,7 @@ module.exports.run = async (Client, msg, args) => {
         Client.playermanager.leave(msg.guild.id);
         clearInterval(guild.interval);
         guild.queue = [];
+        guild.previous = null;
         guild.votes.clear();
         guild.process = 0;
         guild.isPaused = false;

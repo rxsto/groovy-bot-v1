@@ -57,9 +57,6 @@ typings/
 # dotenv environment variables file
 .env
 
-# npm lock file
-package-lock.json
-
 # config
 config.json
 application.yml
@@ -67,6 +64,7 @@ config.js
 
 # data
 data
+package-lock.json
 
 # dashboard
 dashboard

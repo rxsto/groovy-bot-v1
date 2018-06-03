@@ -19,28 +19,24 @@ const texts = JSON.parse(fs.readFileSync("./bot/json/lang/en.json", "utf8"));
 
 const token = config.Test.TOKEN;
 
-const nodes = [
-    { host: config.nodes.alfHOST, port: config.nodes.alfPORT, region: "eu", password: config.nodes.alfPASS },
-    { host: config.nodes.zapHOST, port: config.nodes.zapPORT, region: "eu", password: config.nodes.zapPASS },
-    { host: config.nodes.leeHOST, port: config.nodes.leePORT, region: "eu", password: config.nodes.leePASS },
-    { host: config.nodes.yanHOST, port: config.nodes.yanPORT, region: "eu", password: config.nodes.yanPASS },
-    { host: config.nodes.lsgHOST, port: config.nodes.lsgPORT, region: "eu", password: config.nodes.lsgPASS },
-];
+const nodes = config.nodes;
 
 class Groovy extends Discord.Client {
     constructor(options) {
         super(options);
+        this.useable = true;
         this.functions = require("./util/functions.js");
         this.log = require("./util/logger.js");
         this.config = require("./json/config.js");
         this.commands = new Discord.Collection();
         this.servers = new Discord.Collection();
         this.patrons = new Discord.Collection();
+        this.voted = new Discord.Collection();
         this.playermanager = null;
         this.webhook = null;
         this.mysql = null;
+        this.dbl = null;
         this.executed = 0;
-        this.voted = {};
     }
 }
 
@@ -50,11 +46,11 @@ const init = async () => {
     await Client.login(token).then(Client.log.info("[Core] Successfully connected to Discord API"));
     Client.mysql = new Connection.MySql("127.0.0.1", "bot", config.GLOBAL_PASS, "bot");
     const { body: { shards: totalShards } } = await superagent.get("https://discordapp.com/api/gateway/bot").set("Authorization", config.Groovy.TOKEN);
-    Client.playermanager = await new Lavalink.PlayerManager(Client, nodes, {
+    Client.playermanager = new Lavalink.PlayerManager(Client, nodes, {
         user: Client.user.id,
         shards: totalShards
     });
-    await SetUp.run(Client, token);
+    await SetUp.run(Client, await Client.guilds.array(), token);
     if(token == config.TOKEN) await Client.functions.postcount(Client, Client.guilds.size);
 
     Client.webhook = new Discord.WebhookClient("450345181053583362", config.webhooks.logs);
@@ -102,8 +98,30 @@ const init = async () => {
     process.Client = Client;
 
     if(Client.token === config.Groovy.TOKEN) {
-        //require("./modules/dailyStats.js");
-        //require("./modules/currentStatistics.js");
+        var guild = Client.guilds.get("403882830225997825");
+        if(guild == null) return;
+
+        var dailyid;
+        var currentid;
+
+        var category = guild.channels.get("451387368721612810");
+
+        await category.children.array().forEach(channel => {
+            channel.delete();
+        });
+
+        await guild.createChannel("stats", "text").then(channel => {
+            channel.setParent("451387368721612810");
+            currentid = channel.id;
+        });
+
+        await guild.createChannel("daily", "text").then(channel => {
+            channel.setParent("451387368721612810");
+            dailyid = channel.id;
+        });
+
+        require("./modules/dailyStats.js")(Client, dailyid);
+        require("./modules/currentStatistics.js")(Client, currentid);
         //require("./modules/webDashboard.js")(Client);
     }
 
@@ -113,7 +131,7 @@ const init = async () => {
 
     Client.on("guildCreate", guild => {
         Client.log.info(`[Shard ${(Client.shard.id + 1)}] [GuildHandler] New guild joined: ${guild.name} (id: ${guild.id}) with ${guild.memberCount} members!`);
-        var guildlog = Client.functions.returnEmbed(`:white_check_mark: [Shard ${(Client.shard.id + 1)}] New guild joined: **${guild.name}** (id: ${guild.id}). This guild has **${guild.memberCount}** members!`, "Created");
+        var guildlog = Client.functions.returnEmbed(`:white_check_mark: [Shard ${(Client.shard.id + 1)}] New guild joined: **${guild.name}** (id: ${guild.id}). This guild has **${guild.memberCount}** members!`, "Joined");
         Client.webhook.send({ embeds: [guildlog] });
         Client.functions.postcount(Client);
 
@@ -150,15 +168,16 @@ const init = async () => {
     });
 
     Client.on('message', async msg => {
+        if(Client.useable == false) return;
         if(msg.channel.type == "dm" || msg.channel.type == "group") return;
         if(msg.guild == null) return;
         if(Client.servers.has(msg.guild.id)) {
             if(msg.content.startsWith(Client.servers.get(msg.guild.id).prefix) || msg.content.startsWith('<@'+Client.user.id+'>') || msg.content.startsWith('<@!'+Client.user.id+'>')) {
-                await commandHandler.run(Client, await msg);
+                commandHandler.run(Client, await msg);
             }
         } else {
             await Client.functions.checkGuild(Client, msg.guild, config.PREFIX, msg.guild.me.displayColor);
-            await commandHandler.run(Client, await msg);
+            commandHandler.run(Client, await msg);
         }
     });
 };

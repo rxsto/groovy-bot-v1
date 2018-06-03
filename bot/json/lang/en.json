@@ -80,7 +80,7 @@
     "paused_nothing": ":no_entry: Nothing to pause.",
     "paused_text": ":pause_button: Successfully paused.",
     "paused_title": "Paused",
-    "ping_text": "This is Groovy's current ping: ",
+    "ping_text": ":satellite: This is Groovy's current ping: ",
     "ping_title": "Ping",
     "playlist_added_successfully_text": ":white_check_mark: The playlist was added successfully!",
     "playlist_added_successfully_title": "Successfully added a playlist",
@@ -176,12 +176,14 @@
     "vote_end": ":warning: Your temporary features got disabled! Vote up in 23 hours again to get them back! If you want to be able to use Patrons-only features 24/7, you should consider donating! (https://patreon.com/rxsto) - Thank you for your support!",
     "vote_not": ":no_entry: You didn't vote! Check here: [Vote!](https://discordbots.org/bot/402116404301660181/vote)",
     "vote_not_member": ":no_entry: You need to be member of Groovy's guild to get listed! Join here: [Groovy's Discord](https://groovybot.xyz/support/)",
-    "vote_success_text": ":white_check_mark: You got added successfully to the list! Enjoy your temporary features!",
+    "vote_success_text": ":white_check_mark: You got successfully added to the list! Enjoy your temporary features!",
     "vote_success_title": "Successfully added",
-    "vote_text1": ":arrow_up: By upvoting the bot, you are going to get access to Patrons-only features for one hour! You need to upvote [here](https://discordbots.org/bot/402116404301660181/vote), and check with `",
-    "vote_text2": "vote check` to get listed! If you want to be able to use Patrons-only features 24/7, you should consider [donating!](https://patreon.com/rxsto) - Thank you for your support!",
+    "vote_text": ":arrow_up: By upvoting the bot, you are going to get access to Patrons-only features for two hours! You need to upvote [here](https://discordbots.org/bot/402116404301660181/vote) and wait for the success-message! Then you got listed! If you want to be able to use Patrons-only features 24/7, you should consider [donating!](https://patreon.com/rxsto) - Thank you for your support!",
     "vote_title": "Vote",
     "vote_wait": ":no_entry: You got access to Patrons-only features today already! Vote up again in 23h to get them back! If you want to be able to use Patrons-only features 24/7, you should consider donating! (https://patreon.com/rxsto) - Thank you for your support!",
     "wait_for_skip": ":warning: The system is not ready yet! Please wait for 5 seconds, until the song will skip!",
-    "wrong_args": ":no_entry: Check your arguments!"
+    "wrong_args": ":no_entry: Check your arguments!",
+    "previous_text": ":white_check_mark: Successfully started playing previous song!",
+    "previous_title": "Started playing previous song!",
+    "no_previous": ":no_entry: There is no previous song!"
 }

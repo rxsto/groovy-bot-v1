@@ -79,6 +79,7 @@ module.exports.run = (Client, msg, args) => {
     
                     guild.collector.on("collect", async m => {
                         if(m.author == Client.user) return;
+                        if(m.author != msg.author) return;
 
                         if(m.content.length > 10) {
                             await message.clearReactions();
@@ -158,6 +159,7 @@ module.exports.run = (Client, msg, args) => {
     
                     guild.collector.on("collect", async m => {
                         if(m.author == Client.user) return;
+                        if(m.author != msg.author) return;
 
                         if(isNaN(parseInt(m.content))) return await collected_message.edit(texts.no_number);
                         if(parseInt(m.content) < 1 || parseInt(m.content) > 50) {
@@ -234,6 +236,7 @@ module.exports.run = (Client, msg, args) => {
     
                     guild.collector.on("collect", async m => {
                         if(m.author == Client.user) return;
+                        if(m.author != msg.author) return;
                         
                         if(m.content == "true" || m.content == "on") {
                             guild.djMode = true;
@@ -314,6 +317,7 @@ module.exports.run = (Client, msg, args) => {
     
                     guild.collector.on("collect", async m => {
                         if(m.author == Client.user) return;
+                        if(m.author != msg.author) return;
 
                         if(m.content == "true" || m.content == "on") {
                             guild.announceSongs = true;
@@ -392,6 +396,9 @@ module.exports.run = (Client, msg, args) => {
     
                     guild.collector.on("collect", async m => {
                         if(m.author == Client.user) return;
+                        if(m.author != msg.author) return;
+
+                        if(Client.functions.checkPatron(Client, guild, texts, msg, "0", true) == false) return;
 
                         if(isNaN(parseInt(m.content))) return await collected_message.edit(texts.no_number);
                         if(parseInt(m.content) < 1 || parseInt(m.content) > 100) {
@@ -468,6 +475,7 @@ module.exports.run = (Client, msg, args) => {
     
                     guild.collector.on("collect", async m => {
                         if(m.author == Client.user) return;
+                        if(m.author != msg.author) return;
 
                         if(m.content.length > 25) return await collected_message.edit(texts.settings_role_to_long);
                         Client.mysql.executeQuery(`UPDATE guilds SET djRole = '${m.content}' WHERE id = '${msg.guild.id}'`);

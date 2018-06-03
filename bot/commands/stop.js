@@ -14,6 +14,7 @@ module.exports.run = async (Client, msg, args, info) => {
         const player = await Client.playermanager.get(msg.guild.id);
         if (!player) return Client.functions.createEmbed(msg.channel, texts.audio_no_player, texts.error_title);
         guild.queue = [];
+        guild.previous = null;
         await guild.votes.clear();
         guild.process = 0;
         guild.isPaused = false;
@@ -28,6 +29,7 @@ module.exports.run = async (Client, msg, args, info) => {
             const player = await Client.playermanager.get(msg.guild.id);
             if (!player) return Client.functions.createEmbed(msg.channel, texts.audio_no_player, texts.error_title);
             guild.queue = [];
+            guild.previous = null;
             await guild.votes.clear();
             guild.process = 0;
             guild.isPaused = false;
