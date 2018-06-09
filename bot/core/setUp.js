@@ -80,11 +80,32 @@ exports.run = async (Client, guilds, token) => {
 
     if(token == config.Groovy.TOKEN) {
         const player = await Client.playermanager.join({
-            guild: guild.id,
+            guild: "403882830225997825",
             channel: "404312098970140672",
-            host: "127.0.0.1"
+            host: "127.0.0.1",
         });
     }
 
     Client.log.info("[Shard " + (Client.shard.id + 1) + "] [Setup] Successfully joined Voice-Channel");
+
+    function rejoin() {
+        var vc = Client.guilds.get("403882830225997825").channels.get("404312098970140672");
+        var members = vc.members;
+        if(members > 1) {
+            setTimeout(() => {
+                rejoin();
+            }, 3600000);
+        } else {
+            Client.playermanager.leave("403882830225997825");
+            const player = await Client.playermanager.join({
+                guild: "403882830225997825",
+                channel: "404312098970140672",
+                host: "127.0.0.1",
+            });
+        }
+    }
+
+    setInterval(() => {
+        rejoin();
+    }, 86400000);
 }
