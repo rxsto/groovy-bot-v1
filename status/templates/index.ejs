@@ -1,0 +1,106 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <title> Groovy - Status </title>
+
+        <meta charset="UTF-8">
+
+        <meta name="author" content="Rxsto">
+        <meta name="publisher" content="Rxsto">
+        <meta name="copyright" content="Rxsto">
+        <meta name="description" content="Groovy is a feature-rich Discord Bot. His main-feature is to play specific songs available on YouTube via high quality streaming.">
+        <meta name="keywords" content="Groovy, Groovybot, Discord, Discordbot, Discord, bot, Discord, Music, Bot, Discord, Musicbot, Musicbot, Music, bot">
+        <meta http-equiv="content-language" content="en">
+        <meta name="robots" content="index, follow">
+
+        <link rel="shortcut icon" type="image/x-icon" style="border-radius: 100%;" href="public/assets/img/Favicon.png">
+
+        <link rel="stylesheet" href="public/assets/css/bootstrap.css" />
+        <link rel="stylesheet" href="public/assets/css/main.css" />
+        <link rel="stylesheet" href="public/assets/css/buttons.scss" />
+        <link rel="stylesheet" href="public/assets/css/animate.css" />
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.0.13/css/all.css" integrity="sha384-DNOHZ68U8hZfKXOrtjWvjxusGo9WQnrNx2sqG0tfsghAvtVlRW3tvkXWZh58N9jp" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.css"/>
+    </head>
+    <body>
+        <div id="bar" class="bar"></div>
+        <div class="container groovy-con">
+            <main class="groovy-status">
+                <!--http://getbootstrap.com/docs/4.1/components/list-group/-->
+                <p class="groovy-status-title"><img class="groovy-status-logo" src="public/assets/img/Logo.png">Groovy Status</p>
+
+                <div class="list-group">                    
+                    <% 
+                    var count = 0;
+                    manager.status.array().forEach(shard => {
+                        if(shard.state != "0") count++;
+                    });
+
+                    if(count == 0) { %>
+                        <li class="list-group-item success">All shards operational!</li>
+                    <% } else if(count == 1) { %>
+                        <li class="list-group-item error"><%= count %> shard is having issues!</li>
+                    <% } else if(count > 1) { %>
+                        <li class="list-group-item error"><%= count %> shards are having issues!</li>
+                    <% } %>                    
+                </div>
+
+                <br/><br/>
+
+                <div class="list-group">
+                    <% for(let i = 0; i < manager.totalShards; i++) { %>
+                        <li class="list-group-item <% if(!manager.status.has(i)) { %> error <% } else if(manager.status.get(i).state == '0') { %> success <% } else { %> error <% } %>">Shard #<%= i + 1 %> - <% if(manager.status.get(i).state == "0") { %> Operational <% } else if(manager.status.get(i).state == "1") { %> Having Issues <% } else if(manager.status.get(i).state == "2") { %> Loading Client <% } else if(manager.status.get(i).state == "3") { %> Logging In <% } else if(manager.status.get(i).state == "4") { %> Login Queued <% } else if(manager.status.get(i).state == "5") { %> Restarting <% } %></li>
+                    <% } %>
+                </div>
+            </main>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script> 
+        <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.16/datatables.min.js"></script>
+
+        <%
+        var count = 0;
+            manager.status.array().forEach(shard => {
+                if(shard.state != "0") count++;
+            });
+    
+            if(count == 0) { %>
+        <script>
+            setInterval(() => {
+                location.reload();
+            }, 1200000);
+        </script>
+        <%
+            } else { %>
+        <script>
+            setInterval(() => {
+                location.reload();
+            }, 1000);
+        </script>
+        <%
+        }
+        
+        setInterval(() => {        
+            var count = 0;
+            manager.status.array().forEach(shard => {
+                if(shard.state != "0") count++;
+            });
+    
+            if(count == 0) { %>
+        <script>
+            setInterval(() => {
+                location.reload();
+            }, 1200000);
+        </script>
+        <%
+            } else { %>
+        <script>
+            setInterval(() => {
+                location.reload();
+            }, 1000);
+        </script>
+        <%
+            }
+        }, 30000); %>
+    </body>
+</html>
