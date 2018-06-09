@@ -12,4 +12,6 @@ module.exports.run = async (Client, msg, args) => {
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
     Client.shard.broadcastEval('this.functions.reload(this);');
+
+    Client.functions.createEmbed(msg.channel, "Successfully reloaded all patrons!", "Reloaded");
 }

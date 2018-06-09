@@ -8,16 +8,16 @@ module.exports.run = async (Client, msg, args) => {
 
     var vc = msg.member.voiceChannel;
 
-    if(Client.functions.checkDJ(guild, msg) == false) return Client.functions.createEmbed(msg.channel, texts.no_dj + "`" + guild.djRole + "`!", texts.error_title);
+    if(Client.functions.checkDJ(guild, msg) == false) return Client.functions.createEmbed(msg.channel, texts.general_no_dj + "`" + guild.djRole + "`!", texts.error_title);
 
-    if(vc == msg.guild.me.voiceChannel) return Client.functions.createEmbed(msg.channel, texts.is_same_vc, texts.error_title);
+    if(vc == msg.guild.me.voiceChannel) return Client.functions.createEmbed(msg.channel, texts.command_join_is_already_vc, texts.error_title);
 
-    if(!vc) return Client.functions.createEmbed(msg.channel, texts.no_channel, texts.error_title);
+    if(!vc) return Client.functions.createEmbed(msg.channel, texts.general_not_in_channel, texts.error_title);
 
     if (!vc.joinable) {
-        return Client.functions.createEmbed(msg.channel, texts.no_perms_connect, texts.error_title);
+        return Client.functions.createEmbed(msg.channel, texts.general_no_perms_connect, texts.error_title);
     } else if (!vc.speakable) {
-        return Client.functions.createEmbed(msg.channel, texts.no_perms_speak, texts.error_title);
+        return Client.functions.createEmbed(msg.channel, texts.general_no_perms_speak, texts.error_title);
     }
     
     const player = await Client.playermanager.join({
@@ -57,5 +57,5 @@ module.exports.run = async (Client, msg, args) => {
         }
     }, 600000);
 
-    Client.functions.createEmbed(msg.channel, texts.joined_text, texts.joined_title);
+    Client.functions.createEmbed(msg.channel, texts.command_join_text, texts.command_join_text);
 }

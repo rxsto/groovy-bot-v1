@@ -11,10 +11,7 @@ module.exports.run = async (Client, msg, args) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
-    Client.shard.broadcastEval('this.functions.update(this);');    
+    Client.shard.broadcastEval('this.functions.update(this);');
 
-    // save queue + proccess foreach player
-    // save loop, loopqueue, shuffle, pause etc
-
-    // add init with join etc
+    Client.functions.createEmbed(msg.channel, "Successfully updated the bot!", "Updated");
 }

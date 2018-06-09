@@ -30,7 +30,7 @@ module.exports.run = (Client, msg, args) => {
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
     if(!guild.queue[0]) {
-        Client.functions.createEmbed(msg.channel, texts.np_nothing, texts.np_title);
+        Client.functions.createEmbed(msg.channel, texts.command_np_nothing, texts.command_np_title);
         return;
     }
 
@@ -79,7 +79,7 @@ module.exports.run = (Client, msg, args) => {
             const player = Client.playermanager.get(msg.guild.id);
             if (!player) return;
 
-            if(msg.member.voiceChannel != msg.guild.me.voiceChannel) return Client.functions.createEmbed(msg.channel, texts.same_channel, texts.error_title);
+            if(msg.member.voiceChannel != msg.guild.me.voiceChannel) return Client.functions.createEmbed(msg.channel, texts.general_same_channel, texts.error_title);
 
             switch(reaction.emoji.name) {
                 case reactions.playpause:
@@ -175,7 +175,7 @@ module.exports.run = (Client, msg, args) => {
 
     async function resetReactions(msg) {
         var message;
-        msg.channel.send(texts.np_setting_emojis).then((m) => {
+        msg.channel.send(texts.general_setting_emojis).then((m) => {
             message = m;
         });
 

@@ -11,5 +11,5 @@ module.exports.run = (Client, msg, args) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
     
-    Client.functions.createEmbed(msg.channel, texts.vote_text, texts.vote_title);
+    Client.functions.createEmbed(msg.channel, texts.command_vote_text, texts.command_vote_title);
 }

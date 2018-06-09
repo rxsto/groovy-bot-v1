@@ -31,28 +31,29 @@ module.exports.run = async (Client, msg, args) => {
 
     var emb_stats =  {
         embed: {
-            color: msg.channel.guild.me.displayColor, title: texts.stats_title,
+            color: msg.channel.guild.me.displayColor, 
+            title: texts.command_stats_title,
             thumbnail: {
               url: Client.user.avatarURL
             },
             fields: [
                 {
-                    name: texts.stats_servers,
+                    name: texts.command_stats_servers,
                     value: servers,
                     inline: true
                 },
                 {
-                    name: texts.stats_members,
+                    name: texts.command_stats_members,
                     value: members,
                     inline: true
                 },
                 {
-                    name: texts.stats_playing,
+                    name: texts.command_stats_playing,
                     value: playing,
                     inline: true
                 },
                 {
-                    name: texts.stats_commands,
+                    name: texts.command_stats_commands,
                     value: commands,
                     inline: true
                 }

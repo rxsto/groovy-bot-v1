@@ -14,7 +14,7 @@ module.exports.run = async (Client, msg) => {
     if(msg.channel.type == "text" && msg.content.startsWith(guild.prefix) || msg.content.startsWith('<@'+Client.user.id+'>') || msg.content.startsWith('<@!'+Client.user.id+'>')) {
         if(Client.functions.checkPermissions(Client, msg) == false) return;
 
-        if(msg.isMemberMentioned(msg.guild.me)) return Client.functions.createEmbed(msg.channel, texts.mentioned + guild.prefix + "`", texts.mentioned_title);
+        if(msg.isMemberMentioned(msg.guild.me)) return Client.functions.createEmbed(msg.channel, texts.general_mentioned_text + " `" + guild.prefix + "`", texts.general_mentioned_title);
 
         var invoke = msg.content.split(' ')[0].substr(guild.prefix.length);
         var args   = msg.content.split(' ').slice(1);

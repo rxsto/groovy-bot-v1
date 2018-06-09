@@ -23,10 +23,10 @@ dbl.webhook.on('vote', vote => {
         manager.broadcastEval(`this.functions.upvote(this, "${vote.user}");`);
     }
 
-    global.msgUser(vote.user, texts.vote_success_text);
+    global.msgUser(vote.user, texts.command_vote_success);
 
     setTimeout( () => {
-        global.msgUser(vote.user, texts.vote_end);
+        global.msgUser(vote.user, texts.command_vote_end);
     }, 3600000);
 });
 

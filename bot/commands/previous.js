@@ -8,7 +8,7 @@ module.exports.run = async (Client, msg, args, info) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
-    if(guild.previous == null) return Client.functions.createEmbed(msg.channel, texts.no_previous, texts.error_title);
+    if(guild.previous == null) return Client.functions.createEmbed(msg.channel, texts.command_previous_error, texts.error_title);
 
     const player = Client.playermanager.get(msg.guild.id);
     if (!player) return Client.functions.createEmbed(msg.channel, texts.audio_no_player, texts.error_title);
@@ -20,5 +20,5 @@ module.exports.run = async (Client, msg, args, info) => {
 
     await player.stop();
 
-    Client.functions.createEmbed(msg.channel, texts.previous_text, texts.previous_title);
+    Client.functions.createEmbed(msg.channel, texts.command_previous_text, texts.command_previous_title);
 }

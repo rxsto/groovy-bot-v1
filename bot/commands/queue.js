@@ -12,7 +12,7 @@ module.exports.run = async (Client, msg, args) => {
     
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
-    if(guild.queue.length == 0) return Client.functions.createEmbed(msg.channel, texts.queue_nothing, texts.error_title);
+    if(guild.queue.length == 0) return Client.functions.createEmbed(msg.channel, texts.command_queue_nothing, texts.error_title);
 
     var page = 1;
     var pages = Math.ceil(guild.queue.length / 10);
@@ -102,17 +102,17 @@ module.exports.run = async (Client, msg, args) => {
         return content;
     }
 
-    async function resetReactions(msg_to_reset) {
-        var message_to_delete;
-        msg_to_reset.channel.send(texts.np_setting_emojis).then((m) => {
-            message_to_delete = m;
+    async function resetReactions(msg) {
+        var message;
+        msg.channel.send(texts.general_setting_emojis).then((m) => {
+            message = m;
         });
 
-        await msg_to_reset.clearReactions();
+        await msg.clearReactions();
     
-        await msg_to_reset.react('⏪');
-        await msg_to_reset.react('⏩');
+        await msg.react('⏪');
+        await msg.react('⏩');
 
-        await message_to_delete.delete();
+        await message.delete();
     }
 }

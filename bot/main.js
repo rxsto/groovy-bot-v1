@@ -158,7 +158,7 @@ const init = async () => {
         if(channel == null) return;
         if(!guild.me.permissionsIn(channel).has("SEND_MESSAGES")) return;
 
-        Client.functions.createEmbed(channel, texts.first_join, texts.first_join_title);
+        Client.functions.createEmbed(channel, texts.general_first_join_text, texts.general_first_join_title);
     });
 
     Client.on("guildDelete", guild => {
@@ -184,7 +184,7 @@ const init = async () => {
         server.isPaused = false;
         server.isPlaying = false;
 
-        guild.owner.send(texts.left_guild);
+        guild.owner.send(texts.general_left_text);
     });
 
     Client.on('message', async msg => {
@@ -198,13 +198,13 @@ const init = async () => {
         } else {
             await Client.functions.checkGuild(Client, msg.guild, config.PREFIX, msg.guild.me.displayColor);
             if(msg.guild.me.permissionsIn(msg.channel).has("USE_EXTERNAL_EMOJIS")) {
-                msg.channel.send("<:check:449207827026673677> " + texts.init_guild).then(msg => {
+                msg.channel.send("<:check:449207827026673677> " + texts.general_init_guild).then(msg => {
                     setTimeout(() => {
                         msg.delete();
                     }, 2500);
                 });
             } else {
-                msg.channel.send(":white_check_mark: " + texts.init_guild).then(msg => {
+                msg.channel.send(":white_check_mark: " + texts.general_init_guild).then(msg => {
                     setTimeout(() => {
                         msg.delete();
                     }, 2500);

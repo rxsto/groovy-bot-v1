@@ -6,12 +6,12 @@ module.exports.run = (Client, msg, args) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
-    if(msg.member.voiceChannel != msg.guild.me.voiceChannel) return Client.functions.createEmbed(msg.channel, texts.same_channel, texts.error_title);
+    if(msg.member.voiceChannel != msg.guild.me.voiceChannel) return Client.functions.createEmbed(msg.channel, texts.general_same_channel, texts.error_title);
 
-    if(Client.functions.checkDJ(guild, msg) == false) return Client.functions.createEmbed(msg.channel, texts.no_dj + "`" + guild.djRole + "`!", texts.error_title);
+    if(Client.functions.checkDJ(guild, msg) == false) return Client.functions.createEmbed(msg.channel, texts.general_no_dj + "`" + guild.djRole + "`!", texts.error_title);
 
-    if(!args[0]) return Client.functions.createEmbed(msg.channel, texts.no_arguments, texts.error_title);
-    if(args[1]) return Client.functions.createEmbed(msg.channel, texts.invalid_seek_position, texts.error_title);
+    if(!args[0]) return Client.functions.createEmbed(msg.channel, texts.general_no_arguments, texts.error_title);
+    if(args[1]) return Client.functions.createEmbed(msg.channel, texts.general_invalid_seek_position, texts.error_title);
 
     var content = args.join(" ");
     var position = content.split(":");
@@ -22,9 +22,9 @@ module.exports.run = (Client, msg, args) => {
         if(isNaN(number)) get = true;
     });
 
-    if(get == true) return Client.functions.createEmbed(msg.channel, texts.no_number, texts.error_title);
+    if(get == true) return Client.functions.createEmbed(msg.channel, texts.general_no_number, texts.error_title);
 
-    if(position.length > 4 || position.length < 1) return Client.functions.createEmbed(msg.channel, texts.invalid_seek_position, texts.error_title);
+    if(position.length > 4 || position.length < 1) return Client.functions.createEmbed(msg.channel, texts.general_invalid_seek_position, texts.error_title);
 
     switch (position.length) {
         case 1:
@@ -50,9 +50,9 @@ module.exports.run = (Client, msg, args) => {
     if (!player) return Client.functions.createEmbed(msg.channel, texts.audio_no_player, texts.error_title);
 
     var jumpto = amount * 1000;
-    if(jumpto > guild.queue[0].info.length) return Client.functions.createEmbed(msg.channel, texts.number_to_big, texts.error_title);
+    if(jumpto > guild.queue[0].info.length) return Client.functions.createEmbed(msg.channel, texts.general_number_to_big, texts.error_title);
     guild.process = jumpto / 1000;
 
     player.seek(jumpto);
-    Client.functions.createEmbed(msg.channel, ":fast_forward: " + texts.seek_text + "`" + new Date(jumpto).toISOString().substr(11, 8) + "`!", texts.seek_title);
+    Client.functions.createEmbed(msg.channel, ":fast_forward: " + texts.command_seek_text + "`" + new Date(jumpto).toISOString().substr(11, 8) + "`!", texts.command_seek_title);
 }

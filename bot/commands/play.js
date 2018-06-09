@@ -12,11 +12,11 @@ module.exports.run = async (Client, msg, args, info, mode) => {
     var vc = msg.member.voiceChannel;
     var search = args.join(" ");
 
-    if(!vc) return Client.functions.createEmbed(msg.channel, texts.no_channel, texts.error_title);    
-    if(!args[0]) return Client.functions.createEmbed(msg.channel, texts.no_arguments, texts.error_title);
-    if(!vc.joinable) return Client.functions.createEmbed(msg.channel, texts.no_perms_connect, texts.error_title);
-    if(!vc.speakable) return Client.functions.createEmbed(msg.channel, texts.no_perms_speak, texts.error_title);
-    if(msg.guild.me.voiceChannel) if(vc != msg.guild.me.voiceChannel) return Client.functions.createEmbed(msg.channel, texts.same_channel, texts.error_title);
+    if(!vc) return Client.functions.createEmbed(msg.channel, texts.general_not_in_channel, texts.error_title);    
+    if(!args[0]) return Client.functions.createEmbed(msg.channel, texts.general_no_arguments, texts.error_title);
+    if(!vc.joinable) return Client.functions.createEmbed(msg.channel, texts.general_no_perms_connect, texts.error_title);
+    if(!vc.speakable) return Client.functions.createEmbed(msg.channel, texts.general_no_perms_speak, texts.error_title);
+    if(msg.guild.me.voiceChannel) if(vc != msg.guild.me.voiceChannel) return Client.functions.createEmbed(msg.channel, texts.general_same_channel, texts.error_title);
     
     if(guild.isPaused) {
         const player = Client.playermanager.get(msg.guild.id);
@@ -51,7 +51,7 @@ module.exports.run = async (Client, msg, args, info, mode) => {
             if(Client.functions.checkPatron(Client, guild, texts, msg, "2", false) == true) maximum = 300;
             if(Client.functions.checkPatron(Client, guild, texts, msg, "3", false) == true) maximum = 1000;
 
-            if(songData.length >= limit) Client.functions.createEmbed(msg.channel, texts.not_whole_playlist, texts.error_title);
+            if(songData.length >= limit) Client.functions.createEmbed(msg.channel, texts.command_play_not_whole_playlist, texts.error_title);
 
             if(songData.length >= limit) {
                 limit = limit;
@@ -61,7 +61,7 @@ module.exports.run = async (Client, msg, args, info, mode) => {
 
             limit = limit - 1;
 
-            Client.functions.createEmbed(msg.channel, texts.playlist_added_successfully_text, texts.playlist_added_successfully_title);
+            Client.functions.createEmbed(msg.channel, texts.command_play_playlist_text, texts.command_play_playlist_title);
 
             for (let i = 0; i <= limit; i++) {
                 await handle(songData[i], true, mode);
@@ -73,9 +73,9 @@ module.exports.run = async (Client, msg, args, info, mode) => {
             song = await Client.functions.getSong(YTMini[0]);
             await handle(song[0], false, mode);               
         } else if(soundCloud) {
-            Client.functions.createEmbed(msg.channel, texts.not_available, texts.error_title);
+            Client.functions.createEmbed(msg.channel, texts.error_not_available, texts.error_title);
         } else if(scPlaylist) {
-            Client.functions.createEmbed(msg.channel, texts.not_available, texts.error_title);
+            Client.functions.createEmbed(msg.channel, texts.error_not_available, texts.error_title);
         } else {
             track = args.join(" ");
             song = await Client.functions.getSong("ytsearch: " + track);
@@ -89,14 +89,13 @@ module.exports.run = async (Client, msg, args, info, mode) => {
 
     async function handle(song, playlist, mode) {
         if(song == null) return;
-        if (!vc.joinable) return Client.functions.createEmbed(msg.channel, texts.no_perms_connect, texts.error_title);
         const player = await Client.playermanager.join({
             guild: msg.guild.id,
             channel: msg.member.voiceChannelID,
             host: "127.0.0.1"
         });
     
-        if (!player) return Client.functions.createEmbed(msg.channel, texts.audio_no_player, texts.error_title);
+        if (!player) return Client.functions.createEmbed(msg.channel, texts.general_no_player, texts.error_title);
         
         await player.volume(guild.defaultVolume);
         song.info.member = msg.member;
@@ -112,7 +111,7 @@ module.exports.run = async (Client, msg, args, info, mode) => {
             if(Client.functions.checkPatron(Client, guild, texts, msg, "2", false) == true) maximum = 300;
             if(Client.functions.checkPatron(Client, guild, texts, msg, "3", false) == true) maximum = 1000;
     
-            if(guild.queue.length >= maximum) return Client.functions.createEmbed(msg.channel, texts.queue_to_long, texts.error_title);
+            if(guild.queue.length >= maximum) return Client.functions.createEmbed(msg.channel, texts.command_play_queue_full, texts.error_title);
 
             if(mode != null) {
                 if(mode == "playskip") {
@@ -132,14 +131,13 @@ module.exports.run = async (Client, msg, args, info, mode) => {
                 guild.queue.push(song);
             }    
             
-            if(playlist == false) Client.functions.createEmbed(msg.channel, ":musical_note: " + texts.audio_your_song + " **" + song.info.title + "** " + texts.audio_getid_added_queue_text, texts.audio_getid_added_queue);
+            if(playlist == false) Client.functions.createEmbed(msg.channel, texts.command_play_your_song + " **" + song.info.title + "** " + texts.command_play_added_text, texts.command_play_added_title);
         }
     }
 
     async function play() {
         const player = await Client.playermanager.get(msg.guild.id);
-        if (!player) return Client.functions.createEmbed(msg.channel, texts.audio_no_player, texts.error_title);
-        if (!vc.speakable) return Client.functions.createEmbed(msg.channel, texts.no_perms_speak, texts.error_title);
+        if (!player) return Client.functions.createEmbed(msg.channel, texts.general_no_player, texts.error_title);
         await player.play(guild.queue[0].track);
         guild.isPlaying = true;
         guild.interval = setInterval(function(){ guild.process++ }, 1000);
@@ -177,7 +175,7 @@ module.exports.run = async (Client, msg, args, info, mode) => {
 
         if(guild.announceSongs) {
             if(guild.loopSong == false && guild.loopQueue == false) {
-                Client.functions.createEmbed(msg.channel, ":musical_note: " + texts.audio_playsong_now_playing_text1 + "**" + guild.queue[0].info.title + "**" + texts.audio_playsong_now_playing_text2, texts.audio_playsong_now_playing_title);
+                Client.functions.createEmbed(msg.channel, ":musical_note: " + texts.command_play_your_song + " **" + guild.queue[0].info.title + "** " + texts.command_play_now_text, texts.command_play_now_title);
             }            
         }
 

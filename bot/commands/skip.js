@@ -8,7 +8,7 @@ module.exports.run = async (Client, msg, args, info) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
-    if(msg.member.voiceChannel != msg.guild.me.voiceChannel) return Client.functions.createEmbed(msg.channel, texts.same_channel, texts.error_title);
+    if(msg.member.voiceChannel != msg.guild.me.voiceChannel) return Client.functions.createEmbed(msg.channel, texts.general_same_channel, texts.error_title);
 
     if(guild.djMode) {
         if(msg.member.hasPermission("KICK_MEMBERS", false, true, true)) return skip();
@@ -22,14 +22,14 @@ module.exports.run = async (Client, msg, args, info) => {
             if(percentage >= 1) {
                 await skip();
             } else {
-                if(guild.votes.has(msg.author.id)) return Client.functions.createEmbed(msg.channel, texts.skip_vote_already, texts.error_title);
+                if(guild.votes.has(msg.author.id)) return Client.functions.createEmbed(msg.channel, texts.command_skip_vote_already, texts.error_title);
                 guild.votes.set(msg.author.id, msg.author);
                 if(Math.floor(guild.votes.size / members) >= 1) return await skip();
 
                 var emb = new RichEmbed();
-                emb.setDescription(texts.skip_vote_text + "`" + guild.votes.size + "`!");
+                emb.setDescription(texts.command_skip_vote_text + "`" + guild.votes.size + "`!");
                 emb.setColor(msg.channel.guild.me.displayColor);
-                emb.setTitle(texts.skip_vote_title)
+                emb.setTitle(texts.command_skip_vote_title)
 
                 msg.channel.send(emb).then(async message => {
                     await resetReactions(message);
@@ -39,7 +39,7 @@ module.exports.run = async (Client, msg, args, info) => {
                     guild.collector = new ReactionCollector(message, reaction_filter, { time: 600000 });
                     
                     guild.collector.on("collect", async r => {
-                        if(msg.member.voiceChannel != msg.guild.me.voiceChannel) return Client.functions.createEmbed(msg.channel, texts.same_channel, texts.error_title);
+                        if(msg.member.voiceChannel != msg.guild.me.voiceChannel) return Client.functions.createEmbed(msg.channel, texts.general_same_channel, texts.error_title);
                         
                         switch(r.emoji.name) {
                             case "⬆":
@@ -62,9 +62,9 @@ module.exports.run = async (Client, msg, args, info) => {
                                 return await skip();
                             } else {
                                 var emb = new RichEmbed();        
-                                emb.setDescription(texts.skip_vote_text + "`" + guild.votes.size + "`!");
+                                emb.setDescription(texts.command_skip_vote_text + "`" + guild.votes.size + "`!");
                                 emb.setColor(msg.channel.guild.me.displayColor);
-                                emb.setTitle(texts.skip_vote_title);
+                                emb.setTitle(texts.command_skip_vote_title);
                                 message.edit(new_emb);
                             }
 
@@ -93,14 +93,14 @@ module.exports.run = async (Client, msg, args, info) => {
         if(args[0]) {
             if(args[1]) {                
                 if(info) {
-                    Client.functions.createEmbed(msg.channel, texts.skip_args, texts.error_title);
+                    Client.functions.createEmbed(msg.channel, texts.command_skip_args, texts.error_title);
                 }
             } else {
                 var pos = args.join(" ");
                 if(!isNaN(pos)) {
                     if(pos > guild.queue.length) {                        
                         if(info) {
-                            Client.functions.createEmbed(msg.channel, texts.skip_shorter, texts.error_title);
+                            Client.functions.createEmbed(msg.channel, texts.command_skip_shorter, texts.error_title);
                         }
                     } else {
                         var remove = pos - 2;
@@ -108,24 +108,24 @@ module.exports.run = async (Client, msg, args, info) => {
                         guild.process = 0;
                         await player.stop();
                         if(info) {
-                            Client.functions.createEmbed(msg.channel, texts.skip_text + args + ".", texts.skip_title + args + "");
+                            Client.functions.createEmbed(msg.channel, texts.command_skip_text + args + ".", texts.command_skip_title + args + "");
                         }
                     }
                 } else {                    
                     if(info) {
-                        Client.functions.createEmbed(msg.channel, texts.no_number, texts.error_title);
+                        Client.functions.createEmbed(msg.channel, texts.general_no_number, texts.error_title);
                     }
                 }
             }
         } else {
             if(!guild.queue[1]) {                
                 if(info) {
-                    Client.functions.createEmbed(msg.channel, texts.skip_no_song, texts.error_title);
+                    Client.functions.createEmbed(msg.channel, texts.command_skip_no_song, texts.error_title);
                 }
             } else {
                 await player.stop();
                 if(info) {
-                    Client.functions.createEmbed(msg.channel, texts.skip_single_text, texts.skip_single_title);
+                    Client.functions.createEmbed(msg.channel, texts.command_skip_single_text, texts.command_skip_single_title);
                 }
             }
         }     
@@ -143,16 +143,16 @@ module.exports.run = async (Client, msg, args, info) => {
         });
     }
 
-    async function resetReactions(msg_to_reset) {
-        var message_to_delete;
-        await msg_to_reset.channel.send(texts.np_setting_emojis).then((m) => {
-            message_to_delete = m;
+    async function resetReactions(msg) {
+        var message;
+        msg.channel.send(texts.general_setting_emojis).then((m) => {
+            message = m;
         });
 
-        await msg_to_reset.clearReactions();
+        await msg.clearReactions();
     
-        await msg_to_reset.react('⬆');
+        await msg.react('⬆');
 
-        await message_to_delete.delete();
+        await message.delete();
     }
 }

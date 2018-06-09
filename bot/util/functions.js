@@ -102,7 +102,7 @@ module.exports = {
         }
     
         if(check == false) {
-            if(info) Client.functions.createEmbed(msg.channel, texts.no_patron1 + guild.prefix + texts.no_patron2, texts.error_title);
+            if(info) Client.functions.createEmbed(msg.channel, texts.general_no_patron_text_1 + guild.prefix + texts.general_no_patron_text_2, texts.error_title);
             return false;
         }
     
@@ -127,7 +127,7 @@ module.exports = {
         }
     
         if(check == false) {
-            if(info) Client.functions.createEmbed(msg.channel, texts.low_patron, texts.error_title);
+            if(info) Client.functions.createEmbed(msg.channel, texts.general_to_low_patron, texts.error_title);
             return false;
         }
 
@@ -317,7 +317,7 @@ module.exports = {
             }, 2000);
             var guild = Client.guilds.get(player.id);
             if(!guild.me.lastMessage.channel) return;
-            Client.functions.createEmbed(guild.me.lastMessage.channel, texts.update_text, texts.update_title);
+            Client.functions.createEmbed(guild.me.lastMessage.channel, texts.general_update_text, texts.general_update_title);
         });
 
         Client.functions.createEmbed(msg.channel, "Successfully started update!", "Started update");

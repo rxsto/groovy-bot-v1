@@ -6,5 +6,5 @@ module.exports.run = (Client, msg, args) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
-    Client.functions.createEmbed(msg.channel, texts.invite_text, texts.invite_title);
+    Client.functions.createEmbed(msg.channel, texts.command_invite_text, texts.command_invite_title);
 }

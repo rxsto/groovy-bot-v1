@@ -6,7 +6,7 @@ module.exports.run = async (Client, msg, args, info) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
-    if(Client.functions.checkDJ(guild, msg) == false) return Client.functions.createEmbed(msg.channel, texts.no_dj + "`" + guild.djRole + "`!", texts.error_title);
+    if(Client.functions.checkDJ(guild, msg) == false) return Client.functions.createEmbed(msg.channel, texts.general_no_dj + "`" + guild.djRole + "`!", texts.error_title);
     
     if(!msg.member.voiceChannel) return;
 
@@ -37,10 +37,10 @@ module.exports.run = async (Client, msg, args, info) => {
             clearInterval(guild.interval);
             await player.stop();
             if(info) {
-                Client.functions.createEmbed(msg.channel, texts.stop_text, texts.stop_title);
+                Client.functions.createEmbed(msg.channel, texts.command_stop_text, texts.command_stop_title);
             }
         } else {
-            Client.functions.createEmbed(msg.channel, texts.same_channel, texts.error_title);
+            Client.functions.createEmbed(msg.channel, texts.general_same_channel, texts.error_title);
         }
     }
 }
