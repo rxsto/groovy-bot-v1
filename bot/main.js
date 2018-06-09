@@ -167,6 +167,12 @@ const init = async () => {
         Client.webhook.send({ embeds: [guildlog] });
         Client.functions.postcount(Client);
 
+        try {    
+            Client.mysql.executeQuery(`DELETE FROM guilds WHERE id = '${guild.id}'`);
+        } catch (error) {
+            Client.log.error(`[Shard ${(Client.shard.id + 1)}] [Core] ` + error);
+        }
+
         var server = Client.servers.get(guild.id);
 
         Client.playermanager.leave(guild.id);
@@ -178,11 +184,7 @@ const init = async () => {
         server.isPaused = false;
         server.isPlaying = false;
 
-        try {    
-            Client.mysql.executeQuery(`DELETE FROM guilds WHERE id = '${guild.id}'`);
-        } catch (error) {
-            Client.log.error(`[Shard ${(Client.shard.id + 1)}] [Core] ` + error);
-        }
+        guild.owner.send(texts.left_guild);
     });
 
     Client.on('message', async msg => {
