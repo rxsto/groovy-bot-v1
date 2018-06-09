@@ -6,23 +6,23 @@ const log = require("./logger.js");
 const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
 
 class MySql {
-    constructor(host, user, password, database) {
+    constructor(host, user, database) {
         log.info("[MySQL] Initializing MySQL-Connection");
 
         this.con = MySqlMod.createConnection({
-            host:     "127.0.0.1",
-            user:     "bot",
+            host:     host,
+            user:     user,
             password: config.GLOBAL_PASS,
-            database: "bot",
+            database: database,
             supportBigNumbers: true,
-            bigNumberStrings: true
+            bigNumberStrings: true,
         });
 
         this.scon = new syncSQL({
-            host:     "127.0.0.1",
-            user:     "bot",
+            host:     host,
+            user:     user,
             password: config.GLOBAL_PASS,
-            database: "bot"
+            database: database,
         });
 
         this.connect({
