@@ -137,7 +137,6 @@ module.exports.run = async (Client, msg, args, info, mode) => {
     }
 
     async function play() {
-        if(!msg.guild.me.permissionsIn(msg.channel).has("SEND_MESSAGES")) return;
         const player = await Client.playermanager.get(msg.guild.id);
         if (!player) return Client.functions.createEmbed(msg.channel, texts.audio_no_player, texts.error_title);
         if (!vc.speakable) return Client.functions.createEmbed(msg.channel, texts.no_perms_speak, texts.error_title);
