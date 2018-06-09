@@ -18,6 +18,12 @@ exports.run = async (Client, guilds, token) => {
     results.forEach(guild => {
         var id = guild.id;
 
+        var djMode = false;
+        var announceSongs = false;
+
+        if(guild.djMode == 1) djMode = true;
+        if(guild.announceSongs == 1) announceSongs = true;
+
         var guild = {
             prefix: guild.prefix,
             djMode: guild.djMode,
@@ -67,7 +73,7 @@ exports.run = async (Client, guilds, token) => {
         }
     });
         
-    Client.log.info(`[SetUp] Initialized ${guilds_check} guilds`);
+    Client.log.info(`[Shard ${Client.shard.id + 1}] [SetUp] Initialized ${guilds_check} guilds`);
 
     const guild = Client.guilds.get("403882830225997825");
     if(!guild) return;
