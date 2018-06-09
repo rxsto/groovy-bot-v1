@@ -1,6 +1,7 @@
 const Discord = require("discord.js");
 const Dbl = require("dblapi.js");
 const fs = require("fs");
+const colors = require("colors");
 
 const global = require("./global.js");
 
@@ -8,12 +9,11 @@ const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
 const texts = JSON.parse(fs.readFileSync("./bot/json/lang/en.json", "utf8"));
 
 var manager;
-var users = new Discord.Collection();
 
 const dbl = new Dbl(config.keys.dbl, { webhookPort: 1234, webhookAuth: config.passwords.dblwebhook });
 
 dbl.webhook.on('ready', hook => {
-    console.log(`Webhook running at http://${hook.hostname}:${hook.port}${hook.path}`);
+    info(`Webhook running at http://${hook.hostname}:${hook.port}${hook.path}`);
 });
 
 dbl.webhook.on('vote', vote => {
@@ -29,6 +29,37 @@ dbl.webhook.on('vote', vote => {
         global.msgUser(vote.user, texts.vote_end);
     }, 3600000);
 });
+
+function info(content) {
+    var first = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '').split(" ")[1];
+    var upgrade = first.split(":");
+
+    upgrade[0] = parseInt(upgrade[0]) + 2;
+    var time = upgrade.join(":");
+
+    content.split('\n').forEach(s => {
+        console.log(`[${time}] ` + colors.green(` ${'[ INFO ]'} `) + ` ${s}`);
+        write_info(`[${time}] ` + ` ${'[ INFO ]'} ` + ` ${s}`);
+    });
+}
+
+function write_info(text) {
+    var time = new Date().toISOString().split("T")[0];
+
+    fs.stat(`logs/Groovy_Info_${time}.txt`, function(err, stat) {
+        if(err == null) {
+            fs.appendFile(`logs/Groovy_Info_${time}.txt`, `${text}\n`, (err) => {
+                if (err) console.log(err);
+            }); 
+        } else if(err.code == 'ENOENT') {
+            fs.writeFile(`logs/Groovy_Info_${time}.txt`, `${text}\n`, (err) => {
+                if (err) console.log(err);
+            });
+        } else {
+            console.log('Some other error: ', err.code);
+        }
+    });
+}
 
 module.exports.setManager = function(newmanager) {
     manager = newmanager;
