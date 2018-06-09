@@ -43,8 +43,10 @@ class Groovy extends Discord.Client {
 const Client = new Groovy({ messageCacheMaxSize: 100, messageCacheLifetime: 86400, messageSweepInterval: 86400, disabledEvents: ['TYPING_START'] });
 
 const init = async () => {
+    Client.shard.send("3");
     await Client.login(token).then(Client.log.info("[Core] Successfully connected to Discord API"));
-    Client.mysql = new Connection.MySql("127.0.0.1", "bot", config.GLOBAL_PASS, "bot");
+    Client.shard.send("2");
+    Client.mysql = new Connection.MySql("127.0.0.1", "bot", "bot");
     const { body: { shards: totalShards } } = await superagent.get("https://discordapp.com/api/gateway/bot").set("Authorization", config.Groovy.TOKEN);
     Client.playermanager = new Lavalink.PlayerManager(Client, nodes, {
         user: Client.user.id,
@@ -99,34 +101,39 @@ const init = async () => {
 
     if(Client.token === config.Groovy.TOKEN) {
         var guild = Client.guilds.get("403882830225997825");
-        if(guild == null) return;
 
-        var dailyid;
-        var currentid;
-
-        var category = guild.channels.get("451387368721612810");
-
-        await category.children.array().forEach(channel => {
-            channel.delete();
-        });
-
-        await guild.createChannel("stats", "text").then(channel => {
-            channel.setParent("451387368721612810");
-            currentid = channel.id;
-        });
-
-        await guild.createChannel("daily", "text").then(channel => {
-            channel.setParent("451387368721612810");
-            dailyid = channel.id;
-        });
-
-        require("./modules/dailyStats.js")(Client, dailyid);
-        require("./modules/currentStatistics.js")(Client, currentid);
+        if(guild != null) {
+            var dailyid;
+            var currentid;
+    
+            var category = guild.channels.get("451387368721612810");
+    
+            await category.children.array().forEach(channel => {
+                channel.delete();
+            });
+    
+            await guild.createChannel("stats", "text").then(channel => {
+                channel.setParent("451387368721612810");
+                currentid = channel.id;
+            });
+    
+            await guild.createChannel("daily", "text").then(channel => {
+                channel.setParent("451387368721612810");
+                dailyid = channel.id;
+            });
+    
+            require("./modules/dailyStats.js")(Client, dailyid);
+            require("./modules/currentStatistics.js")(Client, currentid);
+        }
+        
         //require("./modules/webDashboard.js")(Client);
     }
 
+    Client.shard.send("0");
+
     Client.on("error", error => {
         logger.error("[Shard " + (Client.shard.id + 1) + "] [Core] " + error);
+        Client.shard.send("1");
     });
 
     Client.on("guildCreate", guild => {
@@ -160,6 +167,17 @@ const init = async () => {
         Client.webhook.send({ embeds: [guildlog] });
         Client.functions.postcount(Client);
 
+        var server = Client.servers.get(guild.id);
+
+        Client.playermanager.leave(guild.id);
+        clearInterval(server.interval);
+        server.queue = [];
+        server.previous = null;
+        server.votes.clear();
+        server.process = 0;
+        server.isPaused = false;
+        server.isPlaying = false;
+
         try {    
             Client.mysql.executeQuery(`DELETE FROM guilds WHERE id = '${guild.id}'`);
         } catch (error) {
@@ -169,19 +187,35 @@ const init = async () => {
 
     Client.on('message', async msg => {
         if(Client.useable == false) return;
-        if(msg.channel.type == "dm" || msg.channel.type == "group") return;
-        if(msg.guild == null) return;
+        if(msg.channel.type != "text") return;
+        if(msg.author.bot) return;
         if(Client.servers.has(msg.guild.id)) {
             if(msg.content.startsWith(Client.servers.get(msg.guild.id).prefix) || msg.content.startsWith('<@'+Client.user.id+'>') || msg.content.startsWith('<@!'+Client.user.id+'>')) {
-                commandHandler.run(Client, await msg);
+                commandHandler.run(Client, msg);
             }
         } else {
             await Client.functions.checkGuild(Client, msg.guild, config.PREFIX, msg.guild.me.displayColor);
-            commandHandler.run(Client, await msg);
+            if(msg.guild.me.permissionsIn(msg.channel).has("USE_EXTERNAL_EMOJIS")) {
+                msg.channel.send("<:check:449207827026673677> " + texts.init_guild).then(msg => {
+                    setTimeout(() => {
+                        msg.delete();
+                    }, 2500);
+                });
+            } else {
+                msg.channel.send(":white_check_mark: " + texts.init_guild).then(msg => {
+                    setTimeout(() => {
+                        msg.delete();
+                    }, 2500);
+                });
+            }
         }
     });
 };
 
 init();
+
+module.exports.getClient = () => {
+    return Client;
+}
 
 process.on("unhandledRejection", error => logger.error(`[Shard ${(Client.shard.id + 1)}] unhandledRejection:\n${error.stack}`)).on("uncaughtException", error => logger.error(`[Shard ${(Client.shard.id + 1)}] uncaughtException:\n${error.stack}`)).on("error", error => logger.error(`[Shard ${(Client.shard.id + 1)}] Error:\n${error.stack}`)).on("warn", error => logger.error(`[Shard ${(Client.shard.id + 1)}] Warning:\n${error.stack}`));
