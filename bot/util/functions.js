@@ -345,5 +345,11 @@ module.exports = {
         }
 
         return true;
+    },
+
+    restart(Client, id) {
+        if(id) if((Client.shard.id + 1) != id) return;
+        Client.shard.send("3");
+        process.exit(0);
     }
 }
