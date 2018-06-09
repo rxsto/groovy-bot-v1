@@ -3,7 +3,7 @@ module.exports.list = {
     aliases: "aliases.js", al: "aliases.js",
     info: "info.js",
     partner: "partner.js",
-    sponsor: "sponsor.js",
+    sponsor: "sponsor.js", sponsors: "sponsor.js",
     invite: "invite.js",
     support: "support.js",
     donate: "donate.js",
@@ -46,4 +46,5 @@ module.exports.list = {
     update: "update.js",
     eval: "eval.js",
     reload: "reload.js",
+    shards: "shards.js",
 }
