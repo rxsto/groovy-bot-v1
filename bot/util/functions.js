@@ -2,19 +2,18 @@ const Discord = require("discord.js");
 const snekfetch = require("snekfetch");
 const superagent = require('superagent');
 const fs = require("fs");
-const PlexiDevApi = require('plexibotsapi');
 
 const readdir = require("util").promisify(require("fs").readdir);
+
+const main = require("../main.js");
 
 const log = require("./logger.js");
 
 const config = JSON.parse(fs.readFileSync('./bot/json/config.json', 'utf8'));
 
-let api = new PlexiDevApi(config.keys.plexi);
-
 module.exports = {
     async getSong(string) {
-        const res = await snekfetch.get(`http://localhost:2333/loadtracks`).query({ identifier: string }).set("Authorization", config.GLOBAL_PASS).catch(err => {
+        const res = await snekfetch.get(`http://81.30.144.101:2333/loadtracks`).query({ identifier: string }).set("Authorization", config.GLOBAL_PASS).catch(err => {
             console.error(err);
             return null;
         });
@@ -34,7 +33,7 @@ module.exports = {
             user_count = results.reduce((prev, val) => prev + val, 0);
         }).catch(console.error);
 
-        var sql = `UPDATE stats SET (servers, members) = ('${server_count}', '${user_count}') WHERE id = '402116404301660181'`;
+        var sql = `UPDATE stats SET servers = '${server_count}', members = '${user_count}' WHERE id = '402116404301660181'`;
         Client.mysql.executeQuery(sql);
         
         const { body: { shards: totalShards } } = await superagent.get("https://discordapp.com/api/gateway/bot").set("Authorization", config.Groovy.TOKEN);
@@ -65,9 +64,6 @@ module.exports = {
             })
             .then()
             .catch(err => log.error("[PostServerCount] 3 " + err));
-    
-        api.postServers(Client.user.id, server_count);
-        api.postUsers(Client.user.id, server_count);
     
         snekfetch.post("https://botsfordiscord.com/api/v1/bots/402116404301660181")
             .set("Authorization", config.keys.botsfor)
@@ -145,33 +141,15 @@ module.exports = {
         
         emb.setDescription(content);
         emb.setColor(channel.guild.me.displayColor);
-        emb.setTitle(title)
-        
-        channel.send(emb).then((m) => {
-            message = m
-        });
-        
-        random_emb();
-
-        return message;
-        
-        function random_emb() {
-            var vote_embed = new Discord.RichEmbed();
-            vote_embed.setDescription(":mega: You want to get access to Patrons-only features? You can test them daily for 2 hours by upvoting Groovy! You need to upvote [here](https://discordbots.org/bot/402116404301660181/vote) and check the vote command!");
-            vote_embed.setColor(channel.guild.me.displayColor);
-            vote_embed.setTitle("Patrons-only features! Vote up!");
-    
-            var check = Math.floor((Math.random() * 100) + 1);
-    
-            if(check == 42) channel.send(vote_embed);
-        }
+        emb.setAuthor(title, main.getClient().user.avatarURL);
+        channel.send(emb);
     },
 
     returnEmbed(content, title) {
         var emb = new Discord.RichEmbed();
         
         emb.setDescription(content);
-        emb.setTitle(title);
+        emb.setAuthor(title, main.getClient().user.avatarURL);
 
         return emb;
     },
@@ -305,6 +283,8 @@ module.exports = {
 
                 Client.patrons.set(id, object);
             });
+
+            Client.functions.createEmbed(msg.channel, "Successfully reloaded patrons!", "Reloaded patrons");
         });
     },
 
@@ -339,5 +319,31 @@ module.exports = {
             if(!guild.me.lastMessage.channel) return;
             Client.functions.createEmbed(guild.me.lastMessage.channel, texts.update_text, texts.update_title);
         });
+
+        Client.functions.createEmbed(msg.channel, "Successfully started update!", "Started update");
+    },
+
+    checkPermissions(Client, msg) {
+        if(!msg.guild.me.permissionsIn(msg.channel).has("SEND_MESSAGES")) {
+            msg.author.send("<:error:449207829619015680> I am not allowed to send messages into this channel! Please check my permissions!");
+            return false;
+        }
+
+        if(!msg.guild.me.permissionsIn(msg.channel).has("USE_EXTERNAL_EMOJIS")) {
+            Client.functions.createEmbed(":x: I am not allowed to use external emojis in this channel! Please check my permissions!", "Error");
+            return false;
+        }
+
+        if(!msg.guild.me.permissionsIn(msg.channel).has("EMBED_LINKS")) {
+            Client.functions.createEmbed(":x: I am not allowed to send links into this channel! Please check my permissions!", "Error");
+            return false;
+        }
+
+        if(!msg.guild.me.permissionsIn(msg.channel).has("ADD_REACTIONS")) {
+            Client.functions.createEmbed(":x: I am not allowed to add reactions to this message! Please check my permissions!", "Error");
+            return false;
+        }
+
+        return true;
     }
 }
