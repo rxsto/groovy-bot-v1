@@ -1,14 +1,11 @@
 var manager;
 
 exports.msgUser = function(id,msg){
-	var rand = Math.floor(Math.random()*manager.totalShards);
+	var x = Math.floor(Math.random() * manager.totalShards);
 	manager.broadcastEval(`
-		if(this.shard.id==${rand}){
-			this.fetchUser('${id}')
-			.then(user => {
-				if(user!=undefined)
-					user.send(\`${msg}\`)
-					.catch(err => console.error(err));
+		if(this.shard.id==${x}){
+			this.fetchUser('${id}').then(user => {
+				if(user != undefined) user.send(\`${msg}\`).catch(err => console.error(err));
 			}).catch(err => console.error(err));
 		}
 	`);
