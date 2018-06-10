@@ -1,0 +1,17 @@
+version: '3'
+
+services:
+  groovy-bot:
+    image: 'node:10'
+    working_dir: /home/bot/docker
+    volumes:
+      - ./:/home/bot/docker
+    expose:
+      - '80'
+      - '4224'
+      - '4334'
+      - '27589'
+      - '6544'
+      - '2584'
+      - '2333'
+    command: 'npm start'
