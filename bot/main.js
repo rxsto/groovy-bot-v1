@@ -27,11 +27,11 @@ class Groovy extends Discord.Client {
         this.useable = true;
         this.functions = require("./util/functions.js");
         this.log = require("./util/logger.js");
-        this.config = require("./json/config.js");
         this.commands = new Discord.Collection();
         this.servers = new Discord.Collection();
         this.patrons = new Discord.Collection();
         this.voted = new Discord.Collection();
+        this.emotes = new Discord.Collection();
         this.playermanager = null;
         this.webhook = null;
         this.mysql = null;
@@ -50,7 +50,7 @@ const init = async () => {
     const { body: { shards: totalShards } } = await superagent.get("https://discordapp.com/api/gateway/bot").set("Authorization", config.Groovy.TOKEN);
     Client.playermanager = new Lavalink.PlayerManager(Client, nodes, {
         user: Client.user.id,
-        shards: totalShards
+        shards: totalShards,
     });
     await SetUp.run(Client, await Client.guilds.array(), token);
     if(token == config.TOKEN) await Client.functions.postcount(Client, Client.guilds.size);
