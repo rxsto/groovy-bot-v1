@@ -9,6 +9,12 @@ exports.run = async (Client, guilds, token) => {
         Client.appInfo = await Client.fetchApplication();
     }, 60000);
 
+    Client.emotes.set("check", "<:check:449207827026673677> ");
+    Client.emotes.set("error", "<:error:449207829619015680> ");
+    Client.emotes.set("info", "<:info:455302054689374239> ");
+    Client.emotes.set("warning", ":warning: ");
+    Client.emotes.set("point", ":white_small_square: ");
+
     Client.user.setPresence({ game: { name: "" }, status: "online" });    
 
     var results = await Client.mysql.executeSelect(`SELECT * FROM guilds`);
@@ -26,9 +32,9 @@ exports.run = async (Client, guilds, token) => {
 
         var guild = {
             prefix: guild.prefix,
-            djMode: guild.djMode,
+            djMode: djMode,
             djRole: guild.djRole,
-            announceSongs: guild.announceSongs,
+            announceSongs: announceSongs,
             queueLength: guild.queueLength,
             defaultVolume: guild.defaultVolume,
             language: guild.language,
@@ -88,7 +94,7 @@ exports.run = async (Client, guilds, token) => {
 
     Client.log.info("[Shard " + (Client.shard.id + 1) + "] [Setup] Successfully joined Voice-Channel");
 
-    function rejoin() {
+    async function rejoin() {
         var vc = Client.guilds.get("403882830225997825").channels.get("404312098970140672");
         var members = vc.members;
         if(members > 1) {
