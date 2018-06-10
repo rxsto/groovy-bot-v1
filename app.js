@@ -76,9 +76,6 @@ async function init() {
             case "5":
             status.setState(shard.id, "5", Manager);
             break;
-    
-            default:
-            status.setState(shard.id, "1", Manager);
         }
     });
     
