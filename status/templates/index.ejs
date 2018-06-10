@@ -49,7 +49,7 @@
 
                 <div class="list-group">
                     <% for(let i = 0; i < manager.totalShards; i++) { %>
-                        <li class="list-group-item <% if(!manager.status.has(i)) { %> error <% } else if(manager.status.get(i).state == '0') { %> success <% } else { %> error <% } %>">Shard #<%= i + 1 %> - <% if(manager.status.get(i).state == "0") { %> Operational <% } else if(manager.status.get(i).state == "1") { %> Having Issues <% } else if(manager.status.get(i).state == "2") { %> Loading Client <% } else if(manager.status.get(i).state == "3") { %> Logging In <% } else if(manager.status.get(i).state == "4") { %> Login Queued <% } else if(manager.status.get(i).state == "5") { %> Restarting <% } %></li>
+                        <li class="list-group-item <% if(!manager.status.has(i)) { %> error <% } else if(manager.status.get(i).state == '0') { %> success <% } else { %> error <% } %>">Shard #<%= i + 1 %> - <% if(manager.status.get(i).state == "0") { %> Operational <% } else if(manager.status.get(i).state == "1") { %> Having Issues <% } else if(manager.status.get(i).state == "2") { %> Loading Client <% } else if(manager.status.get(i).state == "3") { %> Logging In <% } else if(manager.status.get(i).state == "4") { %> Login Queued <% } else if(manager.status.get(i).state == "5") { %> Restarting <% } else { %> undefined <% } %> </li>
                     <% } %>
                 </div>
             </main>
