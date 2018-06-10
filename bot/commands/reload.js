@@ -13,5 +13,5 @@ module.exports.run = async (Client, msg, args) => {
 
     Client.shard.broadcastEval('this.functions.reload(this);');
 
-    Client.functions.createEmbed(msg.channel, "Successfully reloaded all patrons!", "Reloaded");
+    Client.functions.createEmbed(msg.channel, Client.emotes.get("check") + "Successfully reloaded all patrons!", "Reloaded");
 }

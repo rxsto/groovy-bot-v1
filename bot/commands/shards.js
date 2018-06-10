@@ -11,21 +11,33 @@ module.exports.run = async (Client, msg, args) => {
 
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
-    if(args[1]) return Client.functions.createEmbed(msg.channel, ":x: Error! Usage: " + guild.prefix + " restart [id:id:id...]", "Error");
+    if(args[2]) return Client.functions.createEmbed(msg.channel, Client.emotes.get("error") + "Usage: " + guild.prefix + "shards restart [id:id...]", "Error");
 
-    if(!args[0]) {
-        Client.shard.broadcastEval('this.functions.restart(this);');
-        Client.functions.createEmbed(msg.channel, "<:check:449207827026673677> Successfully restarted all shards, please be patient!", "Restarted");
-    } else {
-        var shards = args.split(":");
-        if(shards.length > 1) {
-            for (let i = 0; index < shards.length; i++) {
-                Client.shard.broadcastEval(`this.functions.restart(this, ${shards[i]});`);
-            }
-            Client.functions.createEmbed(msg.channel, "<:check:449207827026673677> Successfully restarted " + shards.length + " shards (" + shards.join(", ") +  "), please be patient!", "Restarted");
+    if(!args[0]) return Client.functions.createEmbed(msg.channel, Client.emotes.get("error") + "Usage: " + guild.prefix + "shards restart [id:id...]", "Error");
+
+    console.log(args);
+
+    if(args[0] == "restart") {
+        if(!args[1]) {
+            Client.functions.createEmbed(msg.channel, Client.emotes.get("check") + "Successfully restarted all shards, please be patient!", "Restarted");
+            setTimeout(() => {
+                Client.shard.broadcastEval('this.functions.restart(this);');
+            }, 2000);        
         } else {
-            Client.shard.broadcastEval(`this.functions.restart(this, ${shards[0]});`);
-            Client.functions.createEmbed(msg.channel, "<:check:449207827026673677> Successfully restarted shard " + shards[0] + ", please be patient!", "Restarted");
+            var shards = args[1].split(":");
+            if(shards.length > 1) {
+                Client.functions.createEmbed(msg.channel, Client.emotes.get("check") + "Successfully restarted " + shards.length + " shards (" + shards.join(", ") +  "), please be patient!", "Restarted");
+                setTimeout(() => {
+                    for (let i = 0; i < shards.length; i++) {
+                        Client.shard.broadcastEval(`this.functions.restart(this, ${shards[i]});`);
+                    }
+                }, 2000);
+            } else {
+                Client.functions.createEmbed(msg.channel, Client.emotes.get("check") + "Successfully restarted shard " + shards[0] + ", please be patient!", "Restarted");
+                setTimeout(() => {
+                    Client.shard.broadcastEval(`this.functions.restart(this, ${shards[0]});`);
+                }, 2000);            
+            }
         }
     }
 }

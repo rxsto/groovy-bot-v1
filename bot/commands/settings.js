@@ -2,6 +2,8 @@ const fs = require("fs");
 
 const { RichEmbed, ReactionCollector, MessageCollector } = require('discord.js');
 
+const main = require("../main.js");
+
 const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
 
 module.exports.run = (Client, msg, args) => {
@@ -12,7 +14,11 @@ module.exports.run = (Client, msg, args) => {
 
     var emb =  {
         embed: {
-            color: msg.channel.guild.me.highestRole.color, title: "Groovy - Settings",
+            color: msg.channel.guild.me.highestRole.color,
+            author: {
+                name: "Groovy - Settings",
+                icon_url: main.getClient().user.avatarURL
+            },
             fields: [
                 {
                     name: ":exclamation: " + texts.command_settings_prefix,
@@ -45,7 +51,7 @@ module.exports.run = (Client, msg, args) => {
                     inline: true
                 },
                 {
-                    name: texts.command_settings_help_internal_title,
+                    name: Client.emotes.get("info") + texts.command_settings_help_internal_title,
                     value: texts.command_settings_help_internal_text,
                     inline: false
                 }
@@ -96,7 +102,11 @@ module.exports.run = (Client, msg, args) => {
 
                         var new_emb =  {
                             embed: {
-                                color: msg.channel.guild.me.highestRole.color, title: "Groovy - Settings",
+                                color: msg.channel.guild.me.highestRole.color,
+                                author: {
+                                    name: "Groovy - Settings",
+                                    icon_url: main.getClient().user.avatarURL
+                                },
                                 fields: [
                                     {
                                         name: ":exclamation: " + texts.command_settings_prefix,
@@ -129,7 +139,7 @@ module.exports.run = (Client, msg, args) => {
                                         inline: true
                                     },
                                     {
-                                        name: texts.command_settings_help_internal_title,
+                                        name: Client.emotes.get("info") + texts.command_settings_help_internal_title,
                                         value: texts.command_settings_help_internal_text,
                                         inline: false
                                     }
@@ -175,7 +185,11 @@ module.exports.run = (Client, msg, args) => {
 
                         var new_emb =  {
                             embed: {
-                                color: msg.channel.guild.me.highestRole.color, title: "Groovy - Settings",
+                                color: msg.channel.guild.me.highestRole.color,
+                                author: {
+                                    name: "Groovy - Settings",
+                                    icon_url: main.getClient().user.avatarURL
+                                },
                                 fields: [
                                     {
                                         name: ":exclamation: " + texts.command_settings_prefix,
@@ -208,7 +222,7 @@ module.exports.run = (Client, msg, args) => {
                                         inline: true
                                     },
                                     {
-                                        name: texts.command_settings_help_internal_title,
+                                        name: Client.emotes.get("info") + texts.command_settings_help_internal_title,
                                         value: texts.command_settings_help_internal_text,
                                         inline: false
                                     }
@@ -256,7 +270,11 @@ module.exports.run = (Client, msg, args) => {
 
                         var new_emb =  {
                             embed: {
-                                color: msg.channel.guild.me.highestRole.color, title: "Groovy - Settings",
+                                color: msg.channel.guild.me.highestRole.color,
+                                author: {
+                                    name: "Groovy - Settings",
+                                    icon_url: main.getClient().user.avatarURL
+                                },
                                 fields: [
                                     {
                                         name: ":exclamation: " + texts.command_settings_prefix,
@@ -289,7 +307,7 @@ module.exports.run = (Client, msg, args) => {
                                         inline: true
                                     },
                                     {
-                                        name: texts.command_settings_help_internal_title,
+                                        name: Client.emotes.get("info") + texts.command_settings_help_internal_title,
                                         value: texts.command_settings_help_internal_text,
                                         inline: false
                                     }
@@ -335,7 +353,11 @@ module.exports.run = (Client, msg, args) => {
 
                         var new_emb =  {
                             embed: {
-                                color: msg.channel.guild.me.highestRole.color, title: "Groovy - Settings",
+                                color: msg.channel.guild.me.highestRole.color,
+                                author: {
+                                    name: "Groovy - Settings",
+                                    icon_url: main.getClient().user.avatarURL
+                                },
                                 fields: [
                                     {
                                         name: ":exclamation: " + texts.command_settings_prefix,
@@ -368,7 +390,7 @@ module.exports.run = (Client, msg, args) => {
                                         inline: true
                                     },
                                     {
-                                        name: texts.command_settings_help_internal_title,
+                                        name: Client.emotes.get("info") + texts.command_settings_help_internal_title,
                                         value: texts.command_settings_help_internal_text,
                                         inline: false
                                     }
@@ -414,7 +436,11 @@ module.exports.run = (Client, msg, args) => {
 
                         var new_emb =  {
                             embed: {
-                                color: msg.channel.guild.me.highestRole.color, title: "Groovy - Settings",
+                                color: msg.channel.guild.me.highestRole.color,
+                                author: {
+                                    name: "Groovy - Settings",
+                                    icon_url: main.getClient().user.avatarURL
+                                },
                                 fields: [
                                     {
                                         name: ":exclamation: " + texts.command_settings_prefix,
@@ -447,7 +473,7 @@ module.exports.run = (Client, msg, args) => {
                                         inline: true
                                     },
                                     {
-                                        name: texts.command_settings_help_internal_title,
+                                        name: Client.emotes.get("info") + texts.command_settings_help_internal_title,
                                         value: texts.command_settings_help_internal_text,
                                         inline: false
                                     }
@@ -487,7 +513,11 @@ module.exports.run = (Client, msg, args) => {
 
                         var new_emb =  {
                             embed: {
-                                color: msg.channel.guild.me.highestRole.color, title: "Groovy - Settings",
+                                color: msg.channel.guild.me.highestRole.color,
+                                author: {
+                                    name: "Groovy - Settings",
+                                    icon_url: main.getClient().user.avatarURL
+                                },
                                 fields: [
                                     {
                                         name: ":exclamation: " + texts.command_settings_prefix,
@@ -520,7 +550,7 @@ module.exports.run = (Client, msg, args) => {
                                         inline: true
                                     },
                                     {
-                                        name: texts.command_settings_help_internal_title,
+                                        name: Client.emotes.get("info") + texts.command_settings_help_internal_title,
                                         value: texts.command_settings_help_internal_text,
                                         inline: false
                                     }
@@ -556,7 +586,7 @@ module.exports.run = (Client, msg, args) => {
 
     async function resetReactions(msg_to_reset) {
         var message_to_delete;
-        await msg_to_reset.channel.send(texts.np_setting_emojis).then((m) => {
+        msg_to_reset.channel.send(Client.emotes.get("warning") + texts.general_setting_emojis).then((m) => {
             message_to_delete = m;
         });
 

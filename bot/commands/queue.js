@@ -1,6 +1,8 @@
 const fs = require("fs");
 const { RichEmbed, ReactionCollector } = require('discord.js');
 
+const main = require("../main.js");
+
 const reactions = {
     backwards: "⏪",
     forwards: "⏩",
@@ -12,7 +14,7 @@ module.exports.run = async (Client, msg, args) => {
     
     texts = JSON.parse(fs.readFileSync( "./bot/json/lang/" + guild.language + ".json", 'utf8'));
 
-    if(guild.queue.length == 0) return Client.functions.createEmbed(msg.channel, texts.command_queue_nothing, texts.error_title);
+    if(guild.queue.length == 0) return Client.functions.createEmbed(msg.channel, Client.emotes.get("error") + texts.command_queue_nothing, texts.error_title);
 
     var page = 1;
     var pages = Math.ceil(guild.queue.length / 10);
@@ -26,7 +28,7 @@ module.exports.run = async (Client, msg, args) => {
 
     const embed = new RichEmbed()
         .setColor(msg.guild.me.displayColor)
-        .setTitle("Queue")
+        .setAuthor(texts.command_queue_title, main.getClient().user.avatarURL)
         .setFooter(`Page ${page} of ${pages}`)
         .setDescription(generateContent());
     
@@ -104,7 +106,7 @@ module.exports.run = async (Client, msg, args) => {
 
     async function resetReactions(msg) {
         var message;
-        msg.channel.send(texts.general_setting_emojis).then((m) => {
+        msg.channel.send(Client.emotes.get("warning") + texts.general_setting_emojis).then((m) => {
             message = m;
         });
 

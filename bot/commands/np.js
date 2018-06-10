@@ -2,6 +2,8 @@ const { RichEmbed, ReactionCollector } = require('discord.js');
 
 const fs = require("fs");
 
+const main = require("../main.js");
+
 let fileResume = require("./resume.js");
 let filePause = require("./pause.js");
 let fileStop = require("./stop.js");
@@ -43,13 +45,13 @@ module.exports.run = (Client, msg, args) => {
     var percentage = Math.floor(go);
 
     var stopped_embed = new RichEmbed();
-    stopped_embed.setDescription(texts.np_nothing);
-    stopped_embed.setTitle(texts.np_title);
+    stopped_embed.setDescription(texts.command_np_nothing);
+    stopped_embed.setAuthor(texts.command_np_title, main.getClient().user.avatarURL);
     stopped_embed.setColor(msg.guild.me.highestRole.color);
 
     var playing_embed = new RichEmbed();
     playing_embed.setDescription(((!guild.isPaused ? ":arrow_forward: " : ":pause_button: ") + getpercentage(percentage) + " `[" + new Date(guild.process * 1000).toISOString().substr(11, 8) + "/" + new Date(guild.queue[0].info.length).toISOString().substr(11, 8) + "]`"  + (guild.loopSong ? " :repeat_one:" : "") + (guild.loopQueue ? " :repeat:" : "") + (guild.isShuffling ? " :twisted_rightwards_arrows:" : "") + " :loud_sound:"));
-    playing_embed.setTitle(guild.queue[0].info.title);
+    playing_embed.setAuthor(guild.queue[0].info.title, main.getClient().user.avatarURL);
     playing_embed.setColor(msg.guild.me.highestRole.color);
 
     msg.channel.send('', playing_embed).then(async message => {
@@ -60,7 +62,7 @@ module.exports.run = (Client, msg, args) => {
         guild.collector = new ReactionCollector(message, reaction_filter, { time: 3600000 });
 
         var message_warning;
-        msg.channel.send(texts.np_setting_emojis).then((m) => {
+        msg.channel.send(Client.emotes.get("warning") + texts.general_setting_emojis).then((m) => {
             message_warning = m;
         });
 
@@ -124,7 +126,7 @@ module.exports.run = (Client, msg, args) => {
         interval = setInterval( () => {
             if(!guild.queue[0]) {
                 clearInterval(interval);
-                message.edit("", stopped_embed);
+                message.edit(stopped_embed);
                 message.clearReactions();
             } else {
                 var pr = guild.process;
@@ -135,10 +137,10 @@ module.exports.run = (Client, msg, args) => {
                 var second_embed = new RichEmbed();
             
                 second_embed.setDescription(((!guild.isPaused ? ":arrow_forward: " : ":pause_button: ") + getpercentage(percentage) + " `[" + new Date(guild.process * 1000).toISOString().substr(11, 8) + "/" + new Date(guild.queue[0].info.length).toISOString().substr(11, 8) + "]`"  + (guild.loopSong ? " :repeat_one:" : "") + (guild.loopQueue ? " :repeat:" : "") + (guild.isShuffling ? " :twisted_rightwards_arrows:" : "") + " :loud_sound:"));
-                second_embed.setTitle(guild.queue[0].info.title);
+                second_embed.setAuthor(guild.queue[0].info.title, main.getClient().user.avatarURL);
                 second_embed.setColor(msg.guild.me.highestRole.color);
 
-                message.edit("", second_embed);
+                message.edit(second_embed);
             }        
         }, 5000);
 
@@ -175,7 +177,7 @@ module.exports.run = (Client, msg, args) => {
 
     async function resetReactions(msg) {
         var message;
-        msg.channel.send(texts.general_setting_emojis).then((m) => {
+        msg.channel.send(Client.emotes.get("warning") + texts.general_setting_emojis).then((m) => {
             message = m;
         });
 

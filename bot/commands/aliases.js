@@ -23,7 +23,7 @@ module.exports.run = async (Client, msg, args) => {
             message += " `" + alias + "`";
         } else {
             if(command != "help") message += "\n";
-            message += "▫ `" + command + "` useable with `" + alias + "`";
+            message += "▫ `" + command + "` : `" + alias + "`";
         }
         last_command = command;
     }

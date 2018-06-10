@@ -13,5 +13,5 @@ module.exports.run = async (Client, msg, args) => {
 
     Client.shard.broadcastEval('this.functions.update(this);');
 
-    Client.functions.createEmbed(msg.channel, "Successfully updated the bot!", "Updated");
+    Client.functions.createEmbed(msg.channel, Client.emotes.get("check") + "Successfully updated the bot!", "Updated");
 }
