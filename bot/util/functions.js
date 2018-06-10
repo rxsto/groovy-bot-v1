@@ -13,7 +13,7 @@ const config = JSON.parse(fs.readFileSync('./bot/json/config.json', 'utf8'));
 
 module.exports = {
     async getSong(string) {
-        const res = await snekfetch.get(`http://81.30.144.101:2333/loadtracks`).query({ identifier: string }).set("Authorization", config.GLOBAL_PASS).catch(err => {
+        const res = await snekfetch.get(`http://127.0.0.1:2333/loadtracks`).query({ identifier: string }).set("Authorization", config.GLOBAL_PASS).catch(err => {
             console.error(err);
             return null;
         });
@@ -33,8 +33,8 @@ module.exports = {
             user_count = results.reduce((prev, val) => prev + val, 0);
         }).catch(console.error);
 
-        var sql = `UPDATE stats SET servers = '${server_count}', members = '${user_count}' WHERE id = '402116404301660181'`;
-        Client.mysql.executeQuery(sql);
+        /*var sql = `UPDATE stats SET servers = '${server_count}', members = '${user_count}' WHERE id = '402116404301660181'`;
+        Client.mysql.executeQuery(sql);*/
         
         const { body: { shards: totalShards } } = await superagent.get("https://discordapp.com/api/gateway/bot").set("Authorization", config.Groovy.TOKEN);
     
@@ -79,6 +79,7 @@ module.exports = {
     checkDJ(guild, msg) {
         if(guild.djMode) {
             if(msg.member.hasPermission("KICK_MEMBERS", false, true, true)) return true;
+            if(msg.member.vc) if(msg.member.vc.members.size < 2) return true;
             if(!msg.member.roles.find("name", guild.djRole)) {
                 return false;
             } else {
@@ -102,7 +103,7 @@ module.exports = {
         }
     
         if(check == false) {
-            if(info) Client.functions.createEmbed(msg.channel, texts.general_no_patron_text_1 + guild.prefix + texts.general_no_patron_text_2, texts.error_title);
+            if(info) Client.functions.createEmbed(msg.channel, Client.emotes.get("error") + texts.general_no_patron_text_1 + guild.prefix + texts.general_no_patron_text_2, texts.error_title);
             return false;
         }
     
@@ -127,7 +128,7 @@ module.exports = {
         }
     
         if(check == false) {
-            if(info) Client.functions.createEmbed(msg.channel, texts.general_to_low_patron, texts.error_title);
+            if(info) Client.functions.createEmbed(msg.channel, Client.emotes.get("error") + texts.general_to_low_patron, texts.error_title);
             return false;
         }
 
@@ -283,8 +284,6 @@ module.exports = {
 
                 Client.patrons.set(id, object);
             });
-
-            Client.functions.createEmbed(msg.channel, "Successfully reloaded patrons!", "Reloaded patrons");
         });
     },
 
@@ -319,8 +318,6 @@ module.exports = {
             if(!guild.me.lastMessage.channel) return;
             Client.functions.createEmbed(guild.me.lastMessage.channel, texts.general_update_text, texts.general_update_title);
         });
-
-        Client.functions.createEmbed(msg.channel, "Successfully started update!", "Started update");
     },
 
     checkPermissions(Client, msg) {
@@ -348,8 +345,14 @@ module.exports = {
     },
 
     restart(Client, id) {
-        if(id) if((Client.shard.id + 1) != id) return;
-        Client.shard.send("3");
-        process.exit(0);
+        var local_id = (Client.shard.id + 1);
+        var id = id;
+        if(id) {
+            if(local_id == id) {
+                process.exit(0);
+            }
+        } else {
+            process.exit(0);
+        }
     }
 }
