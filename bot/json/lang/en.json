@@ -121,7 +121,7 @@
     "command_skip_vote_already": "You already voted for a skip!",
     "command_skip_vote_text": ":mega: Somebody voted for a skip! Current votes: ",
     "command_skip_vote_title": "Somebody voted",
-    "command_sponsor_text": "We are proudly sponsored by these hosters!\n\n:gem: Premium Hosters\n:crown: Helpful Hosters\n:tools: Supporting Hosters\n\n:white_small_square: :gem: [LudusHosting](https://ludus-hosting.de/aff.php?aff=29)\n:white_small_square: :crown: [Zap-Hosting](https://zap-hosting.com/groovybot)",
+    "command_sponsor_text": "We are proudly sponsored by these hosters!\n\n:gem: Premium Hosters\n:crown: Helpful Hosters\n:tools: Supporting Hosters\n\n:white_small_square: :crown: [BoltN-Hosting](https://boltn-hosting.com)\n:white_small_square: :crown: [Zap-Hosting](https://zap-hosting.com/groovybot)",
     "command_sponsor_title": "Groovy - Sponsors",
     "command_stats_commands": "Commands Used",
     "command_stats_members": "Total Members",
