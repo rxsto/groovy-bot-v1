@@ -46,12 +46,12 @@ module.exports.run = (Client, msg, args) => {
 
     var stopped_embed = new RichEmbed();
     stopped_embed.setDescription(texts.command_np_nothing);
-    stopped_embed.setAuthor(texts.command_np_title, main.getClient().user.avatarURL);
+    stopped_embed.setAuthor(texts.command_np_title);
     stopped_embed.setColor(msg.guild.me.highestRole.color);
 
     var playing_embed = new RichEmbed();
     playing_embed.setDescription(((!guild.isPaused ? ":arrow_forward: " : ":pause_button: ") + getpercentage(percentage) + " `[" + new Date(guild.process * 1000).toISOString().substr(11, 8) + "/" + new Date(guild.queue[0].info.length).toISOString().substr(11, 8) + "]`"  + (guild.loopSong ? " :repeat_one:" : "") + (guild.loopQueue ? " :repeat:" : "") + (guild.isShuffling ? " :twisted_rightwards_arrows:" : "") + " :loud_sound:"));
-    playing_embed.setAuthor(guild.queue[0].info.title, main.getClient().user.avatarURL);
+    playing_embed.setAuthor(guild.queue[0].info.title);
     playing_embed.setColor(msg.guild.me.highestRole.color);
 
     msg.channel.send('', playing_embed).then(async message => {
@@ -137,7 +137,7 @@ module.exports.run = (Client, msg, args) => {
                 var second_embed = new RichEmbed();
             
                 second_embed.setDescription(((!guild.isPaused ? ":arrow_forward: " : ":pause_button: ") + getpercentage(percentage) + " `[" + new Date(guild.process * 1000).toISOString().substr(11, 8) + "/" + new Date(guild.queue[0].info.length).toISOString().substr(11, 8) + "]`"  + (guild.loopSong ? " :repeat_one:" : "") + (guild.loopQueue ? " :repeat:" : "") + (guild.isShuffling ? " :twisted_rightwards_arrows:" : "") + " :loud_sound:"));
-                second_embed.setAuthor(guild.queue[0].info.title, main.getClient().user.avatarURL);
+                second_embed.setAuthor(guild.queue[0].info.title);
                 second_embed.setColor(msg.guild.me.highestRole.color);
 
                 message.edit(second_embed);

@@ -28,7 +28,7 @@ module.exports.run = async (Client, msg, args) => {
 
     const embed = new RichEmbed()
         .setColor(msg.guild.me.displayColor)
-        .setAuthor(texts.command_queue_title, main.getClient().user.avatarURL)
+        .setAuthor(texts.command_queue_title)
         .setFooter(`Page ${page} of ${pages}`)
         .setDescription(generateContent());
     

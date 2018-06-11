@@ -1,9 +1,4 @@
 const fs = require("fs");
-const DBL = require("dblapi.js");
-
-const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
-
-const dbl = new DBL(config.LIST_ORG);
 
 module.exports.run = (Client, msg, args) => {
 

@@ -1,8 +1,6 @@
 const fs = require("fs");
 const snekfetch = require("snekfetch");
 
-const config = JSON.parse(fs.readFileSync('./bot/json/config.json', 'utf8'));
-
 module.exports.run = async (Client, msg, args) => {
 
     if(msg.author.id != "254892085000405004") return;

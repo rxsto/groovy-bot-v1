@@ -4,8 +4,6 @@ const { RichEmbed, ReactionCollector, MessageCollector } = require('discord.js')
 
 const main = require("../main.js");
 
-const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
-
 module.exports.run = (Client, msg, args) => {
 
     var guild = Client.servers.get(msg.guild.id);
@@ -16,8 +14,7 @@ module.exports.run = (Client, msg, args) => {
         embed: {
             color: msg.channel.guild.me.highestRole.color,
             author: {
-                name: "Groovy - Settings",
-                icon_url: main.getClient().user.avatarURL
+                name: "Groovy - Settings",                
             },
             fields: [
                 {
@@ -104,8 +101,7 @@ module.exports.run = (Client, msg, args) => {
                             embed: {
                                 color: msg.channel.guild.me.highestRole.color,
                                 author: {
-                                    name: "Groovy - Settings",
-                                    icon_url: main.getClient().user.avatarURL
+                                    name: "Groovy - Settings",                                    
                                 },
                                 fields: [
                                     {
@@ -187,8 +183,7 @@ module.exports.run = (Client, msg, args) => {
                             embed: {
                                 color: msg.channel.guild.me.highestRole.color,
                                 author: {
-                                    name: "Groovy - Settings",
-                                    icon_url: main.getClient().user.avatarURL
+                                    name: "Groovy - Settings",                                    
                                 },
                                 fields: [
                                     {
@@ -272,8 +267,7 @@ module.exports.run = (Client, msg, args) => {
                             embed: {
                                 color: msg.channel.guild.me.highestRole.color,
                                 author: {
-                                    name: "Groovy - Settings",
-                                    icon_url: main.getClient().user.avatarURL
+                                    name: "Groovy - Settings",                                    
                                 },
                                 fields: [
                                     {
@@ -355,8 +349,7 @@ module.exports.run = (Client, msg, args) => {
                             embed: {
                                 color: msg.channel.guild.me.highestRole.color,
                                 author: {
-                                    name: "Groovy - Settings",
-                                    icon_url: main.getClient().user.avatarURL
+                                    name: "Groovy - Settings",                                    
                                 },
                                 fields: [
                                     {
@@ -438,8 +431,7 @@ module.exports.run = (Client, msg, args) => {
                             embed: {
                                 color: msg.channel.guild.me.highestRole.color,
                                 author: {
-                                    name: "Groovy - Settings",
-                                    icon_url: main.getClient().user.avatarURL
+                                    name: "Groovy - Settings",                                    
                                 },
                                 fields: [
                                     {
@@ -515,8 +507,7 @@ module.exports.run = (Client, msg, args) => {
                             embed: {
                                 color: msg.channel.guild.me.highestRole.color,
                                 author: {
-                                    name: "Groovy - Settings",
-                                    icon_url: main.getClient().user.avatarURL
+                                    name: "Groovy - Settings",                                    
                                 },
                                 fields: [
                                     {

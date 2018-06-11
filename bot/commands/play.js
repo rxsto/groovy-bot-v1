@@ -1,8 +1,6 @@
 const fs = require('fs');
 const snekfetch = require('snekfetch');
 
-const config = JSON.parse(fs.readFileSync('./bot/json/config.json', 'utf8'));
-
 module.exports.run = async (Client, msg, args, info, mode) => {
 
     var guild = Client.servers.get(msg.guild.id);
@@ -41,7 +39,7 @@ module.exports.run = async (Client, msg, args, info, mode) => {
         const scPlaylist = /https:\/\/?soundcloud.com\/.*\/.*\/.*/.exec(args.join(" "));
 
         if(playlist) {
-            const { body } = await snekfetch.get(`https://www.googleapis.com/youtube/v3/playlists?part=id,snippet&id=${playlist[2]}&key=${config.keys.ytapi}`);
+            const { body } = await snekfetch.get(`https://www.googleapis.com/youtube/v3/playlists?part=id,snippet&id=${playlist[2]}&key=${Client.config.keys.ytapi}`);
             if (!body.items[0]) return Client.functions.createEmbed(msg.channel, Client.emotes.get("error") + texts.error_nothing_found, texts.error_title);
             const songData = await Client.functions.getSong(args.join(" "));
             if (!songData) return Client.functions.createEmbed(msg.channel, Client.emotes.get("error") + texts.error_nothing_found, texts.error_title);
@@ -175,7 +173,7 @@ module.exports.run = async (Client, msg, args, info, mode) => {
 
         if(guild.announceSongs) {
             if(guild.loopSong == false && guild.loopQueue == false) {
-                Client.functions.createEmbed(msg.channel, ":musical_note: " + texts.command_play_your_song + " **" + guild.queue[0].info.title + "** " + texts.command_play_now_text, texts.command_play_now_title);
+                Client.functions.createEmbed(msg.channel, Client.emotes.get("check") + texts.command_play_your_song + " **" + guild.queue[0].info.title + "** " + texts.command_play_now_text, texts.command_play_now_title);
             }            
         }
 

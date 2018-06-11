@@ -1,7 +1,5 @@
 const fs = require("fs");
 
-const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
-
 module.exports.run = async (Client, msg, args) => {
 
     var guild = Client.servers.get(msg.guild.id);
@@ -19,7 +17,7 @@ module.exports.run = async (Client, msg, args) => {
                 try {
                     await Client.playermanager.leave(msg.guild.id);
                     await Client.mysql.executeQuery(`DELETE FROM guilds WHERE id = '${msg.guild.id}'`);
-                    await Client.functions.setGuild(Client, msg.guild, config.PREFIX, msg.guild.me.displayColor);
+                    await Client.functions.setGuild(Client, msg.guild, Client.prefix, msg.guild.me.displayColor);
                     await collected_message.edit(Client.emotes.get("warning") + texts.command_reset_text);
                     guild.collector.stop();
                 } catch (error) {
