@@ -18,8 +18,6 @@ const helmet = require("helmet");
 
 const md = require("marked");
 
-const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
-
 module.exports = (Client) => {
   // It's easier to deal with complex paths. 
   // This resolves to: yourbotdir/dashboard/
@@ -56,11 +54,11 @@ module.exports = (Client) => {
     for most purposes. You might have to add more if you want access to more
     stuff from the user. See: https://discordapp.com/developers/docs/topics/oauth2 
 
-  See config.js.example to set these up. 
+  See Client.config.js.example to set these up. 
   */
   passport.use(new Strategy({
     clientID: Client.user.id,
-    clientSecret: config.TEST_SECRET,
+    clientSecret: Client.config.TEST_SECRET,
     callbackURL: "http://localhost:80/callback",
     scope: ["identify", "guilds"]
   },
@@ -73,7 +71,7 @@ module.exports = (Client) => {
   // the `secret` is in fact a "salt" for the data, and should not be shared publicly.
   app.use(session({
     store: new LevelStore("./data/dashboard-session/"),
-    secret: config.TEST_SECRET,
+    secret: Client.config.TEST_SECRET,
     resave: false,
     saveUninitialized: false,
   }));
