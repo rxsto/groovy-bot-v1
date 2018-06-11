@@ -7,16 +7,20 @@ console.log(" \\____/|_|    \\___/  \\___/   \\_/   \\__, |");
 console.log("                                    __/ |");
 console.log("                                   |___/ ");
 
+const debug = true;
+
 const Discord = require('discord.js');
 const superagent = require("superagent");
 const fs = require("fs");
 const colors = require("colors");
 
+(debug ? info("[Init] Debug is on!") : info("[Init] Debug is off!"));
+
 const vote = require("./bot/util/vote.js");
 const global = require("./bot/util/global.js");
 const status = require("./bot/util/status.js");
 
-const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
+const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
 
 const Manager = new Discord.ShardingManager('./bot/main.js');
 Manager.token = config.Groovy.TOKEN;
@@ -26,10 +30,10 @@ module.exports.getManager = () => {
     return Manager;
 }
 
-info("Node.js Version: " + process.version + " - Discord.js Version: " + process.env.npm_package_dependencies_discord_js + " - System: " + process.arch + " " + process.platform);
+info("[Init] Node.js Version: " + process.version + " - Discord.js Version: " + process.env.npm_package_dependencies_discord_js + " - System: " + process.arch + " " + process.platform);
 
 async function init() {
-    const { body: { shards: totalShards } } = await superagent.get("https://discordapp.com/api/gateway/bot").set("Authorization", config.Groovy.TOKEN);
+    const { body: { shards: totalShards } } = await superagent.get("https://discordapp.com/api/gateway/bot").set("Authorization", (debug == true ? config.Test.TOKEN : config.Groovy.TOKEN));
 
     for (let i = 0; i < totalShards; i++) {
         var shard = {
