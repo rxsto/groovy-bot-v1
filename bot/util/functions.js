@@ -9,11 +9,11 @@ const main = require("../main.js");
 
 const log = require("./logger.js");
 
-const config = JSON.parse(fs.readFileSync('./bot/json/config.json', 'utf8'));
+const config = JSON.parse(fs.readFileSync('./config.json', 'utf8'));
 
 module.exports = {
     async getSong(string) {
-        const res = await snekfetch.get(`http://127.0.0.1:2333/loadtracks`).query({ identifier: string }).set("Authorization", config.GLOBAL_PASS).catch(err => {
+        const res = await snekfetch.get(`http://127.0.0.1:2333/loadtracks`).query({ identifier: string }).set("Authorization", config.passwords.global).catch(err => {
             console.error(err);
             return null;
         });
@@ -142,7 +142,7 @@ module.exports = {
         
         emb.setDescription(content);
         emb.setColor(channel.guild.me.displayColor);
-        emb.setAuthor(title, main.getClient().user.avatarURL);
+        emb.setAuthor(title);
         channel.send(emb);
     },
 
@@ -150,7 +150,7 @@ module.exports = {
         var emb = new Discord.RichEmbed();
         
         emb.setDescription(content);
-        emb.setAuthor(title, main.getClient().user.avatarURL);
+        emb.setAuthor(title);
 
         return emb;
     },
@@ -229,7 +229,7 @@ module.exports = {
                 queue: [],
                 previous: null,
     
-                prefix: config.PREFIX,
+                prefix: Client.prefix,
     
                 isPlaying: false,
                 isPaused: false,
@@ -255,7 +255,7 @@ module.exports = {
             Client.servers.set(guild.id, set_guild);
         }
     
-        var sql = `INSERT INTO guilds (id, prefix, djMode, djRole, announceSongs, queueLength, defaultVolume, language) VALUES ('${guild.id}', '${config.PREFIX}', '0', 'DJ', '1', '50', '100', 'en')`;
+        var sql = `INSERT INTO guilds (id, prefix, djMode, djRole, announceSongs, queueLength, defaultVolume, language) VALUES ('${guild.id}', '${Client.prefix}', '0', 'DJ', '1', '50', '100', 'en')`;
         
         try {    
             Client.mysql.executeQuery(sql);
@@ -322,22 +322,21 @@ module.exports = {
 
     checkPermissions(Client, msg) {
         if(!msg.guild.me.permissionsIn(msg.channel).has("SEND_MESSAGES")) {
-            msg.author.send("<:error:449207829619015680> I am not allowed to send messages into this channel! Please check my permissions!");
             return false;
         }
 
         if(!msg.guild.me.permissionsIn(msg.channel).has("USE_EXTERNAL_EMOJIS")) {
-            Client.functions.createEmbed(":x: I am not allowed to use external emojis in this channel! Please check my permissions!", "Error");
+            msg.channel.send(":x: I am not allowed to use external emojis in this channel! Please check my permissions!");
             return false;
         }
 
         if(!msg.guild.me.permissionsIn(msg.channel).has("EMBED_LINKS")) {
-            Client.functions.createEmbed(":x: I am not allowed to send links into this channel! Please check my permissions!", "Error");
+            msg.channel.send(":x: I am not allowed to send links into this channel! Please check my permissions!");
             return false;
         }
 
         if(!msg.guild.me.permissionsIn(msg.channel).has("ADD_REACTIONS")) {
-            Client.functions.createEmbed(":x: I am not allowed to add reactions to this message! Please check my permissions!", "Error");
+            msg.channel.send(":x: I am not allowed to add reactions to messages! Please check my permissions!");
             return false;
         }
 
