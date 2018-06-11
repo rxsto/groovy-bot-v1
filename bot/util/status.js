@@ -1,8 +1,9 @@
 const Discord = require("discord.js");
 const superagent = require("superagent");
 const fs = require("fs");
+const colors = require("colors");
 
-const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
+const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
 const texts = JSON.parse(fs.readFileSync("./bot/json/lang/en.json", "utf8"));
 
 const main = require("../../app.js");
@@ -41,7 +42,40 @@ app.get("/status", (req, res) => {
     renderTemplate(manager, res, req, "index.ejs");
 });
 
-app.listen(80);
+app.listen(3000);
+
+info("[Init] Statuspage is listening on port 3000");
+
+function info(content) {
+    var first = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '').split(" ")[1];
+    var upgrade = first.split(":");
+
+    upgrade[0] = parseInt(upgrade[0]) + 2;
+    var time = upgrade.join(":");
+
+    content.split('\n').forEach(s => {
+        console.log(`[${time}] ` + colors.green(` ${'[ INFO ]'} `) + ` ${s}`);
+        write_info(`[${time}] ` + ` ${'[ INFO ]'} ` + ` ${s}`);
+    });
+}
+
+function write_info(text) {
+    var time = new Date().toISOString().split("T")[0];
+
+    fs.stat(`logs/Groovy_Info_${time}.txt`, function(err, stat) {
+        if(err == null) {
+            fs.appendFile(`logs/Groovy_Info_${time}.txt`, `${text}\n`, (err) => {
+                if (err) console.log(err);
+            }); 
+        } else if(err.code == 'ENOENT') {
+            fs.writeFile(`logs/Groovy_Info_${time}.txt`, `${text}\n`, (err) => {
+                if (err) console.log(err);
+            });
+        } else {
+            console.log('Some other error: ', err.code);
+        }
+    });
+}
 
 module.exports.setManager = function(newmanager) {
     manager = newmanager;

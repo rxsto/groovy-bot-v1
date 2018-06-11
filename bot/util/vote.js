@@ -5,7 +5,7 @@ const colors = require("colors");
 
 const global = require("./global.js");
 
-const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
+const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
 const texts = JSON.parse(fs.readFileSync("./bot/json/lang/en.json", "utf8"));
 
 var manager;
@@ -13,7 +13,7 @@ var manager;
 const dbl = new Dbl(config.keys.dbl, { webhookPort: 1234, webhookAuth: config.passwords.dblwebhook });
 
 dbl.webhook.on('ready', hook => {
-    info(`Webhook running at http://${hook.hostname}:${hook.port}${hook.path}`);
+    info(`[Init] Webhook running at http://${hook.hostname}:${hook.port}${hook.path}`);
 });
 
 dbl.webhook.on('vote', vote => {
