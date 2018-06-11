@@ -3,7 +3,7 @@ const syncSQL = require('sync-mysql');
 const fs = require('fs');
 const log = require("./logger.js");
 
-const config = JSON.parse(fs.readFileSync("./bot/json/config.json", "utf8"));
+const config = JSON.parse(fs.readFileSync("./config.json", "utf8"));
 
 class MySql {
     constructor(host, user, database) {
@@ -12,7 +12,7 @@ class MySql {
         this.con = MySqlMod.createConnection({
             host:     host,
             user:     user,
-            password: config.GLOBAL_PASS,
+            password: config.passwords.global,
             database: database,
             supportBigNumbers: true,
             bigNumberStrings: true,
@@ -21,7 +21,7 @@ class MySql {
         this.scon = new syncSQL({
             host:     host,
             user:     user,
-            password: config.GLOBAL_PASS,
+            password: config.passwords.global,
             database: database,
         });
 
