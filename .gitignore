@@ -108,4 +108,4 @@ venv.bak/
 /config.json
 /logs/
 /lavalink/
-.idea/
+/.idea/
