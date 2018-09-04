@@ -1,5 +1,5 @@
 #!/usr/bin/python3.7
-import asyncio
+
 import os
 
 from discord.ext import commands
