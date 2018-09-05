@@ -80,6 +80,9 @@ async def on_message(msg):
     if msg.author.bot:
         return
 
+    if msg.channel is discord.ChannelType.private:
+        return await msg.channel.send(':v: Hey mate, if you want to use me, just invite me to your server! See ya!')
+
     if len(msg.content.split(' ')) == 1 and msg.content.startswith(f'<@{client.user.id}>'):
         await msg.channel.send(':vulcan: Wazzup mate, my name is Groovy and you can control me with **`.`**')
 
@@ -95,6 +98,11 @@ async def on_message(msg):
             return
 
     await run_command()
+
+
+@client.event
+async def on_command_error(ctx, error):
+    logger.error(error)
 
 
 async def init():
