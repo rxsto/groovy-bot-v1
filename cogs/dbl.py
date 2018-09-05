@@ -23,4 +23,5 @@ class DiscordBotsHandler:
 
 
 def setup(bot):
-    bot.add_cog(DiscordBotsHandler(bot))
+    if not config.Config().get_config()['debug']:
+        bot.add_cog(DiscordBotsHandler(bot))
