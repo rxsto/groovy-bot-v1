@@ -11,4 +11,4 @@ class Support:
 
     @commands.command()
     async def support(self, ctx):
-        await ctx.send(':information_source: You can join my support server here: url')
+        await ctx.send(':information_source: You can join my support server here: https://groovybot.gq/support')
