@@ -5,12 +5,16 @@ import os
 from discord.ext import commands
 
 from utilities import logger
-from utilities import texts
 from utilities import lists
 from utilities.game_animator import GameAnimator
 from utilities.config import Config
 
-prefix = '!'
+debug = True
+
+if debug is True:
+    prefix = '!'
+else:
+    prefix = '.'
 
 logger.init()
 
@@ -37,7 +41,7 @@ async def on_message(msg):
         return
 
     if len(msg.content.split(' ')) == 1 and msg.content.startswith(f'<@{client.user.id}>'):
-        await msg.channel.send(texts.mention_text)
+        await msg.channel.send(':vulcan: Wazzup mate, my name is Groovy and you can control me with **`.`**')
 
     async def run_command(command):
         if command not in lists.cogs:
@@ -67,6 +71,11 @@ async def on_message(msg):
             await run_command(invoke)
 
 
+'''@client.event
+async def on_error(err):
+    logger.error(f'Error: {err}')'''
+
+
 async def init():
     dirname = os.path.dirname(__file__)
     filename = os.path.join(dirname, 'cogs/')
@@ -84,4 +93,8 @@ async def init():
 
 
 logger.info('Logging in ...')
-client.run(config['test_bot']['token'])
+
+if debug is True:
+    client.run(config['test_bot']['token'])
+else:
+    client.run(config['main_bot']['token'])
