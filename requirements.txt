@@ -1,3 +1,4 @@
+asyncpg
 requests
 async-timeout==3.0.0
 attrs==18.2.0
