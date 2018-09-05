@@ -19,6 +19,8 @@ cogs.append('add')
 
 # Leave cog
 cogs.append('leave')
+cogs.append('exit')
+cogs.append('quit')
 
 # Seek cog
 cogs.append('seek')
@@ -56,6 +58,7 @@ cogs.append('rm')
 
 # Search cog
 cogs.append('search')
+cogs.append('find')
 
 # Support cog
 cogs.append('support')
@@ -65,3 +68,6 @@ cogs.append('invite')
 
 # Shard cog
 cogs.append('shard')
+
+# Stats cog
+cogs.append('stats')
