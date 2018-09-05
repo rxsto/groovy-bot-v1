@@ -3,29 +3,53 @@
 import os
 import sys
 
+import discord
 from discord.ext import commands
-
-from utilities import logger, lists, status_page
+from discord.ext.commands.errors import CommandNotFound
+from utilities import logger, status_page
 from utilities.game_animator import GameAnimator
 from utilities.config import Config
+from utilities.database import PostgreClient
 
 if '--test-run' in sys.argv:
     exit(0)
 
-debug = False
+debug = True
 
 if debug is True:
-    prefix = '!'
+    prefix = 'gt!'
 else:
-    prefix = '.'
+    prefix = 'g!'
 
 logger.init()
 
-client = commands.AutoShardedBot(command_prefix=prefix)
+
+async def get_server_prefix(bot: commands.AutoShardedBot, message: discord.Message):
+    if not message.guild:
+        return prefix
+    response = await postgre_client.get_conn().fetchrow(f'SELECT prefix FROM guilds WHERE id = {message.guild.id}')
+    custom_prefix = response["prefix"]
+    result = commands.when_mentioned_or(custom_prefix)(bot, message)
+    result.append(prefix)
+    return result
+
+
+def abort():
+    return
+
+
+client = commands.AutoShardedBot(
+    command_prefix=get_server_prefix,
+    case_insensitive=True,
+    command_not_found=abort
+)
 
 logger.info('Starting Groovy ...')
 
 config = Config().get_config()
+
+postgre_client = PostgreClient(config['database']['user'], config['database']['password'],
+                               config['database']['database'], config['database']['host'])
 
 
 @client.event
@@ -56,35 +80,21 @@ async def on_message(msg):
     if msg.author.bot:
         return
 
-    if not msg.guild.get_member(client.user.id) in msg.mentions and not msg.content.startswith(prefix):
-        return
-
     if len(msg.content.split(' ')) == 1 and msg.content.startswith(f'<@{client.user.id}>'):
         await msg.channel.send(':vulcan: Wazzup mate, my name is Groovy and you can control me with **`.`**')
 
-    async def run_command(command):
-        if command not in lists.cogs:
-            return
+    async def run_command():
 
         logger.info(
             f'{msg.content} » {msg.author.name}#{msg.author.discriminator}'
             f' in #{msg.channel.name} on {msg.guild.name} ({msg.guild.id})'
         )
-        await client.process_commands(msg)
+        try:
+            await client.process_commands(msg)
+        except CommandNotFound:
+            return
 
-    if msg.content.startswith(f'<@{client.user.id}>') and len(msg.content.split(' ')) > 1:
-        invoke = msg.content.split(' ').pop(1)
-        pre = msg.content.split(' ')
-        del pre[0]
-
-        if invoke in lists.cogs:
-            await run_command(invoke)
-
-    if msg.content.startswith(prefix):
-        invoke = msg.content[1:].split(' ')[0]
-
-        if invoke in lists.cogs:
-            await run_command(invoke)
+    await run_command()
 
 
 async def init():
@@ -101,6 +111,7 @@ async def init():
             cog = file.split('.')[0]
             client.load_extension(f'cogs.{cog}')
             logger.info(f'Successfully loaded cog {cog}!')
+    await postgre_client.connect()
 
 
 logger.info('Logging in ...')
