@@ -21,7 +21,6 @@ class Help:
         logger.info(f'Started generating help message ...')
 
         for cog in cogs.cogs:
-            logger.info(f'Adding {cog[0]} ...')
             aliases = ''
             if len(cog) is 3:
                 aliases += f' [{cog[2]}]'
