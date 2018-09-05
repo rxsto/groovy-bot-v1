@@ -8,3 +8,8 @@ script:
   - python -m compileall ./cogs
   - python -m compileall ./utilities
   - python ./main.py --test-run
+cache: pip
+notifications:
+  email: false
+dist: trusty
+os: linux
