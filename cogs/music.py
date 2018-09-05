@@ -54,8 +54,11 @@ class Music:
             return await ctx.send(':no_entry_sign: I\'m already inside a voicechannel!')
 
     @commands.command(aliases=['p', 'add'])
-    async def play(self, ctx, *, query):
+    async def play(self, ctx, *, query=None):
         player = self.bot.lavalink.players.get(ctx.guild.id)
+
+        if query is None:
+            return await ctx.send(':no_entry_sign: Please specify a query!')
 
         if not player.is_connected:
             if not ctx.author.voice or not ctx.author.voice.channel:
@@ -263,6 +266,9 @@ class Music:
     async def remove(self, ctx, index: int):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
+        if not index:
+            return await ctx.send(':no_entry_sign: Please specify a position!')
+
         if not player.queue:
             return await ctx.send(':no_entry_sign: There\'s nothing queued!')
 
@@ -275,7 +281,10 @@ class Music:
         await ctx.send('Removed **' + removed.title + '** from the queue.')
 
     @commands.command(aliases=['find'])
-    async def search(self, ctx, *, query):
+    async def search(self, ctx, *, query=None):
+        if not query:
+            return await ctx.send(':no_entry_sign: Please specify a query!')
+
         if not query.startswith('ytsearch:') and not query.startswith('scsearch:'):
             query = 'ytsearch:' + query
 
