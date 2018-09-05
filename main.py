@@ -1,13 +1,16 @@
 #!/usr/bin/python3.7
 
 import os
+import sys
 
 from discord.ext import commands
 
-from utilities import logger
-from utilities import lists
+from utilities import logger, lists, status_page
 from utilities.game_animator import GameAnimator
 from utilities.config import Config
+
+if '--test-run' in sys.argv:
+    exit(0)
 
 debug = True
 
@@ -30,6 +33,7 @@ async def on_ready():
     logger.info(f'Logged in as {client.user} ...')
     await init()
     GameAnimator(client, client.loop).run()
+    status_page.StatusPage(config, client).init()
 
 
 @client.event
@@ -105,3 +109,11 @@ if debug is True:
     client.run(config['test_bot']['token'])
 else:
     client.run(config['main_bot']['token'])
+
+
+def get_config():
+    return config
+
+
+def get_ping():
+    return client.latency

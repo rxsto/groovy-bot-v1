@@ -1,13 +1,14 @@
-aiohttp==3.3.2
+requests
 async-timeout==3.0.0
 attrs==18.2.0
 cffi==1.11.5
 chardet==3.0.4
-lavalink==2.1.9
+git+https://github.com/Rapptz/discord.py@rewrite
 idna==2.7
+lavalink==2.1.9
 multidict==4.3.1
 pycparser==2.18
-pynacl==1.2.1
+PyNaCl==1.2.1
 six==1.11.0
 websockets==6.0
 yarl==1.2.6
