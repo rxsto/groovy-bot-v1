@@ -14,7 +14,6 @@ class GameAnimator:
             f'playing for {len(self.client.users)} users',
             f'playing in {len(self.client.voice_clients)} voicechannels',
             f'currently serving {self.client.shard_count} shards',
-            f'you\'re on shard {self.client.shard_id}'
             f'listen to some f*cking music!',
             f'how you doin\'?',
             f'join my server!',
