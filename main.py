@@ -9,6 +9,9 @@ from utilities import logger, lists, status_page
 from utilities.game_animator import GameAnimator
 from utilities.config import Config
 
+if '--test-run' in sys.argv:
+    exit(0)
+
 debug = True
 
 if debug is True:
@@ -84,7 +87,7 @@ async def on_message(msg):
             await run_command(invoke)
 
 
-async def init(argv):
+async def init():
     dirname = os.path.dirname(__file__)
     filename = os.path.join(dirname, 'cogs/')
     extensions = os.listdir(filename)
@@ -101,9 +104,6 @@ async def init(argv):
 
 
 logger.info('Logging in ...')
-
-if '--test-run' in sys.argv:
-    exit(0)
 
 if debug is True:
     client.run(config['test_bot']['token'])
