@@ -39,7 +39,12 @@ async def on_shard_ready(shard_id):
 
 @client.event
 async def on_guild_join(guild):
-    logger.info(f'[Shard {guild.shard_id + 1}] Joined guild {guild.name} ({guild.id}) with {guild.member_count}')
+    logger.info(f'[Shard {guild.shard_id + 1}] Joined guild {guild.name} ({guild.id}) with {guild.member_count} users')
+
+
+@client.event
+async def on_guild_remove(guild):
+    logger.info(f'[Shard {guild.shard_id + 1}] Left guild {guild.name} ({guild.id}) with {guild.member_count} users')
 
 
 @client.event
