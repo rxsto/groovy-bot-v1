@@ -1,3 +1,4 @@
+import os
 import time
 
 from enum import Enum
@@ -32,6 +33,8 @@ def critical(message):
 
 
 def init():
+    if not os.path.exists('logs/'):
+        os.makedirs('logs/')
     file = open(f'logs/obstBot_{time.strftime("%d-%m-%Y")}.log', "a")
     own_time = time.strftime("%H:%M:%S")
     init_time = time.strftime("%c")
