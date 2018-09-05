@@ -1,6 +1,7 @@
 #!/usr/bin/python3.7
 
 import os
+import sys
 
 from discord.ext import commands
 
@@ -83,7 +84,7 @@ async def on_message(msg):
             await run_command(invoke)
 
 
-async def init():
+async def init(argv):
     dirname = os.path.dirname(__file__)
     filename = os.path.join(dirname, 'cogs/')
     extensions = os.listdir(filename)
@@ -100,6 +101,9 @@ async def init():
 
 
 logger.info('Logging in ...')
+
+if '--test-run' in sys.argv:
+    exit(0)
 
 if debug is True:
     client.run(config['test_bot']['token'])
