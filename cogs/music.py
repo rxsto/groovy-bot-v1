@@ -6,8 +6,6 @@ import math
 
 from discord.ext import commands
 
-from utilities import texts
-
 time_rx = re.compile('[0-9]+')
 url_rx = re.compile('https?:\/\/(?:www\.)?.+')
 
@@ -35,7 +33,7 @@ class Music:
             if c:
                 c = self.bot.get_channel(c)
                 if c:
-                    await c.send(texts.queue_ended)
+                    await c.send(':white_check_mark: The queue has ended! Why not queue more songs?')
 
     @commands.command(aliases=['j', 'summon'])
     async def join(self, ctx):
@@ -105,15 +103,15 @@ class Music:
         if not player.is_playing:
             await player.play()
 
-    @commands.command()
+    @commands.command(aliases=['exit', 'quit', 'l'])
     async def leave(self, ctx):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_connected:
-            return await ctx.send('Not connected.')
+            return await ctx.send(':no_entry_sign: Not connected.')
 
         if not ctx.author.voice or (player.is_connected and ctx.author.voice.channel.id != int(player.channel_id)):
-            return await ctx.send('You\'re not in my voicechannel!')
+            return await ctx.send(':no_entry_sign: You\'re not in my voicechannel!')
 
         player.queue.clear()
         await player.disconnect()
@@ -125,12 +123,12 @@ class Music:
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:
-            return await ctx.send('Not playing.')
+            return await ctx.send(':no_entry_sign: I\'m not playing.')
 
         seconds = time_rx.search(time)
 
         if not seconds:
-            return await ctx.send('You need to specify the amount of seconds to skip!')
+            return await ctx.send(':no_entry_sign: You need to specify the amount of seconds to seek!')
 
         seconds = int(seconds.group()) * 1000
 
@@ -141,14 +139,14 @@ class Music:
 
         await player.seek(track_time)
 
-        await ctx.send(f'Moved track to **{lavalink.Utils.format_time(track_time)}**')
+        await ctx.send(f':white_check_mark: Seeked to **{lavalink.Utils.format_time(track_time)}**')
 
     @commands.command()
     async def skip(self, ctx):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:
-            return await ctx.send('Not playing.')
+            return await ctx.send(':no_entry_sign: I\'m not playing.')
 
         await ctx.send('⏭ | Skipped.')
         await player.skip()
@@ -158,7 +156,7 @@ class Music:
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:
-            return await ctx.send('Not playing.')
+            return await ctx.send(':no_entry_sign: I\'m not playing.')
 
         player.queue.clear()
         await player.stop()
@@ -185,7 +183,7 @@ class Music:
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.queue:
-            return await ctx.send('There\'s nothing in the queue! Why not queue something?')
+            return await ctx.send(':no_entry_sign: There\'s nothing in the queue! Why not queue something?')
 
         items_per_page = 10
         pages = math.ceil(len(player.queue) / items_per_page)
@@ -203,19 +201,31 @@ class Music:
         embed.set_footer(text=f'Viewing page {page}/{pages}')
         await ctx.send(embed=embed)
 
-    @commands.command(aliases=['resume'])
+    @commands.command()
     async def pause(self, ctx):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:
-            return await ctx.send('Not playing.')
+            return await ctx.send(':no_entry_sign: I\'m not playing.')
+
+        if not player.paused:
+            await player.set_pause(False)
+            await ctx.send('⏯ | Paused')
+        else:
+            await ctx.send(':no_entry_sign: I\'m already paused!')
+
+    @commands.command()
+    async def resume(self, ctx):
+        player = self.bot.lavalink.players.get(ctx.guild.id)
+
+        if not player.is_playing:
+            return await ctx.send(':no_entry_sign: I\'m not playing.')
 
         if player.paused:
             await player.set_pause(False)
             await ctx.send('⏯ | Resumed')
         else:
-            await player.set_pause(True)
-            await ctx.send('⏯ | Paused')
+            await ctx.send(':no_entry_sign: I\'m already resumed!')
 
     @commands.command(aliases=['vol'])
     async def volume(self, ctx, volume: int = None):
@@ -232,7 +242,7 @@ class Music:
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:
-            return await ctx.send('Nothing playing.')
+            return await ctx.send(':no_entry_sign: I\'m not playing.')
 
         player.shuffle = not player.shuffle
 
@@ -243,7 +253,7 @@ class Music:
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:
-            return await ctx.send('Nothing playing.')
+            return await ctx.send(':no_entry_sign: I\'m not playing.')
 
         player.repeat = not player.repeat
 
@@ -254,17 +264,17 @@ class Music:
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.queue:
-            return await ctx.send('Nothing queued.')
+            return await ctx.send(':no_entry_sign: There\'s nothing queued!')
 
         if index > len(player.queue) or index < 1:
-            return await ctx.send('Index has to be >=1 and <=queue size')
+            return await ctx.send(':no_entry_sign: Index has to be >=1 and <=queue size')
 
         index -= 1
         removed = player.queue.pop(index)
 
         await ctx.send('Removed **' + removed.title + '** from the queue.')
 
-    @commands.command()
+    @commands.command(aliases=['find'])
     async def search(self, ctx, *, query):
         if not query.startswith('ytsearch:') and not query.startswith('scsearch:'):
             query = 'ytsearch:' + query
@@ -272,7 +282,7 @@ class Music:
         results = await self.bot.lavalink.get_tracks(query)
 
         if not results or not results['tracks']:
-            return await ctx.send('Nothing found')
+            return await ctx.send(':no_entry_sign: Nothing found')
 
         tracks = results['tracks'][:10]  # First 10 results
 
