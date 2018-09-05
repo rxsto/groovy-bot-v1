@@ -3,6 +3,10 @@ cogs = []
 # Info cog
 cogs.append('info')
 
+# Help cog
+cogs.append('help')
+cogs.append('?')
+
 # Join cog
 cogs.append('join')
 cogs.append('j')
@@ -53,6 +57,11 @@ cogs.append('rm')
 # Search cog
 cogs.append('search')
 
-# Help cog
-cogs.append('help')
-cogs.append('?')
+# Support cog
+cogs.append('support')
+
+# Invite cog
+cogs.append('invite')
+
+# Shard cog
+cogs.append('shard')
