@@ -24,12 +24,18 @@ def warn(message):
     log(LogLevel.WARN, message)
 
 
-def error(message):
+def error(message, *exception: Exception):
     log(LogLevel.ERROR, message)
+    if exception is None:
+        return
+    print(exception)
 
 
-def critical(message):
+def critical(message, *exception: Exception):
     log(LogLevel.CRITICAL, message)
+    if exception is None:
+        return
+    print(exception)
 
 
 def init():
