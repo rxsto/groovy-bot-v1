@@ -12,7 +12,7 @@ from utilities.config import Config
 if '--test-run' in sys.argv:
     exit(0)
 
-debug = True
+debug = False
 
 if debug is True:
     prefix = '!'
