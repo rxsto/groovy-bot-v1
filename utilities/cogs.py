@@ -1,0 +1,23 @@
+info = ['info', 'Shows you some useful information', 'i']
+help = ['help', 'Shows you this message', '?']
+invite = ['invite', 'Shows you an invite for Groovy']
+support = ['support', 'Shows you an invite to the support server']
+
+play = ['play', 'Lets you play any music you want', 'p, add']
+join = ['join', 'Tells the bot to join your channel', 'j']
+leave = ['leave', 'Tells the bot to leave your channel', 'l, exit, quit']
+search = ['search', 'Lets you search songs', 'find']
+pause = ['pause', 'Lets you pause the bot']
+resume = ['resume', 'Lets you resume the bot']
+skip = ['skip', 'Lets you skip the current track', 's']
+seek = ['seek', 'Lets you seek to specific positions']
+stop = ['seek', 'Lets you stop the bot']
+now = ['now', 'Shows you all information about the current track', 'np']
+queue = ['queue', 'Shows you each song inside the queue', 'q']
+volume = ['volume', 'Lets you change the volume', 'vol']
+shuffle = ['shuffle', 'Lets you activate shuffling']
+loop = ['loop', 'Lets you activate the loop']
+remove = ['remove', 'Lets you remove a specific song', 'rm']
+
+cogs = [info, help, invite, support, play, join, leave, search, pause, resume, skip, seek, stop, now, queue, volume,
+        shuffle, loop, remove]
