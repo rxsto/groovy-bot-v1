@@ -33,6 +33,16 @@ async def on_ready():
 
 
 @client.event
+async def on_shard_ready(shard_id):
+    logger.info(f'Shard {shard_id + 1} is ready!')
+
+
+@client.event
+async def on_guild_join(guild):
+    logger.info(f'[Shard {guild.shard_id + 1}] Joined guild {guild.name} ({guild.id}) with {guild.member_count}')
+
+
+@client.event
 async def on_message(msg):
     if msg.author.bot:
         return
@@ -65,15 +75,10 @@ async def on_message(msg):
             await run_command(invoke)
 
     if msg.content.startswith(prefix):
-        invoke = msg.content[1:]
+        invoke = msg.content[1:].split(' ')[0]
 
         if invoke in lists.cogs:
             await run_command(invoke)
-
-
-'''@client.event
-async def on_error(err):
-    logger.error(f'Error: {err}')'''
 
 
 async def init():
