@@ -212,7 +212,7 @@ class Music:
             return await ctx.send(':no_entry_sign: I\'m not playing.')
 
         if not player.paused:
-            await player.set_pause(False)
+            await player.set_pause(True)
             await ctx.send('⏯ | Paused')
         else:
             await ctx.send(':no_entry_sign: I\'m already paused!')
