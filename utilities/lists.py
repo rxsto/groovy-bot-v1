@@ -71,3 +71,6 @@ cogs.append('shard')
 
 # Stats cog
 cogs.append('stats')
+
+# Bot lists
+cogs.append('dbl_handler')

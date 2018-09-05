@@ -4,6 +4,7 @@ attrs==18.2.0
 cffi==1.11.5
 chardet==3.0.4
 git+https://github.com/Rapptz/discord.py@rewrite
+dblpy
 idna==2.7
 lavalink==2.1.9
 multidict==4.3.1
