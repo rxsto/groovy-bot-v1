@@ -1,5 +1,5 @@
 info = ['info', 'Shows you some useful information', 'i']
-help = ['help', 'Shows you this message', '?']
+helpcmd = ['help', 'Shows you this message', '?']
 invite = ['invite', 'Shows you an invite for Groovy']
 support = ['support', 'Shows you an invite to the support server']
 shard = ['shard', 'Shows you your current shard id']
@@ -21,5 +21,5 @@ shuffle = ['shuffle', 'Lets you activate shuffling']
 loop = ['loop', 'Lets you activate the loop']
 remove = ['remove', 'Lets you remove a specific song', 'rm']
 
-cogs = [info, help, invite, support, shard, stats, play, join, leave, search, pause, resume, skip, seek, stop, now, queue, volume,
+cogs = [info, helpcmd, invite, support, shard, stats, play, join, leave, search, pause, resume, skip, seek, stop, now, queue, volume,
         shuffle, loop, remove]

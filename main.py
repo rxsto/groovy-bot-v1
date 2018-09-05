@@ -66,10 +66,7 @@ async def on_message(msg):
     if msg.content.startswith(f'<@{client.user.id}>') and len(msg.content.split(' ')) > 1:
         invoke = msg.content.split(' ').pop(1)
         pre = msg.content.split(' ')
-        for x in range(0, 2):
-            del pre[0]
-
-        content = ' '.join(pre)
+        del pre[0]
 
         if invoke in lists.cogs:
             await run_command(invoke)
