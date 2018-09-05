@@ -3,7 +3,7 @@ async-timeout==3.0.0
 attrs==18.2.0
 cffi==1.11.5
 chardet==3.0.4
-discord.py==1.0.0a1551+g00a659c
+git+https://github.com/Rapptz/discord.py@rewrite
 idna==2.7
 lavalink==2.1.9
 multidict==4.3.1
