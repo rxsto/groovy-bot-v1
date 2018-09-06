@@ -20,7 +20,9 @@ volume = ['volume', 'Lets you change the volume', 'vol']
 shuffle = ['shuffle', 'Lets you activate shuffling']
 loop = ['loop', 'Lets you activate the loop']
 remove = ['remove', 'Lets you remove a specific song', 'rm']
-prefix = ['prefix', 'Lets you change the servers prefix']
+prefix = ['prefix', 'Lets you change the bots prefix']
+
+update = ['update', 'Only admin', 'up']
 
 cogs = [info, helpcmd, invite, support, shard, stats, play, join, leave, search, pause, resume, skip, seek, stop, now, queue, volume,
-        shuffle, loop, remove, prefix]
+        shuffle, loop, remove, prefix, update]
