@@ -74,3 +74,6 @@ cogs.append('stats')
 
 # Bot lists
 cogs.append('dbl')
+
+# Prefix command
+cogs.append('prefix')
