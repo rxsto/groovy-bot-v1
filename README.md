@@ -5,3 +5,5 @@
 [![Discord Bots](https://discordbots.org/api/widget/status/402116404301660181.svg?noavatar=true)](https://discordbots.org/bot/402116404301660181)
 
 Groovy is a feature-rich, experienced and well maintained Discord-bot. His main function is to play high quality music.
+
+[![Botsfordiscord widtget](https://botsfordiscord.com/api/v1/bots/402116404301660181/embed)](https://botsfordiscord.com/bot/402116404301660181)
