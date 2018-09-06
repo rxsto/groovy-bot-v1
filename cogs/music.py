@@ -15,7 +15,10 @@ class Music:
         self.bot = bot
 
         if not hasattr(bot, 'lavalink'):
-            lavalink.Client(bot=bot, ws_port=8910, password='pass', loop=self.bot.loop, log_level=logging.INFO)
+            lavalink.Client(bot=bot, host=bot.get_config()['lavalink']['host'],
+                            ws_port=bot.get_config()['lavalink']['port'],
+                            password=bot.get_config()['lavalink']['password'], loop=self.bot.loop,
+                            log_level=logging.INFO)
         self.bot.lavalink.register_hook(self.track_hook)
 
     async def track_hook(self, event):
@@ -57,7 +60,10 @@ class Music:
     async def play(self, ctx, *, query=None):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
-        if query is None:
+        if query is None and player.paused and player.is_playing:
+            await player.set_pause(False)
+            return await ctx.send('⏯ | Resumed')
+        elif query is None:
             return await ctx.send(':no_entry_sign: Please specify a query!')
 
         if not player.is_connected:
