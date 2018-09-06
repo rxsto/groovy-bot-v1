@@ -1,3 +1,5 @@
+import asyncio
+
 import discord
 import lavalink
 import re
@@ -53,6 +55,7 @@ class Music:
 
             player.store('channel', ctx.channel.id)
             await player.connect(ctx.author.voice.channel.id)
+            return await ctx.send(f':white_check_mark: I joined the voicechannel **`{ctx.author.voice.channel.name}`**!')
         else:
             return await ctx.send(':no_entry_sign: I\'m already inside a voicechannel!')
 
