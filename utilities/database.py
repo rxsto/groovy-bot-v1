@@ -13,12 +13,11 @@ class PostgreClient:
 
     async def connect(self):
         try:
-            self.conn = await asyncpg.connect(user=self.user, password=self.password, database=self.database,
-                                              host=self.host)
+            login_data = {"user": self.user, "password": self.password, "database": self.database, "host": self.host}
+            self.conn = await asyncpg.create_pool(**login_data)
         except IOError as e:
             logger.error("[DATABASE] An error occurred while connecting to the DB", e)
             exit(1)
 
-    def get_conn(self):
+    def get_pool(self):
         return self.conn
-
