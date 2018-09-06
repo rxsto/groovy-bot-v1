@@ -11,4 +11,4 @@ class Invite:
 
     @commands.command()
     async def invite(self, ctx):
-        await ctx.send(':information_source: You can invite me here: https://groovybot.gq/invite')
+        await ctx.send(':information_source: **You can invite me here:** https://groovybot.gq/invite')
