@@ -13,5 +13,5 @@ class Stats:
     async def stats(self, ctx):
         await ctx.send(f':information_source: I\'m playing on **{len(self.bot.guilds)} '
                        f'servers** for **{len(self.bot.users)} users** '
-                       f'in **{len(self.bot.voice_clients)} voicechannels**. '
+                       f'in **{len(self.bot.lavalink.players)} voicechannels**. '
                        f'My ping is currently **{int(self.bot.latency * 1000)} ms**.')
