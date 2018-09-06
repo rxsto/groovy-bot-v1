@@ -8,7 +8,7 @@ cffi==1.11.5
 chardet==3.0.4
 colorama==0.3.9
 dblpy==0.1.6
-discord.py==1.0.0a1551+g00a659c
+git+https://github.com/Rapptz/discord.py.git@rewrite
 idna==2.7
 lavalink==2.1.9
 more-itertools==4.3.0
