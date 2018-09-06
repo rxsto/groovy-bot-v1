@@ -73,7 +73,11 @@ cogs.append('shard')
 cogs.append('stats')
 
 # Bot lists
-cogs.append('dbl')
+cogs.append('botlists')
 
 # Prefix command
 cogs.append('prefix')
+
+# Update command
+cogs.append('update')
+cogs.append('up')
