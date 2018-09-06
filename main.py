@@ -8,6 +8,7 @@ import aiohttp
 import discord
 import datetime
 
+from discord import Message
 from discord.ext import commands
 from discord.ext.commands.errors import CommandNotFound, UserInputError
 from utilities import logger, status_page
@@ -18,50 +19,47 @@ from utilities.database import PostgreClient
 if '--test-run' in sys.argv:
     exit(0)
 
-debug = True
-
-if debug is True:
-    prefix = 'gt!'
-else:
-    prefix = 'g!'
-
 
 class Groovy(commands.AutoShardedBot):
 
     async def get_server_prefix(self, bot: commands.AutoShardedBot, message: discord.Message):
         if not message.guild:
-            return prefix
+            return self.prefix
+        custom_prefix = await self.retrieve_prefix(message.guild.id)
+        result = commands.when_mentioned_or(custom_prefix)(bot, message)
+        result.append(self.prefix)
+        return result
+
+    async def retrieve_prefix(self, guild_id):
         async with self.postgre_client.get_pool().acquire() as connection:
             response = await connection.fetchrow(
-                f'SELECT prefix FROM guilds WHERE id = {message.guild.id}')
+                f'SELECT prefix FROM guilds WHERE id = {guild_id}')
             if response is None:
                 await connection.execute(
-                    f'INSERT INTO guilds (id, prefix, volume) VALUES ({message.guild.id}, \'g!\', 100)')
-                custom_prefix = 'g!'
+                    f'INSERT INTO guilds (id, prefix, volume) VALUES ({guild_id}, \'g!\', 100)')
+                return self.prefix
             else:
-                custom_prefix = response["prefix"]
-            result = commands.when_mentioned_or(custom_prefix)(bot, message)
-            result.append(prefix)
-            return result
-
-    def abort(self):
-        return
+                return response["prefix"]
 
     def __init__(self):
         super().__init__(command_prefix=self.get_server_prefix, case_insensitive=True)
+        self.config = Config().get_config()
+        self.debug = self.config['debug']
+        if self.debug is True:
+            self.prefix = 'gt!'
+        else:
+            self.prefix = 'g!'
         logger.init()
         logger.info('Logging in ...')
 
         logger.info('Starting Groovy ...')
-
-        self.config = Config().get_config()
 
         self.postgre_client = PostgreClient(self.config['database']['user'], self.config['database']['password'],
                                             self.config['database']['database'], self.config['database']['host'])
 
         asyncio.get_event_loop().run_until_complete(self.postgre_client.connect())
 
-        if debug is True:
+        if self.debug is True:
             self.run(self.config['test_bot']['token'])
         else:
             self.run(self.config['main_bot']['token'])
@@ -71,9 +69,13 @@ class Groovy(commands.AutoShardedBot):
         await self.init()
         GameAnimator(self, self.loop).run()
         status_page.StatusPage(self.config, self).init()
+        if not self.is_in_debug_mode():
+            player = self.lavalink.players.get(403882830225997825)
+            player.store('channel', 486765014976561159)
+            await player.connect('486765249488224277')
 
     async def on_shard_ready(self, shard_id):
-        logger.info(f'Shard {shard_id + 1} is ready!')
+        logger.info(f'Shard {shard_id + 1}/{self.shard_count} is ready!')
 
     async def on_guild_join(self, guild):
         logger.info(
@@ -87,11 +89,13 @@ class Groovy(commands.AutoShardedBot):
                 color=0x22d65b,
                 description=f'Owner: {guild.owner.name}#{guild.owner.discriminator}\n'
                             f'Members: {guild.member_count}\n'
-                            f'Shard: {guild.shard_id}'
+                            f'Shard: {guild.shard_id + 1}'
             ).set_thumbnail(url=guild.icon_url))
             async with self.postgre_client.get_pool().acquire() as connection:
-                await connection.execute(
-                    f'INSERT INTO guilds (id, prefix, volume) VALUES ({guild.id}, \'g!\', 100)')
+                check = await connection.fetchrow(f'SELECT * FROM guilds WHERE id = {guild.id}')
+                if check is None:
+                    await connection.execute(
+                        f'INSERT INTO guilds (id, prefix, volume) VALUES ({guild.id}, \'g!\', 100)')
 
     async def on_guild_remove(self, guild):
         logger.info(
@@ -105,22 +109,25 @@ class Groovy(commands.AutoShardedBot):
                 color=0xf22b2b,
                 description=f'Owner: {guild.owner.name}#{guild.owner.discriminator}\n'
                             f'Members: {guild.member_count}\n'
-                            f'Shard: {guild.shard_id}'
+                            f'Shard: {guild.shard_id + 1}'
             ).set_thumbnail(url=guild.icon_url))
             async with self.postgre_client.get_pool().acquire() as connection:
                 await connection.execute(f'DELETE FROM guilds WHERE id = {guild.id}')
 
-    async def on_message(self, msg):
+    async def on_message(self, msg: Message):
         if msg.author.bot:
+            return
+
+        if not msg.channel:
             return
 
         if msg.channel is discord.ChannelType.private:
             return await msg.channel.send(':v: Hey mate, if you want to use me, just invite me to your server! See ya!')
 
         if len(msg.content.split(' ')) == 1 and msg.content.startswith(f'<@{self.user.id}>'):
-            prefixes = await self.get_server_prefix(self, msg)
+            prefix = await self.retrieve_prefix(msg.guild.id)
             await msg.channel.send(f':vulcan: Wazzup mate, my name is Groovy and you can control me with '
-                                   f'**`{prefixes[2]}`**')
+                                   f'**`{prefix}`**')
 
         try:
             await self.process_commands(msg)
@@ -131,6 +138,7 @@ class Groovy(commands.AutoShardedBot):
         logger.info(
             f'{ctx.message.content} » {ctx.message.author.name}#{ctx.message.author.discriminator}'
             f' in #{ctx.message.channel.name} on {ctx.message.guild.name} ({ctx.message.guild.id})'
+            f'Bot account: {self.user.name}'
         )
 
     async def on_command_error(self, ctx, error):
@@ -174,6 +182,9 @@ class Groovy(commands.AutoShardedBot):
 
     def get_postgre_client(self):
         return self.postgre_client
+
+    def is_in_debug_mode(self):
+        return self.debug
 
 
 if __name__ == '__main__':
