@@ -1,3 +1,5 @@
+import asyncio
+
 from discord.ext import commands
 
 
@@ -20,6 +22,10 @@ class Update:
             player = player_tuple[1]
             channel_id = player.fetch('channel')
             guild = self.bot.get_guild(player_tuple[0])
+
+            if guild is None:
+                return
+
             channel = guild.get_channel(channel_id)
 
             if channel is None:
@@ -29,3 +35,16 @@ class Update:
                                'Please be patient! For further information '
                                'check Groovy\'s official support server: '
                                'https://groovybot.gq/support **')
+
+            if player.current is None:
+                return
+
+            await player.set_volume(0)
+            await asyncio.sleep(3)
+            player.queue.clear()
+            sound = await self.bot.lavalink.get_tracks('https://cdn.groovybot.gq/sounds/update.mp3')
+            player.add(requester=254892085000405004, track=sound['tracks'][0])
+            await player.skip()
+            await player.set_volume(100)
+            await asyncio.sleep(7)
+            await player.disconnect()
