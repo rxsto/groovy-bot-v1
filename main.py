@@ -98,6 +98,17 @@ class Groovy(commands.AutoShardedBot):
                         f'INSERT INTO guilds (id, prefix, volume) VALUES ({guild.id}, \'g!\', 100)')
 
     async def on_guild_remove(self, guild):
+        message = '<:hey:454004173013254155> Hey! What a pity that Groovy **didn\'t fit your expectations!** ' \
+                  'We would like to **improve** him, but we don\'t know what to **change**, ' \
+                  'unless you **join our server** and **tell us what we could do better**. ' \
+                  'So do us the **favour** and join Groovy\'s support server and ' \
+                  '**tell the devs** what you want to have **changed**! **Thank you!** - https://groovybot.gq/support'
+        try:
+            await guild.owner.send(message)
+        except discord.Forbidden as e:
+            print(e)
+            return
+
         logger.info(
             f'[Shard {guild.shard_id + 1}] Left guild {guild.name} ({guild.id}) with {guild.member_count} users')
         async with aiohttp.ClientSession() as session:
@@ -136,9 +147,9 @@ class Groovy(commands.AutoShardedBot):
 
     async def on_command_completion(self, ctx):
         logger.info(
-            f'{ctx.message.content} » {ctx.message.author.name}#{ctx.message.author.discriminator}'
-            f' in #{ctx.message.channel.name} on {ctx.message.guild.name} ({ctx.message.guild.id})'
-            f'Bot account: {self.user.name}'
+            f'{ctx.message.content} » {ctx.message.author.name}#{ctx.message.author.discriminator} '
+            f'in #{ctx.message.channel.name} on {ctx.message.guild.name} ({ctx.message.guild.id}) - '
+            f'Account: {self.user.name}'
         )
 
     async def on_command_error(self, ctx, error):
@@ -158,6 +169,7 @@ class Groovy(commands.AutoShardedBot):
 
     async def on_command(self, ctx):
         await ctx.trigger_typing()
+        return self
 
     async def init(self):
         dirname = os.path.dirname(__file__)
