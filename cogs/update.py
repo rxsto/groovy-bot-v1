@@ -21,6 +21,10 @@ class Update:
             channel_id = player.fetch('channel')
             guild = self.bot.get_guild(player_tuple[0])
             channel = guild.get_channel(channel_id)
+
+            if channel is None:
+                return
+
             await channel.send(':warning: **Groovy is going to restart soon! '
                                'Please be patient! For further information '
                                'check Groovy\'s official support server: '
