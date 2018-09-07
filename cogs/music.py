@@ -34,6 +34,8 @@ class Music:
                     embed.set_thumbnail(url=event.track.thumbnail)
                     await c.send(embed=embed)
         elif isinstance(event, lavalink.Events.QueueEndEvent):
+            if self.bot.is_updating():
+                return
             c = event.player.fetch('channel')
             if c:
                 c = self.bot.get_channel(c)
@@ -85,7 +87,8 @@ class Music:
             player.store('channel', ctx.channel.id)
             await player.connect(ctx.author.voice.channel.id)
         else:
-            if not ctx.author.voice or not ctx.author.voice.channel or player.connected_channel.id != ctx.author.voice.channel.id:
+            if not ctx.author.voice or not ctx.author.voice.channel or player.connected_channel.id\
+                    != ctx.author.voice.channel.id:
                 return await ctx.send(':no_entry_sign: Join my voice channel!')
 
         query = query.strip('<>')
@@ -344,7 +347,8 @@ class Music:
             await player.connect(ctx.author.voice.channel.id)
 
         else:
-            if not ctx.author.voice or not ctx.author.voice.channel or player.connected_channel.id != ctx.author.voice.channel.id:
+            if not ctx.author.voice or not ctx.author.voice.channel or player.connected_channel.id \
+                    != ctx.author.voice.channel.id:
                 return await ctx.send(':no_entry_sign: Join my voice channel!')
 
         track = tracks[song]
@@ -356,6 +360,7 @@ class Music:
 
         if not player.is_playing:
             await player.play()
+
 
 
 def setup(bot):

@@ -45,6 +45,7 @@ class Groovy(commands.AutoShardedBot):
         super().__init__(command_prefix=self.get_server_prefix, case_insensitive=True)
         self.config = Config().get_config()
         self.debug = self.config['debug']
+        self.updating = False
         if self.debug is True:
             self.prefix = 'gt!'
         else:
@@ -53,7 +54,8 @@ class Groovy(commands.AutoShardedBot):
         logger.info('Logging in ...')
 
         logger.info('Starting Groovy ...')
-
+        if self.debug:
+            logger.debug("Starting in debug mode")
         self.postgre_client = PostgreClient(self.config['database']['user'], self.config['database']['password'],
                                             self.config['database']['database'], self.config['database']['host'])
 
@@ -73,6 +75,7 @@ class Groovy(commands.AutoShardedBot):
             player = self.lavalink.players.get(403882830225997825)
             player.store('channel', 486765014976561159)
             await player.connect('486765249488224277')
+        await self.reconnect()
 
     async def on_shard_ready(self, shard_id):
         logger.info(f'Shard {shard_id + 1}/{self.shard_count} is ready!')
@@ -186,6 +189,22 @@ class Groovy(commands.AutoShardedBot):
                 self.load_extension(f'cogs.{cog}')
                 logger.info(f'Successfully loaded cog {cog}!')
 
+    async def reconnect(self):
+        async with self.get_postgre_client().get_pool().acquire() as connection:
+            for guild in await connection.fetch('SELECT * FROM queues'):
+                player = self.lavalink.players.get(guild['guild_id'])
+                player.store('channel', guild['text_channel_id'])
+                await player.connect(str(guild['channel_id']))
+                track = await self.lavalink.get_tracks(guild['current_track'])
+                player.add(requester=self.user.id, track=track['tracks'][0])
+                await player.play()
+                await player.seek(guild['current_position'])
+                for queue_track in guild['queue'].replace('[', '').replace(']', '').replace('\'', '').split(', '):
+                    track_result = await self.lavalink.get_tracks(queue_track)
+                    player.add(requester=self.user.id, track=track_result['tracks'][0])
+                delete = await connection.prepare('DELETE FROM queues WHERE guild_id = $1')
+                await delete.fetchval(int(guild['guild_id']))
+
     def get_config(self):
         return self.config
 
@@ -197,6 +216,12 @@ class Groovy(commands.AutoShardedBot):
 
     def is_in_debug_mode(self):
         return self.debug
+
+    def is_updating(self):
+        return self.updating
+
+    def set_updating(self, updating):
+        self.updating = updating
 
 
 if __name__ == '__main__':
