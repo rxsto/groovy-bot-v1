@@ -1,5 +1,3 @@
-import asyncio
-
 import discord
 import lavalink
 import re
@@ -55,7 +53,8 @@ class Music:
 
             player.store('channel', ctx.channel.id)
             await player.connect(ctx.author.voice.channel.id)
-            return await ctx.send(f':white_check_mark: I joined the voicechannel **`{ctx.author.voice.channel.name}`**!')
+            return await ctx.send(
+                f':white_check_mark: I joined the voicechannel **`{ctx.author.voice.channel.name}`**!')
         else:
             return await ctx.send(':no_entry_sign: I\'m already inside a voicechannel!')
 
@@ -107,9 +106,8 @@ class Music:
             await ctx.send(embed=embed)
         else:
             track = results['tracks'][0]
-            embed.title = "Track Enqueued"
-            embed.description = f'[{track["info"]["title"]}]({track["info"]["uri"]})'
-            await ctx.send(embed=embed)
+            success_message = f':musical_note: **Track Enqueued:** {track["info"]["title"]}'
+            await ctx.send(success_message)
             player.add(requester=ctx.author.id, track=track)
 
         if not player.is_playing:
@@ -209,7 +207,7 @@ class Music:
             queue_list += f'`{i + 1}.` [**{track.title}**]({track.uri})\n'
 
         embed = discord.Embed(colour=ctx.guild.me.top_role.colour,
-                              description=f'**{len(player.queue)} tracks**\n\n{queue_list}')
+                              description=f'**Queue - `{len(player.queue)}` tracks**\n\n{queue_list}')
         embed.set_footer(text=f'Viewing page {page}/{pages}')
         await ctx.send(embed=embed)
 
@@ -291,6 +289,8 @@ class Music:
 
     @commands.command(aliases=['find'])
     async def search(self, ctx, *, query=None):
+        player = self.bot.lavalink.players.get(ctx.guild.id)
+
         if not query:
             return await ctx.send(':no_entry_sign: Please specify a query!')
 
@@ -312,6 +312,46 @@ class Music:
                               description=o)
 
         await ctx.send(embed=embed)
+
+        msg = await self.bot.wait_for('message', check=pred)
+
+        try:
+            song = int(msg.content)
+        except ValueError:
+            return await ctx.send(':no_entry_sign: Please enter a number from 1 to 10! Search cancelled!')
+
+        if song < 1 or song > 10:
+            return await ctx.send(':no_entry_sign: Please enter a number from 1 to 10! Search cancelled!')
+
+        if not player.is_connected:
+            if not ctx.author.voice or not ctx.author.voice.channel:
+                return await ctx.send(':no_entry_sign: Join a voice channel!')
+
+            permissions = ctx.author.voice.channel.permissions_for(ctx.me)
+
+            if not permissions.connect or not permissions.speak:
+                return await ctx.send(':no_entry_sign: Missing permissions `CONNECT` and/or `SPEAK`.')
+
+            player.store('channel', ctx.channel.id)
+            await player.connect(ctx.author.voice.channel.id)
+
+        else:
+            if not ctx.author.voice or not ctx.author.voice.channel or player.connected_channel.id != ctx.author.voice.channel.id:
+                return await ctx.send(':no_entry_sign: Join my voice channel!')
+
+        track = tracks[song]
+
+        success_message = f':musical_note: **Track Enqueued:** {track["info"]["title"]}'
+        await ctx.send(success_message)
+
+        player.add(requester=ctx.author.id, track=tracks[song])
+
+        if not player.is_playing:
+            await player.play()
+
+
+def pred(m):
+    return m.author == m.author and m.channel == m.channel
 
 
 def setup(bot):
