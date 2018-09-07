@@ -1,3 +1,5 @@
+import asyncio
+
 import discord
 import lavalink
 import re
@@ -7,7 +9,7 @@ import math
 from discord.ext import commands
 
 time_rx = re.compile('[0-9]+')
-url_rx = re.compile('https?:\/\/(?:www\.)?.+')
+url_rx = re.compile("https?://(?:www\.)?.+")
 
 
 class Music:
@@ -37,6 +39,9 @@ class Music:
                 c = self.bot.get_channel(c)
                 if c:
                     await c.send(':white_check_mark: The queue has ended! Why not queue more songs?')
+            await asyncio.sleep(60 * 5)
+            if event.player.current is None:
+                await event.player.disconnect()
 
     @commands.command(aliases=['j', 'summon'])
     async def join(self, ctx):
@@ -313,15 +318,18 @@ class Music:
 
         await ctx.send(embed=embed)
 
+        def pred(m):
+            return m.author == ctx.message.author and m.channel == ctx.message.channel
+
         msg = await self.bot.wait_for('message', check=pred)
 
         try:
             song = int(msg.content)
         except ValueError:
-            return await ctx.send(':no_entry_sign: Please enter a number from 1 to 10! Search cancelled!')
+            return await ctx.send(':no_entry_sign: Please enter a number from `1` to `10`! **Search cancelled!**')
 
         if song < 1 or song > 10:
-            return await ctx.send(':no_entry_sign: Please enter a number from 1 to 10! Search cancelled!')
+            return await ctx.send(':no_entry_sign: Please enter a number from `1` to `10`! **Search cancelled!**')
 
         if not player.is_connected:
             if not ctx.author.voice or not ctx.author.voice.channel:
@@ -348,10 +356,6 @@ class Music:
 
         if not player.is_playing:
             await player.play()
-
-
-def pred(m):
-    return m.author == m.author and m.channel == m.channel
 
 
 def setup(bot):
