@@ -13,8 +13,6 @@ class StatusPage:
         self.client = client
 
     def init(self):
-        if self.client.is_in_debug_mode():
-            return
         headers = {"Content-Type": "application/x-www-form-urlencoded",
                    "Authorization": "OAuth " + self.config["statuspage"]["api_key"]}
         value = int(self.client.latency * 1000)
