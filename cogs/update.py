@@ -34,11 +34,6 @@ class Update:
             if channel is None:
                 return
 
-            await channel.send(':warning: **Groovy is going to restart soon! '
-                               'Please be patient! For further information '
-                               'check Groovy\'s official support server: '
-                               'https://groovybot.gq/support **')
-
             if player.current is None:
                 return
             track_list = get_track_list(player.queue)
@@ -54,9 +49,10 @@ class Update:
             player.queue.clear()
             sound = await self.bot.lavalink.get_tracks('https://cdn.groovybot.gq/sounds/update.mp3')
             player.add(requester=254892085000405004, track=sound['tracks'][0])
+            player.add(requester=264048760580079616, track=sound['tracks'][0])
             await player.skip()
             await player.set_volume(100)
-            await asyncio.sleep(10)
+            await asyncio.sleep(6.06)
             await player.disconnect()
         await status_msg.edit(content=':white_check_mark: **Finished!** Groovy is going to shutdown now!')
         time.sleep(5)

@@ -51,11 +51,13 @@ class Groovy(commands.AutoShardedBot):
         else:
             self.prefix = 'g!'
         logger.init()
+
+        if self.debug:
+            logger.debug("Starting in debug mode!")
+
         logger.info('Logging in ...')
 
         logger.info('Starting Groovy ...')
-        if self.debug:
-            logger.debug("Starting in debug mode")
         self.postgre_client = PostgreClient(self.config['database']['user'], self.config['database']['password'],
                                             self.config['database']['database'], self.config['database']['host'])
 
