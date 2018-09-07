@@ -29,7 +29,7 @@ class DiscordLists:
             'Content-Type': 'application/json'
         }
         requests.post('https://botblock.org/api/count', json=params, headers=headers)
-        Timer(60.0, self.start_loop)
+        Timer(60.0, self.start_loop).start()
 
 
 def setup(bot):
