@@ -1,3 +1,4 @@
+import main
 from discord.ext import commands
 
 
@@ -11,7 +12,8 @@ class Info:
 
     @commands.command()
     async def info(self, ctx):
+        prefix = await main.Groovy.retrieve_prefix(self.bot, ctx.guild.id)
         await ctx.send(':information_source: **This bot is currently under beta!** Please report any issue!\n'
-                       'You can get all commands and features by typing **`.help`**, '
-                       'if you want to join my support server, type **`.support`**. '
-                       'You can invite me by typing **`.invite`**')
+                       f'You can get all commands and features by typing **`{prefix}help`**, '
+                       f'if you want to join my support server, type **`{prefix}support`**. '
+                       f'You can invite me by typing **`{prefix}invite`**')
