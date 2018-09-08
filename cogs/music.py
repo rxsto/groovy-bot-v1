@@ -42,7 +42,7 @@ class Music:
                 if c:
                     await c.send(':white_check_mark: The queue has ended! Why not queue more songs?')
             await asyncio.sleep(60 * 5)
-            if event.player.current is None:
+            if event.player.current is None or event.player.channel_id != 486765249488224277:
                 await event.player.disconnect()
 
     @commands.command(aliases=['j', 'summon'])
@@ -87,7 +87,7 @@ class Music:
             player.store('channel', ctx.channel.id)
             await player.connect(ctx.author.voice.channel.id)
         else:
-            if not ctx.author.voice or not ctx.author.voice.channel or player.connected_channel.id\
+            if not ctx.author.voice or not ctx.author.voice.channel or player.connected_channel.id \
                     != ctx.author.voice.channel.id:
                 return await ctx.send(':no_entry_sign: Join my voice channel!')
 
@@ -360,7 +360,6 @@ class Music:
 
         if not player.is_playing:
             await player.play()
-
 
 
 def setup(bot):
