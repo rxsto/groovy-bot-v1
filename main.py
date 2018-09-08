@@ -8,10 +8,11 @@ import aiohttp
 import discord
 import datetime
 
-from discord import Message
+from discord import Message, HTTPException, Forbidden
 from discord.ext import commands
 from discord.ext.commands.errors import CommandNotFound, UserInputError
 from utilities import logger, status_page
+from utilities.outages import outages
 from utilities.game_animator import GameAnimator
 from utilities.config import Config
 from utilities.database import PostgreClient
@@ -78,6 +79,7 @@ class Groovy(commands.AutoShardedBot):
             player.store('channel', 486765014976561159)
             await player.connect('486765249488224277')
         await self.reconnect()
+        await self.update_outage_channel('operational')
 
     async def on_shard_ready(self, shard_id):
         logger.info(f'Shard {shard_id + 1}/{self.shard_count} is ready!')
@@ -112,7 +114,6 @@ class Groovy(commands.AutoShardedBot):
             await guild.owner.send(message)
         except discord.Forbidden as e:
             print(e)
-            return
 
         logger.info(
             f'[Shard {guild.shard_id + 1}] Left guild {guild.name} ({guild.id}) with {guild.member_count} users')
@@ -131,6 +132,9 @@ class Groovy(commands.AutoShardedBot):
                 await connection.execute(f'DELETE FROM guilds WHERE id = {guild.id}')
 
     async def on_message(self, msg: Message):
+        if self.updating:
+            return
+
         if msg.author.bot:
             return
 
@@ -194,18 +198,62 @@ class Groovy(commands.AutoShardedBot):
     async def reconnect(self):
         async with self.get_postgre_client().get_pool().acquire() as connection:
             for guild in await connection.fetch('SELECT * FROM queues'):
-                player = self.lavalink.players.get(guild['guild_id'])
-                player.store('channel', guild['text_channel_id'])
-                await player.connect(str(guild['channel_id']))
-                track = await self.lavalink.get_tracks(guild['current_track'])
-                player.add(requester=self.user.id, track=track['tracks'][0])
-                await player.play()
-                await player.seek(guild['current_position'])
-                for queue_track in guild['queue'].replace('[', '').replace(']', '').replace('\'', '').split(', '):
-                    track_result = await self.lavalink.get_tracks(queue_track)
-                    player.add(requester=self.user.id, track=track_result['tracks'][0])
                 delete = await connection.prepare('DELETE FROM queues WHERE guild_id = $1')
                 await delete.fetchval(int(guild['guild_id']))
+
+                player = self.lavalink.players.get(guild['guild_id'])
+                player.store('channel', guild['text_channel_id'])
+
+                await player.connect(str(guild['channel_id']))
+
+                track = await self.lavalink.get_tracks(guild['current_track'])
+                player.add(requester=self.user.id, track=track['tracks'][0])
+
+                await player.play()
+
+                await player.seek(guild['current_position'])
+
+                for queue_track in guild['queue'].replace('[', '').replace(']', '').replace('\'', '').split(', '):
+                    track_result = await self.lavalink.get_tracks(queue_track)
+                    if not track_result['tracks']:
+                        return
+
+                    player.add(requester=self.user.id, track=track_result['tracks'][0])
+
+    async def update_outage_channel(self, outage=None):
+        if self.is_in_debug_mode():
+            return
+
+        if outage is None:
+            return logger.error('No outage was specified!')
+
+        guild = self.get_guild(403882830225997825)
+        channel = discord.utils.get(guild.channels, name='outages')
+        category = self.get_channel(404311551248564255)
+
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(
+                send_messages=False,
+                read_messages=True,
+                read_message_history=True,
+                external_emojis=True,
+                add_reactions=True
+            )
+        }
+
+        try:
+            await channel.delete(reason='Updating outages message')
+        except HTTPException:
+            return logger.error('Something failed while deleting the outages channel!')
+
+        new_channel = await guild.create_text_channel(
+            name='outages',
+            overwrites=overwrites,
+            category=category,
+            reason='Updating outages message'
+        )
+
+        await new_channel.send(outages[outage])
 
     def get_config(self):
         return self.config
