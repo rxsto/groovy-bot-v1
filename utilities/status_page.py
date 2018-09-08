@@ -10,6 +10,7 @@ class StatusPage:
         self.config = config
         self.api_base = 'https://api.statuspage.io'
         self.client = client
+        self.debug = self.client.debug
 
     def init(self):
         headers = {"Content-Type": "application/x-www-form-urlencoded",
