@@ -23,7 +23,5 @@ remove = ['remove', 'Lets you remove a specific song', 'rm']
 prefix = ['prefix', 'Lets you change the bots prefix']
 control = ['control', 'Lets you control the bot with reactions', 'cp, panel']
 
-update = ['update', 'Only admin', 'up']
-
 cogs = [info, helpcmd, invite, support, shard, stats, play, join, leave, search, pause, resume, skip, seek, stop, now, queue, volume,
-        shuffle, loop, remove, prefix, update, control]
+        shuffle, loop, remove, prefix, control]
