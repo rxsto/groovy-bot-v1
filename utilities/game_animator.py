@@ -14,26 +14,15 @@ class GameAnimator:
             f'for {len(self.client.users)} users',
             f'in {len(self.client.lavalink.players)} voicechannels',
             f'on {self.client.shard_count} shards',
-            f'Listen to some f*cking music!',
-            f'How you doin\'?',
-            f'Join my server!',
-            f'Let\'s get the biggest bot on Discord! Muhahahahaa!',
-            f'I\'m Groovy, you know me?',
-            f'Mention me! Like @Groovy',
-            f'Better than Rythm',
-            f'It\'s not a bug, it\'s a feature!',
-            f'Check g!help',
-            f'Do you like what you hear?',
-            f'Vote for me!',
-            f'2 + 2 = 5!',
-            f'Skibidi papapapa! Skraaa!',
-            f'I am written in Delphi!',
-            f'Composing some lit music!',
-            f'Generating useless hash-codes!',
+            f'@Groovy',
+            f'g!help',
             f'groovybot.gq',
+            f'groovybot.gq/support',
+            f'groovybot.gq/vote',
             f'patreon.com/rxsto',
             f'twitter.com/rxsto_official',
-            f'github.com/rxsto'
+            f'github.com/rxsto',
+            f'rxsto.me'
         ]
         game = Game(f'{random.choice(games)}')
         self.event_loop.create_task(
