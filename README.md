@@ -9,3 +9,5 @@ Groovy is a feature-rich, experienced and well maintained Discord-bot. His main 
 
 [![Discord Bots](https://discordbots.org/api/widget/status/402116404301660181.svg?noavatar=true)](https://discordbots.org/bot/402116404301660181)
 [![Botsfordiscord widtget](https://botsfordiscord.com/api/v1/bots/402116404301660181/embed)](https://botsfordiscord.com/bot/402116404301660181)
+[![Discordbots.com](https://discordbotlist.com/bots/460847447602757633/widget")](https://discordbotlist.com/bots/460847447602757633/) i
+
