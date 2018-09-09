@@ -8,7 +8,7 @@ import aiohttp
 import discord
 import datetime
 
-from discord import Message, HTTPException, Forbidden
+from discord import Message, HTTPException
 from discord.ext import commands
 from discord.ext.commands.errors import CommandNotFound, UserInputError
 from utilities import logger, status_page
@@ -41,6 +41,7 @@ class Groovy(commands.AutoShardedBot):
                 return self.prefix
             else:
                 return response["prefix"]
+
 
     def __init__(self):
         super().__init__(command_prefix=self.get_server_prefix, case_insensitive=True)
