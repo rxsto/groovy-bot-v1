@@ -18,12 +18,13 @@ from utilities.game_animator import GameAnimator
 from utilities.config import Config
 from utilities.database import PostgreClient
 
+from cogs.music import Music
+
 if '--test-run' in sys.argv:
     exit(0)
 
 
 class Groovy(commands.AutoShardedBot):
-
     async def get_server_prefix(self, bot: commands.AutoShardedBot, message: discord.Message):
         if not message.guild:
             return self.prefix
@@ -66,9 +67,10 @@ class Groovy(commands.AutoShardedBot):
         if self.debug:
             logger.debug("Starting in debug mode!")
 
+        logger.info('Starting Groovy ...')
+
         logger.info('Logging in ...')
 
-        logger.info('Starting Groovy ...')
         self.postgre_client = PostgreClient(self.config['database']['user'], self.config['database']['password'],
                                             self.config['database']['database'], self.config['database']['host'])
 
@@ -101,7 +103,7 @@ class Groovy(commands.AutoShardedBot):
             error_hook = discord.Webhook.from_url(Config().get_config()['webhooks']['info'],
                                                   adapter=discord.AsyncWebhookAdapter(session))
             await error_hook.send(embed=discord.Embed(
-                title=f":white_check_mark: Joined guild {guild.name} ({guild.id})",
+                title=f"✅ Joined guild {guild.name} ({guild.id})",
                 timestamp=datetime.datetime.now(),
                 color=0x22d65b,
                 description=f'Owner: {guild.owner.name}#{guild.owner.discriminator}\n'
@@ -175,7 +177,7 @@ class Groovy(commands.AutoShardedBot):
         if isinstance(error, CommandNotFound) or isinstance(error, UserInputError):
             return
         embed = discord.Embed(
-            title=":no_entry_sign: An internal error occurred!",
+            title="🚫 An internal error occurred!",
             timestamp=datetime.datetime.now(),
             color=0xf22b2b,
             description=f'Error while parsing command `({ctx.message.content})` on guild **`{ctx.guild.name}`**'
@@ -210,14 +212,17 @@ class Groovy(commands.AutoShardedBot):
                 player = self.lavalink.players.get(guild['guild_id'])
                 player.store('channel', guild['text_channel_id'])
 
+                await Music.fade_out(player)
+
                 await player.connect(str(guild['channel_id']))
 
                 track = await self.lavalink.get_tracks(guild['current_track'])
                 player.add(requester=self.user.id, track=track['tracks'][0])
 
                 await player.play()
-
                 await player.seek(guild['current_position'])
+
+                await Music.fade_in(player)
 
                 for queue_track in guild['queue'].replace('[', '').replace(']', '').replace('\'', '').split(', '):
                     track_result = await self.lavalink.get_tracks(queue_track)
@@ -265,7 +270,7 @@ class Groovy(commands.AutoShardedBot):
         return self.config
 
     def get_ping(self):
-        return self.user.latency
+        return self.latency
 
     def get_postgre_client(self):
         return self.postgre_client
@@ -279,6 +284,15 @@ class Groovy(commands.AutoShardedBot):
     def set_updating(self, updating):
         self.updating = updating
 
+    async def stop():
+        super().logout()
+        self.postgre_client.get_pool().close()
+        
+
 
 if __name__ == '__main__':
-    instance = Groovy()
+    try:
+        instance = Groovy()
+    except KeyboardInterrupt:
+        instance.stop()
+
