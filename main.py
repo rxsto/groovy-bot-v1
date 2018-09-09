@@ -10,6 +10,7 @@ import datetime
 
 from discord import Message, HTTPException
 from discord.ext import commands
+from discord.ext.commands import context
 from discord.ext.commands.errors import CommandNotFound, UserInputError
 from utilities import logger, status_page
 from utilities.outages import outages
@@ -42,6 +43,14 @@ class Groovy(commands.AutoShardedBot):
             else:
                 return response["prefix"]
 
+    async def process_commands(self, message: Message):
+        ctx = await self.get_context(message, cls=context.Context)
+
+        if ctx.command is None:
+            return
+
+        async with ctx.channel.typing():
+            await self.invoke(ctx)
 
     def __init__(self):
         super().__init__(command_prefix=self.get_server_prefix, case_insensitive=True)
@@ -176,10 +185,6 @@ class Groovy(commands.AutoShardedBot):
         await ctx.send(embed=embed)
         logger.error(f'Error while parsing command `({ctx.message.content})` on guild {ctx.guild.name} ({ctx.guild.id})'
                      f' in channel #{ctx.message.channel.name} ({ctx.message.channel.id}) ', error)
-
-    async def on_command(self, ctx):
-        await ctx.trigger_typing()
-        return self
 
     async def init(self):
         dirname = os.path.dirname(__file__)
