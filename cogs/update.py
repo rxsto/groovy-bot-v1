@@ -4,6 +4,8 @@ import time
 from discord import Status, Game
 from discord.ext import commands
 
+from cogs.music import Music
+
 
 def setup(bot):
     bot.add_cog(Update(bot))
@@ -18,7 +20,7 @@ class Update:
         trusted_users = [254892085000405004, 264048760580079616]
         self.bot.set_updating(True)
         if ctx.author.id not in trusted_users:
-            return await ctx.send(':no_entry_sign: This command is only executable by the devs!')
+            return await ctx.send('🚫 This command is only executable by the devs!')
 
         game = Game('Updating!')
         await self.bot.change_presence(status=Status.online, activity=game)
@@ -58,18 +60,17 @@ class Update:
                         ' VALUES ($1, $2, $3, $4, $5, $6)')
                     await statement.fetchval(player_tuple[0], player.current.uri, player.position, str(track_list),
                                              int(player.channel_id), channel_id)
-                await player.set_volume(0)
-                await asyncio.sleep(3)
+                await Music.fade_out(player)
                 player.queue.clear()
                 sound = await self.bot.lavalink.get_tracks('https://cdn.groovybot.gq/sounds/update.mp3')
                 player.add(requester=254892085000405004, track=sound['tracks'][0])
-                await player.skip()
                 if player.paused:
                     await player.set_pause(False)
-                await player.set_volume(100)
+                await Music.fade_in(player)
+                await player.skip()
                 await asyncio.sleep(8)
                 await player.disconnect()
-        await status_msg.edit(content=':white_check_mark: **Groovy is able to be restarted!**')
+        await status_msg.edit(content='✅ **Groovy is able to be restarted!**')
         time.sleep(5)
 
 
