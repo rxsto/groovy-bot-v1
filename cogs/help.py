@@ -18,8 +18,6 @@ class Help:
 
         self.msg = ':white_small_square: **command** [alias1, alias2, ...] - `description`\n\n'
 
-        logger.info(f'Started generating help message ...')
-
         for cog in cogs.cogs:
             aliases = ''
             if len(cog) is 3:
