@@ -9,11 +9,11 @@ from cogs.music import Music
 
 
 class Control:
-    def __init__(self, user, guild, message, player, channel):
+    def __init__(self, user, guild, message, player, channel_id):
         self.user = user
         self.guild = guild
         self.message = message
-        self.channel = channel
+        self.channel_id = channel_id
         self.player = player
 
     async def handle_reaction(self, reaction):
@@ -35,7 +35,7 @@ class Control:
             await Music.fade_in(self.player)
             await self.send_response('✅ Successfully stopped the music!')
         elif emoji == '🔂':
-            repeat_response = '✅ Successfully enabled loop mode!' if not self.player.repeat else\
+            repeat_response = '✅ Successfully enabled loop mode!' if not self.player.repeat else \
                 '✅ Successfully disabled loop mode!'
             self.player.repeat = not self.player.repeat
             await self.send_response(repeat_response)
@@ -114,6 +114,17 @@ class Control:
             if self.message:
                 await self.update_message(True)
 
+    @property
+    def whitelisted_members(self):
+        out = list({})
+        for member in self.channel.members:
+            out.append(member.id)
+        return out
+
+    @property
+    def channel(self):
+        return self.guild.get_channel(self.channel_id)
+
     @staticmethod
     def get_percentage(progress, full):
         percent = round(progress / full, 2)
@@ -132,8 +143,27 @@ class ControlCommand:
         self.map = dict({})
         self.reacts = ['⏯', '⏭', '⏹', '🔂', '🔁', '🔀', '🔄', '🔉', '🔊']
 
-    @commands.command(aliases=['cp', 'panel', 'now', 'np'])
+    @commands.command(aliases=['cp', 'panel'])
     async def control(self, ctx):
+        if ctx.guild.id in self.map.keys():
+            msg = await ctx.send('🚫 You are already using an instance of the control panel on this guild! '
+                                 'Dou you want to reset it?')
+            await msg.add_reaction('✅')
+            await msg.add_reaction('❌')
+
+            def check(r, u):
+                return u.id == ctx.author.id and r.message.id == msg.id
+            reaction, user = await self.bot.wait_for('reaction_add', check=check)
+            if reaction.emoji == '❌':
+                return await msg.delete()
+            elif reaction.emoji == '✅':
+                if user.id not in self.map[ctx.guild.id].whitelisted_members:
+                    return await ctx.send(':no_entry_ You\'re not allowed to use this command')
+                else:
+                    await msg.delete()
+                    if self.map[ctx.guild.id].message:
+                        await self.map[ctx.guild.id].message.delete()
+
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:
@@ -155,7 +185,7 @@ class ControlCommand:
             for react in self.reacts:
                 await msg.add_reaction(react)
 
-            panel = Control(ctx.message.author, ctx.guild, msg, player, ctx.channel)
+            panel = Control(ctx.message.author, ctx.guild, msg, player, ctx.channel.id)
             self.map[ctx.guild.id] = panel
             await panel.update_message(True)
         else:
@@ -168,17 +198,20 @@ class ControlCommand:
             return
         if reaction.message.guild.id not in self.map:
             return
+        user_panel = self.map[reaction.message.guild.id]
+        if user_panel.message.id != reaction.message.id:
+            return
         await reaction.message.remove_reaction(reaction.emoji, user)
         if reaction.emoji not in self.reacts:
             return
-        user_panel = self.map[reaction.message.guild.id]
-        if user.id is not user_panel.user.id:
+        print(str(user_panel.whitelisted_members))
+        if user.id not in user_panel.whitelisted_members:
             return
         await user_panel.handle_reaction(reaction)
 
     async def on_message_delete(self, message):
         if message.id in self.map.keys():
-            del self.map[message.id]
+            del self.map[message.guild.id]
 
 
 def setup(bot):
