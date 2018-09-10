@@ -334,17 +334,12 @@ class Music:
         if check is not None:
             return
 
-        else:
-            if not ctx.author.voice or not ctx.author.voice.channel or player.connected_channel.id \
-                    != ctx.author.voice.channel.id:
-                return await ctx.send('🚫 Join my voice channel!')
-
-        track = tracks[song]
+        track = tracks[song - 1]
 
         success_message = f':musical_note: **Track Enqueued:** {track["info"]["title"]}'
         await ctx.send(success_message)
 
-        player.add(requester=ctx.author.id, track=tracks[song])
+        player.add(requester=ctx.author.id, track=track)
 
         if not player.is_playing:
             await player.play()
