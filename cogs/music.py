@@ -47,27 +47,18 @@ class Music:
 
     @commands.command(aliases=['j', 'summon'])
     async def join(self, ctx):
-        player = self.bot.lavalink.players.get(ctx.guild.id)
-
-        if not player.is_connected:
-            if not ctx.author.voice or not ctx.author.voice.channel:
-                return await ctx.send('🚫 Join a voice channel!')
-
-            permissions = ctx.author.voice.channel.permissions_for(ctx.me)
-
-            if not permissions.connect:
-                return await ctx.send('🚫 Missing permissions `CONNECT`.')
-
-            player.store('channel', ctx.channel.id)
-            await player.connect(ctx.author.voice.channel.id)
-            return await ctx.send(
-                f'✅ I joined the voicechannel **`{ctx.author.voice.channel.name}`**!')
-        else:
-            return await ctx.send('🚫 I\'m already inside a voicechannel!')
+        player = await self.get_player(context=ctx)
+        player.store('channel', ctx.channel.id)
+        check = await self.check_connect(ctx, player)
+        if check is not None:
+            return
+        await player.connect(ctx.author.voice.channel.id)
+        return await ctx.send(
+            f'✅ I joined the voicechannel **`{ctx.author.voice.channel.name}`**!')
 
     @commands.command(aliases=['p', 'add'])
     async def play(self, ctx, *, query=None):
-        player = self.bot.lavalink.players.get(ctx.guild.id)
+        player = await self.get_player(ctx)
 
         if query is None and player.paused and player.is_playing:
             await player.set_pause(False)
@@ -75,21 +66,9 @@ class Music:
         elif query is None:
             return await ctx.send('🚫 Please specify a query!')
 
-        if not player.is_connected:
-            if not ctx.author.voice or not ctx.author.voice.channel:
-                return await ctx.send('🚫 Join a voice channel!')
-
-            permissions = ctx.author.voice.channel.permissions_for(ctx.me)
-
-            if not permissions.connect or not permissions.speak:
-                return await ctx.send('🚫 Missing permissions `CONNECT` and/or `SPEAK`.')
-
-            player.store('channel', ctx.channel.id)
-            await player.connect(ctx.author.voice.channel.id)
-        else:
-            if not ctx.author.voice or not ctx.author.voice.channel or player.connected_channel.id \
-                    != ctx.author.voice.channel.id:
-                return await ctx.send('🚫 Join my voice channel!')
+        check = await self.check_connect(ctx, player)
+        if check is not None:
+            return
 
         query = query.strip('<>')
 
@@ -129,7 +108,7 @@ class Music:
             return await ctx.send('🚫 Not connected.')
 
         if not ctx.author.voice or (player.is_connected and ctx.author.voice.channel.id != int(player.channel_id)):
-            return await ctx.send('🚫 You\'re not in my voicechannel!')
+            return await ctx.send('🚫 You\'re not in my voice channel!')
 
         player.queue.clear()
         await self.fade_out(player)
@@ -137,7 +116,7 @@ class Music:
         await ctx.send('*⃣ | Disconnected.')
         await self.fade_in(player)
 
-    @commands.command()
+    @commands.command
     async def seek(self, ctx, time):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
@@ -160,7 +139,7 @@ class Music:
 
         await ctx.send(f'✅ Seeked to **{lavalink.Utils.format_time(track_time)}**')
 
-    @commands.command()
+    @commands.command
     async def skip(self, ctx, *, to=None):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
@@ -192,7 +171,7 @@ class Music:
         await player.skip()
         await self.fade_in(player)
 
-    @commands.command()
+    @commands.command
     async def stop(self, ctx):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
@@ -228,7 +207,7 @@ class Music:
         embed.set_footer(text=f'Page {page}/{pages}')
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.command
     async def pause(self, ctx):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
@@ -241,7 +220,7 @@ class Music:
         else:
             await ctx.send('🚫 I\'m already paused!')
 
-    @commands.command()
+    @commands.command
     async def resume(self, ctx):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
@@ -271,7 +250,7 @@ class Music:
 
         await player.set_volume(volume)
 
-    @commands.command()
+    @commands.command
     async def shuffle(self, ctx):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
@@ -282,7 +261,7 @@ class Music:
 
         await ctx.send('🔀 | Shuffle ' + ('enabled' if player.shuffle else 'disabled'))
 
-    @commands.command()
+    @commands.command
     async def loop(self, ctx):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
@@ -313,7 +292,7 @@ class Music:
 
     @commands.command(aliases=['find'])
     async def search(self, ctx, *, query=None):
-        player = self.bot.lavalink.players.get(ctx.guild.id)
+        player = await self.get_player(ctx)
 
         if not query:
             return await ctx.send('🚫 Please specify a query!')
@@ -342,25 +321,18 @@ class Music:
 
         msg = await self.bot.wait_for('message', check=pred)
 
+        error = False
+        song = 11
         try:
             song = int(msg.content)
         except ValueError:
+            error = True
+        if song < 1 or song > 10 or error:
             return await ctx.send('🚫 Please enter a number from `1` to `10`! **Search cancelled!**')
 
-        if song < 1 or song > 10:
-            return await ctx.send('🚫 Please enter a number from `1` to `10`! **Search cancelled!**')
-
-        if not player.is_connected:
-            if not ctx.author.voice or not ctx.author.voice.channel:
-                return await ctx.send('🚫 Join a voice channel!')
-
-            permissions = ctx.author.voice.channel.permissions_for(ctx.me)
-
-            if not permissions.connect or not permissions.speak:
-                return await ctx.send('🚫 Missing permissions `CONNECT` and/or `SPEAK`.')
-
-            player.store('channel', ctx.channel.id)
-            await player.connect(ctx.author.voice.channel.id)
+        check = await self.check_connect(ctx, player)
+        if check is not None:
+            return
 
         else:
             if not ctx.author.voice or not ctx.author.voice.channel or player.connected_channel.id \
@@ -388,6 +360,28 @@ class Music:
         player = self.bot.lavalink.players.get(ctx.guild.id)
         await player.seek(0)
         await ctx.send('✅ Successfully reset the progress!')
+
+    async def get_player(self, context):
+        out = self.bot.lavalink.players.get(context.guild.id)
+        return out
+
+    @staticmethod
+    async def check_connect(context, player):
+        if not player.is_connected:
+            if not context.author.voice or not context.author.voice.channel:
+                return await context.send('🚫 Join a voice channel!')
+
+            permissions = context.author.voice.channel.permissions_for(context.me)
+
+            if not permissions.connect or not permissions.speak:
+                return await context.send('🚫 Missing permissions `CONNECT` and/or `SPEAK`.')
+
+            player.store('channel', context.channel.id)
+            await player.connect(context.author.voice.channel.id)
+        else:
+            if not context.author.voice or not context.author.voice.channel or player.connected_channel.id \
+                    != context.author.voice.channel.id:
+                return await context.send('🚫 Join my voice channel!')
 
     @staticmethod
     async def fade_out(player):
