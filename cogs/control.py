@@ -7,8 +7,6 @@ from discord.errors import NotFound
 
 from cogs.music import Music
 
-from threading import Timer
-
 
 class Control:
     def __init__(self, user, guild, message, player, channel):
@@ -21,7 +19,8 @@ class Control:
     async def handle_reaction(self, reaction):
         emoji = reaction.emoji
         if emoji == '⏯':
-            resume_response = '✅ Successfully resumed the music!' if self.player.paused else '✅ Successfully paused music!'
+            resume_response = '✅ Successfully resumed the music!' if self.player.paused else \
+                '✅ Successfully paused music!'
             await self.player.set_pause(not self.player.paused)
             await self.send_response(resume_response)
         elif emoji == '⏭':
@@ -36,13 +35,15 @@ class Control:
             await Music.fade_in(self.player)
             await self.send_response('✅ Successfully stopped the music!')
         elif emoji == '🔂':
-            repeat_response = '✅ Successfully enabled loop mode!' if not self.player.repeat else '✅ Successfully disabled loop mode!'
+            repeat_response = '✅ Successfully enabled loop mode!' if not self.player.repeat else\
+                '✅ Successfully disabled loop mode!'
             self.player.repeat = not self.player.repeat
             await self.send_response(repeat_response)
         elif emoji == '🔁':
             await self.send_response('⚠ **This feature is currently under development!**')
         elif emoji == '🔀':
-            shuffle_response = '✅ Successfully enabled shuffle mode!' if not self.player.shuffle else '✅ Successfully disabled shuffle mode!'
+            shuffle_response = '✅ Successfully enabled shuffle mode!' if not self.player.shuffle else \
+                '✅ Successfully disabled shuffle mode!'
             self.player.shuffle = not self.player.shuffle
             await self.send_response(shuffle_response)
         elif emoji == '🔄':
@@ -138,10 +139,8 @@ class ControlCommand:
         if not player.is_playing:
             return await ctx.send('🚫 I\'m not playing.')
 
-        global embed_title, embed_text
         if ctx.invoked_with == 'cp' or ctx.invoked_with == 'control' or ctx.invoked_with == 'panel':
             embed_title = 'Control Panel'
-            embed_text = ''
         else:
             embed_title = 'Now Playing'
 
@@ -160,7 +159,6 @@ class ControlCommand:
             self.map[ctx.guild.id] = panel
             await panel.update_message(True)
         else:
-            pass
             panel = Control(ctx.message.author, ctx.guild, msg, player, ctx.channel)
             self.map[ctx.guild.id] = panel
             await panel.update_message(False)
