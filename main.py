@@ -97,24 +97,12 @@ class Groovy(commands.AutoShardedBot):
         logger.info(f'Shard {shard_id + 1}/{self.shard_count} is ready!')
 
     async def on_guild_join(self, guild):
-        logger.info(
-            f'[Shard {guild.shard_id + 1}] Joined guild {guild.name} ({guild.id}) with {guild.member_count} users')
-        async with aiohttp.ClientSession() as session:
-            error_hook = discord.Webhook.from_url(Config().get_config()['webhooks']['info'],
-                                                  adapter=discord.AsyncWebhookAdapter(session))
-            await error_hook.send(embed=discord.Embed(
-                title=f"✅ Joined guild {guild.name} ({guild.id})",
-                timestamp=datetime.datetime.now(),
-                color=0x22d65b,
-                description=f'Owner: {guild.owner.name}#{guild.owner.discriminator}\n'
-                            f'Members: {guild.member_count}\n'
-                            f'Shard: {guild.shard_id + 1}'
-            ).set_thumbnail(url=guild.icon_url))
-            async with self.postgre_client.get_pool().acquire() as connection:
-                check = await connection.fetchrow(f'SELECT * FROM guilds WHERE id = {guild.id}')
-                if check is None:
-                    await connection.execute(
-                        f'INSERT INTO guilds (id, prefix, volume) VALUES ({guild.id}, \'g!\', 100)')
+        await self.log_guild("Joined", guild)
+        async with self.postgre_client.get_pool().acquire() as connection:
+            check = await connection.fetchrow(f'SELECT * FROM guilds WHERE id = {guild.id}')
+            if check is None:
+                await connection.execute(
+                    f'INSERT INTO guilds (id, prefix, volume) VALUES ({guild.id}, \'g!\', 100)')
 
     async def on_guild_remove(self, guild):
         message = '<:hey:454004173013254155> Hey! What a pity that Groovy **didn\'t fit your expectations!** ' \
@@ -127,19 +115,7 @@ class Groovy(commands.AutoShardedBot):
         except discord.Forbidden as e:
             print(e)
 
-        logger.info(
-            f'[Shard {guild.shard_id + 1}] Left guild {guild.name} ({guild.id}) with {guild.member_count} users')
-        async with aiohttp.ClientSession() as session:
-            error_hook = discord.Webhook.from_url(Config().get_config()['webhooks']['info'],
-                                                  adapter=discord.AsyncWebhookAdapter(session))
-            await error_hook.send(embed=discord.Embed(
-                title=f":x: Left guild {guild.name} ({guild.id})",
-                timestamp=datetime.datetime.now(),
-                color=0xf22b2b,
-                description=f'Owner: {guild.owner.name}#{guild.owner.discriminator}\n'
-                            f'Members: {guild.member_count}\n'
-                            f'Shard: {guild.shard_id + 1}'
-            ).set_thumbnail(url=guild.icon_url))
+            await self.log_guild("Left", guild)
             async with self.postgre_client.get_pool().acquire() as connection:
                 await connection.execute(f'DELETE FROM guilds WHERE id = {guild.id}')
 
@@ -203,7 +179,7 @@ class Groovy(commands.AutoShardedBot):
         logger.info('Successfully loaded all cogs!')
 
     async def reconnect(self):
-        async with self.get_postgre_client().get_pool().acquire() as connection:
+        async with self.postgre_client.get_pool().acquire() as connection:
             for guild in await connection.fetch('SELECT * FROM queues'):
                 delete = await connection.prepare('DELETE FROM queues WHERE guild_id = $1')
                 await delete.fetchval(int(guild['guild_id']))
@@ -264,6 +240,24 @@ class Groovy(commands.AutoShardedBot):
         )
 
         await new_channel.send(outages[outage])
+
+    async def log_guild(self, action, guild):
+        logger.info(
+            f'[Shard {guild.shard_id + 1}] {action} guild {guild.name} ({guild.id}) with {guild.member_count} users')
+        info_hook = await self.get_hook(hook_type='info')
+        await info_hook.send(embed=discord.Embed(
+            title=f"✅ Joined guild {guild.name} ({guild.id})",
+            timestamp=datetime.datetime.now(),
+            color=0x22d65b,
+            description=f'Owner: {guild.owner.name}#{guild.owner.discriminator}\n'
+                        f'Members: {guild.member_count}\n'
+                        f'Shard: {guild.shard_id + 1}'
+        ).set_thumbnail(url=guild.icon_url))
+
+    async def get_hook(self, hook_type):
+        async with aiohttp.ClientSession() as session:
+            return discord.Webhook.from_url(self.config['webhooks'][hook_type],
+                                            adapter=discord.AsyncWebhookAdapter(session))
 
     def get_config(self):
         return self.config
