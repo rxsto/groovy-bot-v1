@@ -62,20 +62,20 @@ class Groovy(commands.AutoShardedBot):
             self.prefix = 'gt!'
         else:
             self.prefix = 'g!'
-        logger.init()
-
-        if self.debug:
-            logger.debug("Starting in debug mode!")
-
-        logger.info('Starting Groovy ...')
-
-        logger.info('Logging in ...')
-
         self.postgre_client = PostgreClient(self.config['database']['user'], self.config['database']['password'],
                                             self.config['database']['database'], self.config['database']['host'])
 
+        logger.init()
+
+        if self.debug:
+            logger.debug("Starting Groovy in debug mode ...")
+        else:
+            logger.info('Starting Groovy ...')
+
+        logger.info('Connecting to database ...')
         asyncio.get_event_loop().run_until_complete(self.postgre_client.connect())
 
+        logger.info('Logging in ...')
         if self.debug is True:
             self.run(self.config['test_bot']['token'])
         else:
@@ -194,14 +194,13 @@ class Groovy(commands.AutoShardedBot):
         extensions = os.listdir(filename)
 
         logger.info('Started loading cogs ...')
-
         for file in extensions:
             if file.startswith('__'):
-                logger.warn(f'There is a file or dir in /cogs/ which is no cog: {file}')
+                pass
             else:
                 cog = file.split('.')[0]
                 self.load_extension(f'cogs.{cog}')
-                logger.info(f'Successfully loaded cog {cog}!')
+        logger.info('Successfully loaded all cogs!')
 
     async def reconnect(self):
         async with self.get_postgre_client().get_pool().acquire() as connection:
@@ -284,15 +283,7 @@ class Groovy(commands.AutoShardedBot):
     def set_updating(self, updating):
         self.updating = updating
 
-    async def stop():
-        super().logout()
-        self.postgre_client.get_pool().close()
-        
-
 
 if __name__ == '__main__':
-    try:
-        instance = Groovy()
-    except KeyboardInterrupt:
-        instance.stop()
-
+    instance = Groovy()
+    # instance.start()
