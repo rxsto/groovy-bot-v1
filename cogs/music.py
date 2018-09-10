@@ -205,26 +205,6 @@ class Music:
         await ctx.send('⏹ | Stopped.')
         await self.fade_in(player)
 
-    @commands.command(aliases=['np'])
-    async def now(self, ctx):
-        player = self.bot.lavalink.players.get(ctx.guild.id)
-        song = 'Nothing'
-
-        if player.current:
-            pos = lavalink.Utils.format_time(player.position)
-            if player.current.stream:
-                dur = 'LIVE'
-            else:
-                dur = lavalink.Utils.format_time(player.current.duration)
-
-        embed = discord.Embed(
-            colour=ctx.guild.me.top_role.colour,
-            title=player.current.title,
-            url=player.current.uri,
-            description='blah'
-        ).add_thumbnail(url=player.current.thumbnail)
-        await ctx.send(embed=embed)
-
     @commands.command(aliases=['q'])
     async def queue(self, ctx, page: int = 1):
         player = self.bot.lavalink.players.get(ctx.guild.id)
@@ -241,11 +221,11 @@ class Music:
         queue_list = ''
 
         for i, track in enumerate(player.queue[start:end], start=start):
-            queue_list += f'`{i + 1}.` [**{track.title}**]({track.uri})\n'
+            queue_list += f'**`{i + 1}.`** [{track.title}]({track.uri}) {self.bot.get_user(track.requester).mention}\n'
 
         embed = discord.Embed(colour=ctx.guild.me.top_role.colour,
-                              description=f'**Queue - `{len(player.queue)}` tracks**\n\n{queue_list}')
-        embed.set_footer(text=f'Viewing page {page}/{pages}')
+                              description=f'**Queue** - `{len(player.queue)}` tracks\n\n{queue_list}')
+        embed.set_footer(text=f'Page {page}/{pages}')
         await ctx.send(embed=embed)
 
     @commands.command()
@@ -279,16 +259,17 @@ class Music:
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not volume:
-            if player.volume == 0:
-                return await ctx.send(f'🔇 | {player.volume}%')
-            else:                
+            if player.volume > 100:
                 return await ctx.send(f'🔊 | {player.volume}%')
+            else:
+                return await ctx.send(f'🔉 | {player.volume}%')
 
-        await player.set_volume(volume)
-        if player.volume == 0:
-            await ctx.send(f'🔇 | Set to {player.volume}%')
+        if player.volume > volume:
+            await ctx.send(f'🔉 | Set to {player.volume}%')
         else:
             await ctx.send(f'🔊 | Set to {player.volume}%')
+
+        await player.set_volume(volume)
 
     @commands.command()
     async def shuffle(self, ctx):
