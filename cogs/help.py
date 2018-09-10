@@ -3,7 +3,6 @@ import discord
 from discord.ext import commands
 
 from utilities import cogs
-from utilities import logger
 
 
 def setup(bot):
