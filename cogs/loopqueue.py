@@ -2,15 +2,15 @@ from discord.ext import commands
 
 
 def setup(bot):
-    bot.add_cog(Loop(bot))
+    bot.add_cog(Loopqueue(bot))
 
 
-class Loop:
+class Loopqueue:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=['lp'])
-    async def loop(self, ctx):
+    @commands.command(aliases=['lq'])
+    async def loopqueue(self, ctx):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:
@@ -18,4 +18,4 @@ class Loop:
 
         player.repeat = not player.repeat
 
-        await ctx.send('🔂 | Loop ' + ('enabled' if player.repeat else 'disabled'))
+        await ctx.send('🔁 | Loopqueue ' + ('enabled' if player.repeat else 'disabled'))
