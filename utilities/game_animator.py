@@ -1,10 +1,12 @@
 import threading
 import random
 from discord import Status, Game
+from utilities import logger
 
 
 class GameAnimator:
     def __init__(self, client, event_loop):
+        logger.info('Initializing GameAnimator ...')
         self.client = client
         self.event_loop = event_loop
 
