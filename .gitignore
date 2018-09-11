@@ -109,3 +109,4 @@ venv.bak/
 /logs/
 /lavalink/
 /.idea/
+/.vscode/

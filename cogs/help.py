@@ -3,7 +3,6 @@ import discord
 from discord.ext import commands
 
 from utilities import cogs
-from utilities import logger
 
 
 def setup(bot):
@@ -17,8 +16,6 @@ class Help:
         self.title = ':information_source: All commands and features'
 
         self.msg = ':white_small_square: **command** [alias1, alias2, ...] - `description`\n\n'
-
-        logger.info(f'Started generating help message ...')
 
         for cog in cogs.cogs:
             aliases = ''

@@ -19,4 +19,4 @@ class Prefix:
                 return await ctx.send(f':information_source: The current prefix is **`{current_prefix}`**')
             prepared_statement = await connection.prepare('''UPDATE guilds SET prefix = $1 WHERE id = $2''')
             await prepared_statement.fetchval(prefix, ctx.guild.id)
-            return await ctx.send(f':white_check_mark: The prefix was successfully set to **`{prefix}`**')
+            return await ctx.send(f'✅ The prefix was successfully set to **`{prefix}`**')
