@@ -4,6 +4,7 @@ invite = ['invite', 'Shows you an invite for Groovy']
 support = ['support', 'Shows you an invite to the support server']
 shard = ['shard', 'Shows you your current shard id']
 stats = ['stats', 'Shows you Groovy\'s current stats']
+donate = ['donate', 'Shows you some information about donating']
 
 play = ['play', 'Lets you play any music you want', 'p, add']
 join = ['join', 'Tells the bot to join your channel', 'j']
