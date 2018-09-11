@@ -25,5 +25,4 @@ class Leave:
             await Music.fade_out(player)
         await player.disconnect()
         await ctx.send('*⃣ | Disconnected.')
-        if player.current is not None:
-            await Music.fade_in(player)
+        await Music.fade_in(player)

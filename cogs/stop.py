@@ -22,5 +22,4 @@ class Temp:
             await Music.fade_out(player)
         await player.stop()
         await ctx.send('⏹ | Stopped.')
-        if player.current is not None:
-            await Music.fade_in(player)
+        await Music.fade_in(player)
