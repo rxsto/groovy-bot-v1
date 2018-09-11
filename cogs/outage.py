@@ -18,6 +18,9 @@ class Outage:
         if outage is None:
             return await ctx.send('🚫 You need to give an argument!')
 
-        await self.bot.update_outage_channel(outage=outage)
+        try:
+            await self.bot.update_outage_channel(outage=outage)
+        except ValueError:
+            return await ctx.send('🚫 You need to give an valid argument!')
 
         await ctx.send('✅ Updated outages message!')

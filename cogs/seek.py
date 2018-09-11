@@ -1,5 +1,6 @@
 from discord.ext import commands
 from cogs.music import time_rx
+from lavalink import Utils
 
 
 def setup(bot):
@@ -31,4 +32,4 @@ class Seek:
 
         await player.seek(track_time)
 
-        await ctx.send(f'✅ Seeked to **{self.bot.lavalink.Utils.format_time(track_time)}**')
+        await ctx.send(f'✅ Seeked to **{Utils.format_time(track_time)}**')

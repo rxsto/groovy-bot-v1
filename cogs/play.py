@@ -43,12 +43,12 @@ class Play:
             for track in tracks:
                 player.add(requester=ctx.author.id, track=track)
 
-            embed.title = "Playlist Enqueued!"
+            embed.title = "Playlist enqueued!"
             embed.description = f"{results['playlistInfo']['name']} - {len(tracks)} tracks"
             await ctx.send(embed=embed)
         else:
             track = results['tracks'][0]
-            success_message = f':musical_note: **Track Enqueued:** {track["info"]["title"]}'
+            success_message = f':musical_note: **Track enqueued:** {track["info"]["title"]}'
             await ctx.send(success_message)
             player.add(requester=ctx.author.id, track=track)
 
