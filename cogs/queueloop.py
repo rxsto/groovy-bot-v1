@@ -18,7 +18,7 @@ class QueueLoopCommand:
         check = await Music.check_connect(ctx, player)
         if check is not None:
             return
-        enabled = await player.queueloop
+        enabled = await player.toggle_queue_loop
         if enabled:
             return await ctx.send(':repeat: Successfully enabled queueloop')
         else:
@@ -35,5 +35,5 @@ async def toggle_queue_loop(player):
 
 
 def setup(bot):
-    setattr(DefaultPlayer, "queueloop", toggle_queue_loop)
+    setattr(DefaultPlayer, "toggle_queue_loop", toggle_queue_loop)
     bot.add_cog(QueueLoopCommand(bot))

@@ -40,7 +40,10 @@ class Control:
             self.player.repeat = not self.player.repeat
             await self.send_response(repeat_response)
         elif emoji == '🔁':
-            await self.send_response('⚠ **This feature is currently under development!**')
+            queue_loop_status = await self.player.toggle_queue_loop
+            response = ':repeat: Successfully enabled queueloop' if queue_loop_status else\
+                ':repeat: Successfully disabled queueloop'
+            await self.send_response(response)
         elif emoji == '🔀':
             shuffle_response = '✅ Successfully enabled shuffle mode!' if not self.player.shuffle else \
                 '✅ Successfully disabled shuffle mode!'
