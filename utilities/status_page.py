@@ -4,6 +4,8 @@ import requests
 import time
 from threading import Timer
 
+from utilities import logger
+
 
 class StatusPage:
     def __init__(self, config, client):
@@ -13,6 +15,9 @@ class StatusPage:
         self.debug = self.client.debug
 
     def init(self):
+        if self.client.is_in_debug_mode():
+            return
+        logger.info('Initializing system metrics for average ping ...')
         headers = {"Content-Type": "application/x-www-form-urlencoded",
                    "Authorization": "OAuth " + self.config["statuspage"]["api_key"]}
         value = int(self.client.latency * 1000)
