@@ -9,7 +9,7 @@ class Loop:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command
+    @commands.command(aliases=['lp'])
     async def loop(self, ctx):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
@@ -18,4 +18,4 @@ class Loop:
 
         player.repeat = not player.repeat
 
-        await ctx.send('🔁 | Loop ' + ('enabled' if player.repeat else 'disabled'))
+        await ctx.send('🔂 | Loop ' + ('enabled' if player.repeat else 'disabled'))
