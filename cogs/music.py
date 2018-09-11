@@ -1,4 +1,5 @@
 import asyncio
+import base64
 
 import discord
 import lavalink
@@ -19,6 +20,7 @@ class Music:
                             password=bot.get_config()['lavalink']['password'], loop=self.bot.loop,
                             log_level=logging.INFO)
         self.bot.lavalink.register_hook(self.track_hook)
+        self.pattern = '(https://www.youtube.com/watch\?v=...........)'
 
     async def track_hook(self, event):
         if isinstance(event, lavalink.Events.TrackStartEvent):
@@ -41,6 +43,16 @@ class Music:
             await asyncio.sleep(60 * 5)
             if event.player.current is None or event.player.channel_id != 486765249488224277:
                 await event.player.disconnect()
+        elif isinstance(event, lavalink.Events.TrackEndEvent):
+            queue_loop_status = await event.player.queue_loop
+            print(queue_loop_status)
+            if queue_loop_status:
+                # Ignore reason 'REPLACED' to do not requeue songs again after they got skipped
+                if event.reason == 'FINISHED':
+                    loaded_track = base64.b64decode(event.track)
+                    track_url = re.search(self.pattern, str(loaded_track)).group()
+                    tracks = await self.bot.lavalink.get_tracks(track_url)
+                    event.player.add(requester=self.bot.user.id, track=tracks['tracks'][0])
 
     @staticmethod
     async def check_connect(context, player):

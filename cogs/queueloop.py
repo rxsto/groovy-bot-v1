@@ -27,13 +27,24 @@ class QueueLoopCommand:
 
 @property
 async def toggle_queue_loop(player):
+    queue_loop_status = await player.queue_loop
+    print(queue_loop_status)
+    player.delete('queueloop')
+    player.store('queueloop', not queue_loop_status)
+    status = await player.queue_loop
+    print(status)
+    return await player.queue_loop
+
+
+@property
+async def get_queue_loop(player):
     queue_loop_status = player.fetch('queueloop')
     if queue_loop_status is None:
-        queue_loop_status = False
-    player.store('queueloop', not queue_loop_status)
+        return False
     return queue_loop_status
 
 
 def setup(bot):
-    setattr(DefaultPlayer, "toggle_queue_loop", toggle_queue_loop)
+    setattr(DefaultPlayer, 'toggle_queue_loop', toggle_queue_loop)
+    setattr(DefaultPlayer, 'queue_loop', get_queue_loop)
     bot.add_cog(QueueLoopCommand(bot))
