@@ -74,6 +74,7 @@ class Groovy(commands.AutoShardedBot):
 
         logger.info('Connecting to database ...')
         asyncio.get_event_loop().run_until_complete(self.postgre_client.connect())
+        logger.info('Successfully connected to database!')
 
         logger.info('Logging in ...')
         if self.debug is True:
@@ -82,7 +83,7 @@ class Groovy(commands.AutoShardedBot):
             self.run(self.config['main_bot']['token'])
 
     async def on_ready(self):
-        logger.info(f'Logged in as {self.user.name} ...')
+        logger.info(f'Successfully logged in as {self.user.name} ...')
         await self.init()
         GameAnimator(self, self.loop).run()
         status_page.StatusPage(self.config, self).init()
