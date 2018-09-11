@@ -161,7 +161,7 @@ class ControlCommand:
                     return await ctx.send(':no_entry_ You\'re not allowed to use this command')
                 else:
                     await msg.delete()
-                    if self.map[ctx.guild.id].message:
+                    if self.map[ctx.guild.id].message is not None:
                         await self.map[ctx.guild.id].message.delete()
 
         player = self.bot.lavalink.players.get(ctx.guild.id)
@@ -204,7 +204,7 @@ class ControlCommand:
         await user_panel.handle_reaction(reaction)
 
     async def on_message_delete(self, message):
-        if message.id in self.map.keys():
+        if message.guild.id in self.map.keys():
             del self.map[message.guild.id]
 
 
