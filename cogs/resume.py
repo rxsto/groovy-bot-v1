@@ -9,7 +9,7 @@ class Resume:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command
+    @commands.command()
     async def resume(self, ctx):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 

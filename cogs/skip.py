@@ -2,16 +2,12 @@ from discord.ext import commands
 from cogs.music import Music
 
 
-def setup(bot):
-    bot.add_cog(Skip(bot))
-
-
 class Skip:
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command
-    async def skip(self, ctx, *, to=None):
+    @commands.command()
+    async def skip(self, ctx, to=None):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:
@@ -41,3 +37,7 @@ class Skip:
 
         await player.skip()
         await Music.fade_in(player)
+
+
+def setup(bot):
+    bot.add_cog(Skip(bot))
