@@ -21,23 +21,23 @@ class LogLevel(Enum):
 
 
 def debug(message):
-    asyncio.get_event_loop().create_task(log(LogLevel.DEBUG, message))
+    log(LogLevel.DEBUG, message)
 
 
 def info(message):
-    asyncio.get_event_loop().create_task(log(LogLevel.INFO, message))
+    log(LogLevel.INFO, message)
 
 
 def warn(message):
-    asyncio.get_event_loop().create_task(log(LogLevel.WARN, message))
+    log(LogLevel.WARN, message)
 
 
 def error(message, exception: Exception = None):
-    asyncio.get_event_loop().create_task(log(LogLevel.ERROR, message, exception))
+    log(LogLevel.ERROR, message, exception)
 
 
 def critical(message, exception: Exception = None):
-    asyncio.get_event_loop().create_task(log(LogLevel.CRITICAL, message, exception))
+    log(LogLevel.CRITICAL, message, exception)
 
 
 def init():
@@ -50,7 +50,7 @@ def init():
     file.write(f'[{own_time}] [INFO] Initialized logging file while booting on {init_time}\n')
 
 
-async def log(level, message, exception: Exception = None):
+def log(level, message, exception: Exception = None):
     file = open(f'logs/obstBot_{time.strftime("%d-%m-%Y")}.log', "a", encoding='utf-8')
     own_time = time.strftime("%H:%M:%S")
     formatted_message = f'[{own_time}] [{level.name}] {message}'
@@ -60,14 +60,24 @@ async def log(level, message, exception: Exception = None):
         exception_string = f'{exception.__class__.__name__}: {exception}'
         print(exception_string)
         file.write(exception_string + '\n')
-        async with aiohttp.ClientSession() as session:
-            error_hook = Webhook.from_url(Config().get_config()['webhooks']['error'],
-                                          adapter=AsyncWebhookAdapter(session))
-            await error_hook.send(embed=discord.Embed(
-                title="🚫 An internal error occurred!",
-                timestamp=datetime.datetime.now(),
-                color=0xf22b2b,
-                description=f'```{exception_string}```'
-            ))
-
+        get_loop().create_task(log_exception(exception_string))
     file.close()
+
+
+async def log_exception(exception_string):
+    async with aiohttp.ClientSession() as session:
+        error_hook = Webhook.from_url(Config().get_config()['webhooks']['error'],
+                                      adapter=AsyncWebhookAdapter(session))
+        await error_hook.send(embed=discord.Embed(
+            title="🚫 An internal error occurred!",
+            timestamp=datetime.datetime.now(),
+            color=0xf22b2b,
+            description=f'```{exception_string}```'
+        ))
+
+
+def get_loop():
+    try:
+        return asyncio.get_event_loop()
+    except RuntimeError:
+        return asyncio.new_event_loop()
