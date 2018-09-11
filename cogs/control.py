@@ -93,17 +93,17 @@ class Control:
         play_type = '⏸' if self.player.paused else '▶'
         loop_type = '🔂' if self.player.repeat else ''
         shuffle_type = '🔀' if self.player.shuffle else ''
-        desc = f'{play_type}{loop_type}{shuffle_type} ' \
-               f'{self.get_percentage(self.player.position, self.player.current.duration)} **[{pos} / {dur}]**'
 
         song = self.player.current
+
+        desc = f'🎶 **{song.title}** (**{song.author}**)\n\n' \
+               f'{play_type}{loop_type}{shuffle_type} ' \
+               f'{self.get_percentage(self.player.position, song.duration)} **[{pos} / {dur}]**'
 
         embed = discord.Embed(
             colour=self.guild.me.top_role.colour,
             description=desc,
-            title=f'{song.title} ({song.author})',
-            url=song.uri
-        ).set_thumbnail(url=song.thumbnail)
+        )
 
         try:
             await self.message.edit(embed=embed)
@@ -169,14 +169,9 @@ class ControlCommand:
         if not player.is_playing:
             return await ctx.send('🚫 I\'m not playing.')
 
-        if ctx.invoked_with == 'cp' or ctx.invoked_with == 'control' or ctx.invoked_with == 'panel':
-            embed_title = 'Control Panel'
-        else:
-            embed_title = 'Now Playing'
-
         embed = discord.Embed(
-            title=f'{embed_title} - Loading',
-            description='<a:groovyloading:487681291010179072> Please wait while the control panel is loading'
+            title=f'Control Panel - Loading',
+            description='<a:groovyloading:487681291010179072> Please wait while the control panel is loading ...'
         )
 
         msg = await ctx.send(embed=embed)
@@ -204,7 +199,6 @@ class ControlCommand:
         await reaction.message.remove_reaction(reaction.emoji, user)
         if reaction.emoji not in self.reacts:
             return
-        print(str(user_panel.whitelisted_members))
         if user.id not in user_panel.whitelisted_members:
             return
         await user_panel.handle_reaction(reaction)
