@@ -254,30 +254,35 @@ class Groovy(commands.AutoShardedBot):
 
         logger.info(
             f'[Shard {guild.shard_id + 1}] {action} guild {guild.name} ({guild.id}) with {guild.member_count} users')
-        info_hook = await self.get_hook(hook_type='info')
-        await info_hook.send(embed=discord.Embed(
-            title=f'{title} {guild.name} ({guild.id})',
-            timestamp=datetime.datetime.now(),
-            color=color,
-            description=f'Owner: {guild.owner.name}#{guild.owner.discriminator}\n'
-                        f'Members: {guild.member_count}\n'
-                        f'Shard: {guild.shard_id + 1}'
-        ).set_thumbnail(url=guild.icon_url))
+        async with aiohttp.ClientSession() as session:
+            info_hook = await self.get_hook(hook_type='info', session=session)
+            await info_hook.send(embed=discord.Embed(
+                title=f'{title} {guild.name} ({guild.id})',
+                timestamp=datetime.datetime.now(),
+                color=color,
+                description=f'Owner: {guild.owner.name}#{guild.owner.discriminator}\n'
+                            f'Members: {guild.member_count}\n'
+                            f'Shard: {guild.shard_id + 1}'
+            ).set_thumbnail(url=guild.icon_url))
 
     async def log_member(self, action_bool, member):
+
+        if member.bot:
+            return
 
         title = '✅ Joined' if action_bool is True else '❌ Left'
         color = 0x22d65b if action_bool is True else 0xe85353
 
-        info_hook = await self.get_hook(hook_type='info')
-        await info_hook.send(embed=discord.Embed(
-            title=f'{title}: {member.name}#{member.discriminator} ({member.id})',
-            timestamp=datetime.datetime.now(),
-            color=color
-        ).set_image(url=member.avatar_url))
-
-    async def get_hook(self, hook_type):
         async with aiohttp.ClientSession() as session:
+            info_hook = await self.get_hook(hook_type='user', session=session)
+            await info_hook.send(embed=discord.Embed(
+                title=f'{title}: {member.name}#{member.discriminator} ({member.id})',
+                timestamp=datetime.datetime.now(),
+                description=member.mention,
+                color=color
+            ).set_thumbnail(url=member.avatar_url))
+
+    async def get_hook(self, hook_type, session):
             return discord.Webhook.from_url(self.config['webhooks'][hook_type],
                                             adapter=discord.AsyncWebhookAdapter(session))
 
