@@ -98,7 +98,9 @@ class Groovy(commands.AutoShardedBot):
         logger.info(f'Shard {shard_id + 1}/{self.shard_count} is ready!')
 
     async def on_guild_join(self, guild):
-        await self.log_guild("Joined", guild)
+        if self.is_in_debug_mode():
+            return
+        await self.log_guild(True, guild)
         async with self.postgre_client.get_pool().acquire() as connection:
             check = await connection.fetchrow(f'SELECT * FROM guilds WHERE id = {guild.id}')
             if check is None:
@@ -106,19 +108,21 @@ class Groovy(commands.AutoShardedBot):
                     f'INSERT INTO guilds (id, prefix, volume) VALUES ({guild.id}, \'g!\', 100)')
 
     async def on_guild_remove(self, guild):
-        message = '<:hey:454004173013254155> Hey! What a pity that Groovy **didn\'t fit your expectations!** ' \
-                  'We would like to **improve** him, but we don\'t know what to **change**, ' \
-                  'unless you **join our server** and **tell us what we could do better**. ' \
-                  'So do us the **favour** and join Groovy\'s support server and ' \
-                  '**tell the devs** what you want to have **changed**! **Thank you!** - https://groovybot.gq/support'
-        try:
-            await guild.owner.send(message)
-        except discord.Forbidden as e:
-            print(e)
+        if self.is_in_debug_mode():
+            return
+        await self.log_guild(False, guild)
+        async with self.postgre_client.get_pool().acquire() as connection:
+            await connection.execute(f'DELETE FROM guilds WHERE id = {guild.id}')
 
-            await self.log_guild("Left", guild)
-            async with self.postgre_client.get_pool().acquire() as connection:
-                await connection.execute(f'DELETE FROM guilds WHERE id = {guild.id}')
+    async def on_member_join(self, member):
+        if self.is_in_debug_mode():
+            return
+        await self.log_member(True, member)
+
+    async def on_member_remove(self, member):
+        if self.is_in_debug_mode():
+            return
+        await self.log_member(False, member)
 
     async def on_message(self, msg: Message):
         if self.updating:
@@ -154,7 +158,7 @@ class Groovy(commands.AutoShardedBot):
         if isinstance(error, CommandNotFound) or isinstance(error, UserInputError):
             return
         embed = discord.Embed(
-            title="🚫 An internal error occurred!",
+            title=f'🚫 An internal error occurred! Bot: {self.user.name}',
             timestamp=datetime.datetime.now(),
             color=0xf22b2b,
             description=f'Error while parsing command `({ctx.message.content})` on guild **`{ctx.guild.name}`**'
@@ -242,18 +246,35 @@ class Groovy(commands.AutoShardedBot):
 
         await new_channel.send(outages[outage])
 
-    async def log_guild(self, action, guild):
+    async def log_guild(self, action_bool, guild):
+
+        action = 'Joined' if action_bool is True else 'Left'
+        title = '✅ Joined guild' if action_bool is True else '❌ Left guild'
+        color = 0x22d65b if action_bool is True else 0xe85353
+
         logger.info(
             f'[Shard {guild.shard_id + 1}] {action} guild {guild.name} ({guild.id}) with {guild.member_count} users')
         info_hook = await self.get_hook(hook_type='info')
         await info_hook.send(embed=discord.Embed(
-            title=f"✅ Joined guild {guild.name} ({guild.id})",
+            title=f'{title} {guild.name} ({guild.id})',
             timestamp=datetime.datetime.now(),
-            color=0x22d65b,
+            color=color,
             description=f'Owner: {guild.owner.name}#{guild.owner.discriminator}\n'
                         f'Members: {guild.member_count}\n'
                         f'Shard: {guild.shard_id + 1}'
         ).set_thumbnail(url=guild.icon_url))
+
+    async def log_member(self, action_bool, member):
+
+        title = '✅ Joined' if action_bool is True else '❌ Left'
+        color = 0x22d65b if action_bool is True else 0xe85353
+
+        info_hook = await self.get_hook(hook_type='info')
+        await info_hook.send(embed=discord.Embed(
+            title=f'{title}: {member.name}#{member.discriminator} ({member.id})',
+            timestamp=datetime.datetime.now(),
+            color=color
+        ).set_image(url=member.avatar_url))
 
     async def get_hook(self, hook_type):
         async with aiohttp.ClientSession() as session:
@@ -281,4 +302,3 @@ class Groovy(commands.AutoShardedBot):
 
 if __name__ == '__main__':
     instance = Groovy()
-    # instance.start()
