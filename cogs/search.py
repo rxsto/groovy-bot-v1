@@ -28,9 +28,9 @@ class Search:
 
         tracks = results['tracks'][:10]  # First 10 results
 
-        o = ''
+        o = '🎶 Select one song with typing the number\n\n'
         for i, t in enumerate(tracks, start=1):
-            o += f'`{i}.` [{t["info"]["title"]}]({t["info"]["uri"]})\n'
+            o += f'**{i}.** [{t["info"]["title"]}]({t["info"]["uri"]})\n'
 
         embed = discord.Embed(colour=ctx.guild.me.top_role.colour,
                               description=o)
@@ -57,7 +57,7 @@ class Search:
 
         track = tracks[song - 1]
 
-        success_message = f':musical_note: **Track Enqueued:** {track["info"]["title"]}'
+        success_message = f'🎶 **Track Enqueued:** {track["info"]["title"]}'
         await ctx.send(success_message)
 
         player.add(requester=ctx.author.id, track=track)

@@ -43,7 +43,7 @@ def critical(message, exception: Exception = None):
 def init():
     if not os.path.exists('logs/'):
         os.makedirs('logs/')
-    file = open(f'logs/obstBot_{time.strftime("%d-%m-%Y")}.log', "a")
+    file = open(f'logs/Groovy_{time.strftime("%d-%m-%Y")}.log', "a")
     own_time = time.strftime("%H:%M:%S")
     init_time = time.strftime("%c")
     file.write(f'[{own_time}] [INFO] ------------------------------------------------------------------\n')
@@ -51,7 +51,7 @@ def init():
 
 
 def log(level, message, exception: Exception = None):
-    file = open(f'logs/obstBot_{time.strftime("%d-%m-%Y")}.log', "a", encoding='utf-8')
+    file = open(f'logs/Groovy_{time.strftime("%d-%m-%Y")}.log', "a", encoding='utf-8')
     own_time = time.strftime("%H:%M:%S")
     formatted_message = f'[{own_time}] [{level.name}] {message}'
     print(formatted_message)

@@ -20,6 +20,9 @@ class Leave:
         if not ctx.author.voice or (player.is_connected and ctx.author.voice.channel.id != int(player.channel_id)):
             return await ctx.send('🚫 You\'re not in my voice channel!')
 
+        if player.channel_id == '486765249488224277':
+            return await ctx.send('🚫 I have to stay in this channel!')
+
         player.queue.clear()
         if player.current is not None:
             await Music.fade_out(player)

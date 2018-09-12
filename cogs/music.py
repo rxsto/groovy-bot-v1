@@ -29,8 +29,8 @@ class Music:
             if c:
                 c = self.bot.get_channel(c)
                 if c:
-                    embed = discord.Embed(colour=c.guild.me.top_role.colour, title='Now Playing',
-                                          description=event.track.title)
+                    embed = discord.Embed(colour=c.guild.me.top_role.colour, title='🎶 Now Playing',
+                                          description=f'{event.track.title} ({event.track.author})')
                     embed.set_thumbnail(url=event.track.thumbnail)
                     await c.send(embed=embed)
         elif isinstance(event, lavalink.Events.QueueEndEvent):
@@ -42,7 +42,11 @@ class Music:
                 if c:
                     await c.send('✅ The queue has ended! Why not queue more songs?')
             await asyncio.sleep(60 * 5)
-            if event.player.current is None or event.player.channel_id != 486765249488224277:
+
+            if event.player.channel_id == '486765249488224277':
+                return
+
+            if event.player.current is None:
                 await event.player.disconnect()
         elif isinstance(event, lavalink.Events.TrackEndEvent):
             queue_loop_status = await event.player.queue_loop

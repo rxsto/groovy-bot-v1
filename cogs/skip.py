@@ -7,7 +7,7 @@ class Skip:
         self.bot = bot
 
     @commands.command()
-    async def skip(self, ctx, to=None):
+    async def skip(self, ctx, *, to=None):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:

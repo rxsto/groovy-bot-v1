@@ -18,6 +18,6 @@ class Resume:
 
         if player.paused:
             await player.set_pause(False)
-            await ctx.send('⏯ | Resumed')
+            await ctx.send('▶ | Resumed')
         else:
             await ctx.send('🚫 I\'m already resumed!')

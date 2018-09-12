@@ -18,6 +18,6 @@ class Pause:
 
         if not player.paused:
             await player.set_pause(True)
-            await ctx.send('⏯ | Paused')
+            await ctx.send('⏸ | Paused')
         else:
             await ctx.send('🚫 I\'m already paused!')
