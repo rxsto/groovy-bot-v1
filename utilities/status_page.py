@@ -13,11 +13,11 @@ class StatusPage:
         self.api_base = 'https://api.statuspage.io'
         self.client = client
         self.debug = self.client.debug
+        logger.info('Initializing system metrics for average ping ...')
 
     def init(self):
         if self.client.is_in_debug_mode():
             return
-        logger.info('Initializing system metrics for average ping ...')
         headers = {"Content-Type": "application/x-www-form-urlencoded",
                    "Authorization": "OAuth " + self.config["statuspage"]["api_key"]}
         value = int(self.client.latency * 1000)
