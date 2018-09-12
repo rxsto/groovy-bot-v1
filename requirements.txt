@@ -23,3 +23,4 @@ six==1.11.0
 urllib3==1.23
 websockets==6.0
 yarl==1.2.6
+lyricsgenius

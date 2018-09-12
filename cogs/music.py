@@ -1,10 +1,12 @@
 import asyncio
-import base64
+import json
 
 import discord
 import lavalink
 import re
 import logging
+
+import requests
 
 time_rx = re.compile('[0-9]+')
 url_rx = re.compile("https?://(?:www\.)?.+")
@@ -20,7 +22,6 @@ class Music:
                             password=bot.get_config()['lavalink']['password'], loop=self.bot.loop,
                             log_level=logging.INFO)
         self.bot.lavalink.register_hook(self.track_hook)
-        self.pattern = '(https://www.youtube.com/watch\?v=...........)'
 
     async def track_hook(self, event):
         if isinstance(event, lavalink.Events.TrackStartEvent):
@@ -45,14 +46,11 @@ class Music:
                 await event.player.disconnect()
         elif isinstance(event, lavalink.Events.TrackEndEvent):
             queue_loop_status = await event.player.queue_loop
-            print(queue_loop_status)
             if queue_loop_status:
                 # Ignore reason 'REPLACED' to do not requeue songs again after they got skipped
                 if event.reason == 'FINISHED':
-                    loaded_track = base64.b64decode(event.track)
-                    track_url = re.search(self.pattern, str(loaded_track)).group()
-                    tracks = await self.bot.lavalink.get_tracks(track_url)
-                    event.player.add(requester=self.bot.user.id, track=tracks['tracks'][0])
+                    track = await self.decode_base64_track(event.track)
+                    event.player.add(requester=self.bot.user.id, track=track)
 
     @staticmethod
     async def check_connect(context, player):
@@ -71,6 +69,20 @@ class Music:
             if not context.author.voice or not context.author.voice.channel or player.connected_channel.id \
                     != context.author.voice.channel.id:
                 return await context.send('🚫 Join my voice channel!')
+
+    async def decode_base64_track(self, track):
+        headers = {
+            "Authorization": self.bot.get_config()['lavalink']['password'],
+            "Content-Type": "application/json"
+        }
+        params = f'["{track}"]'
+        lavalink_host = self.bot.get_config()['lavalink']['host']
+        lavalink_port = 2333
+        track_response = requests.post(f'http://{lavalink_host}:{lavalink_port}/decodetracks',
+                                       data=params,
+                                       headers=headers)
+        track = json.loads(track_response.text)[0]
+        return track
 
     @staticmethod
     async def fade_out(player):
