@@ -41,8 +41,8 @@ class Control:
             await self.send_response(repeat_response)
         elif emoji == '🔁':
             loop_queue_status = await self.player.toggle_loop_queue
-            response = '🔁 Successfully enabled loopqueue mode' if loop_queue_status else\
-                '🔁 Successfully disabled loopqueue mode'
+            response = '✅ Successfully enabled loopqueue mode!' if not loop_queue_status else\
+                '✅ Successfully disabled loopqueue mode!'
             await self.send_response(response)
         elif emoji == '🔀':
             shuffle_response = '✅ Successfully enabled shuffle mode!' if not self.player.shuffle else \
