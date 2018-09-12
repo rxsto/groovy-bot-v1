@@ -14,7 +14,6 @@ class Play:
     @commands.command(aliases=['p', 'add'])
     async def play(self, ctx, *, query=None):
         player = self.bot.lavalink.players.get(ctx.guild.id)
-        await player.toggle_queue_loop
         if query is None and player.paused and player.is_playing:
             await player.set_pause(False)
             return await ctx.send('⏯ | Resumed')

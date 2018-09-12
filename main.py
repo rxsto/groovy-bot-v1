@@ -17,7 +17,6 @@ from utilities.outages import outages
 from utilities.game_animator import GameAnimator
 from utilities.config import Config
 from utilities.database import PostgreClient
-import lyricsgenius as genius
 
 from cogs.music import Music
 
@@ -57,7 +56,6 @@ class Groovy(commands.AutoShardedBot):
     def __init__(self):
         super().__init__(command_prefix=self.get_server_prefix, case_insensitive=True)
         self.config = Config().get_config()
-        self.genius_client = genius.Genius(self.config['genius']['token'])
         self.debug = self.config['debug']
         self.session = aiohttp.ClientSession(loop=self.loop)
         self.updating = False
@@ -306,9 +304,6 @@ class Groovy(commands.AutoShardedBot):
 
     def set_updating(self, updating):
         self.updating = updating
-
-    def get_genius(self):
-        return self.genius_client
 
 
 if __name__ == '__main__':

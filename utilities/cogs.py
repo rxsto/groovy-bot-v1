@@ -30,6 +30,7 @@ prefix = ['prefix', 'Lets you change the bots prefix']
 control = ['control', 'Lets you control the bot with reactions', 'cp, panel']
 clear = ['clear', 'Lets you clear the queue', 'cls, cl']
 reset = ['reset', 'Lets you reset the current progress', 'restart']
+cleanup = ['cleanup', 'Lets you delete all songs from absent users', 'clean']
 
 info_cogs = [info, helpcmd, invite, support, shard, stats, donate, vote]
 

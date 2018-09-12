@@ -41,8 +41,8 @@ class Control:
             await self.send_response(repeat_response)
         elif emoji == '🔁':
             loop_queue_status = await self.player.toggle_loop_queue
-            response = '🔁 Successfully enabled loopqueue mode' if loop_queue_status else\
-                '🔁 Successfully disabled loopqueue mode'
+            response = '✅ Successfully enabled loopqueue mode!' if not loop_queue_status else\
+                '✅ Successfully disabled loopqueue mode!'
             await self.send_response(response)
         elif emoji == '🔀':
             shuffle_response = '✅ Successfully enabled shuffle mode!' if not self.player.shuffle else \
@@ -86,7 +86,6 @@ class Control:
                     return await self.message.delete()
                 except NotFound:
                     return
-            print('huso')
             del self
             return
         pos = lavalink.Utils.format_time(self.player.position)
@@ -96,12 +95,13 @@ class Control:
             dur = lavalink.Utils.format_time(self.player.current.duration)
         play_type = '⏸' if self.player.paused else '▶'
         loop_type = '🔂' if self.player.repeat else ''
+        loopqueue_type = '🔁' if await self.player.loop_queue else ''
         shuffle_type = '🔀' if self.player.shuffle else ''
 
         song = self.player.current
 
         desc = f'🎶 **{song.title}** (**{song.author}**)\n\n' \
-               f'{play_type}{loop_type}{shuffle_type} ' \
+               f'{play_type}{loop_type}{loopqueue_type}{shuffle_type} ' \
                f'{self.get_percentage(self.player.position, song.duration)} **[{pos} / {dur}]**'
 
         embed = discord.Embed(
