@@ -40,9 +40,9 @@ class Control:
             self.player.repeat = not self.player.repeat
             await self.send_response(repeat_response)
         elif emoji == '🔁':
-            queue_loop_status = await self.player.toggle_queue_loop
-            response = ':repeat: Successfully enabled loopqueue mode' if queue_loop_status else\
-                ':repeat: Successfully disabled loopqueue mode'
+            loop_queue_status = await self.player.toggle_loop_queue
+            response = '🔁 Successfully enabled loopqueue mode' if loop_queue_status else\
+                '🔁 Successfully disabled loopqueue mode'
             await self.send_response(response)
         elif emoji == '🔀':
             shuffle_response = '✅ Successfully enabled shuffle mode!' if not self.player.shuffle else \
@@ -73,7 +73,7 @@ class Control:
     async def send_response(self, response):
         async with self.channel.typing():
             message = await self.channel.send(response)
-        await asyncio.sleep(3.5)
+        await asyncio.sleep(2)
         try:
             await message.delete()
         except NotFound:
@@ -86,6 +86,7 @@ class Control:
                     return await self.message.delete()
                 except NotFound:
                     return
+            print('huso')
             del self
             return
         pos = lavalink.Utils.format_time(self.player.position)
@@ -113,7 +114,7 @@ class Control:
         except NotFound:
             pass
         if loop:
-            await asyncio.sleep(10)
+            await asyncio.sleep(5)
             if self.message:
                 await self.update_message(True)
 
@@ -208,7 +209,9 @@ class ControlCommand:
 
     async def on_message_delete(self, message):
         if message.guild.id in self.map.keys():
-            del self.map[message.guild.id]
+            user_panel = self.map[message.guild.id]
+            if user_panel.message.id == message.id:
+                del self.map[message.guild.id]
 
 
 def setup(bot):
