@@ -86,7 +86,6 @@ class Control:
                     return await self.message.delete()
                 except NotFound:
                     return
-            print('huso')
             del self
             return
         pos = lavalink.Utils.format_time(self.player.position)
@@ -96,12 +95,13 @@ class Control:
             dur = lavalink.Utils.format_time(self.player.current.duration)
         play_type = '⏸' if self.player.paused else '▶'
         loop_type = '🔂' if self.player.repeat else ''
+        loopqueue_type = '🔁' if await self.player.loop_queue else ''
         shuffle_type = '🔀' if self.player.shuffle else ''
 
         song = self.player.current
 
         desc = f'🎶 **{song.title}** (**{song.author}**)\n\n' \
-               f'{play_type}{loop_type}{shuffle_type} ' \
+               f'{play_type}{loop_type}{loopqueue_type}{shuffle_type} ' \
                f'{self.get_percentage(self.player.position, song.duration)} **[{pos} / {dur}]**'
 
         embed = discord.Embed(

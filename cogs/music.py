@@ -52,6 +52,7 @@ class Music:
             loop_queue_status = await event.player.loop_queue
             if loop_queue_status:
                 # Ignore reason 'REPLACED' to do not requeue songs again after they got skipped
+                print(event.reason)
                 if event.reason == 'FINISHED':
                     track = await self.decode_base64_track(event.track)
                     event.player.add(requester=self.bot.user.id, track=track)
