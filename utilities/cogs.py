@@ -31,5 +31,7 @@ control = ['control', 'Lets you control the bot with reactions', 'cp, panel']
 clear = ['clear', 'Lets you clear the queue', 'cls, cl']
 reset = ['reset', 'Lets you reset the current progress', 'restart']
 
-cogs = [info, helpcmd, invite, support, shard, stats, donate, vote, play, playtop, playskip, join, leave, search, pause, resume, skip,
-        seek, stop, now, queue, volume, shuffle, loop, loopqueue, move, remove, prefix, control, clear, reset]
+info_cogs = [info, helpcmd, invite, support, shard, stats, donate, vote]
+
+music_cogs = [play, playtop, playskip, join, leave, search, pause, resume, skip,
+              seek, stop, now, queue, volume, shuffle, loop, loopqueue, move, remove, prefix, control, clear, reset]
