@@ -15,7 +15,7 @@ class Loopqueue:
 
     @commands.command(aliases=['lq', 'loopq'])
     async def loopqueue(self, ctx):
-        return ctx.send('🚫 Currently under construction!')
+        return await ctx.send('🚫 Currently under construction!')
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:

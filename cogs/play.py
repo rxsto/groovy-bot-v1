@@ -48,7 +48,7 @@ class Play:
             await ctx.send(embed=embed)
         else:
             track = results['tracks'][0]
-            success_message = f':musical_note: **Track enqueued:** {track["info"]["title"]}'
+            success_message = f'🎶 **Track enqueued:** {track["info"]["title"]}'
             await ctx.send(success_message)
             player.add(requester=ctx.author.id, track=track)
 

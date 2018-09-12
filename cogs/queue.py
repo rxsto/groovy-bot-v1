@@ -31,6 +31,6 @@ class Queue:
             queue_list += f'**{i + 1}.** [{track.title}]({track.uri}) {self.bot.get_user(track.requester).mention}\n'
 
         embed = discord.Embed(colour=ctx.guild.me.top_role.colour,
-                              description=f'**Queue** - `{len(player.queue)}` tracks\n\n{queue_list}')
+                              description=f'🎶 **Queue** - `{len(player.queue)}` tracks\n\n{queue_list}')
         embed.set_footer(text=f'Page {page}/{pages}')
         await ctx.send(embed=embed)
