@@ -59,6 +59,7 @@ class Groovy(commands.AutoShardedBot):
         self.config = Config().get_config()
         self.genius_client = genius.Genius(self.config['genius']['token'])
         self.debug = self.config['debug']
+        self.session = aiohttp.ClientSession(loop=self.loop)
         self.updating = False
         if self.debug is True:
             self.prefix = 'gt!'

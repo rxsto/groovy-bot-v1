@@ -6,7 +6,6 @@ import lavalink
 import re
 import logging
 
-import requests
 
 time_rx = re.compile('[0-9]+')
 url_rx = re.compile("https?://(?:www\.)?.+")
@@ -82,9 +81,9 @@ class Music:
         params = f'["{track}"]'
         lavalink_host = self.bot.get_config()['lavalink']['host']
         lavalink_port = 2333
-        track_response = requests.post(f'http://{lavalink_host}:{lavalink_port}/decodetracks',
-                                       data=params,
-                                       headers=headers)
+        track_response = await self.bot.session.post(f'http://{lavalink_host}:{lavalink_port}/decodetracks',
+                                                     data=params,
+                                                     headers=headers)
         track = json.loads(track_response.text)[0]
         return track
 

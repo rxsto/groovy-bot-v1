@@ -1,6 +1,5 @@
 from threading import Timer
 
-import requests
 
 from main import Groovy
 
@@ -28,7 +27,7 @@ class DiscordLists:
         headers = {
             'Content-Type': 'application/json'
         }
-        requests.post('https://botblock.org/api/count', json=params, headers=headers)
+        await self.bot.session.post('https://botblock.org/api/count', json=params, headers=headers)
         Timer(60.0, self.start_loop).start()
 
 

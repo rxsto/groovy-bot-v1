@@ -15,7 +15,7 @@ class PostgreClient:
         try:
             login_data = {"user": self.user, "password": self.password, "database": self.database, "host": self.host}
             self.conn = await asyncpg.create_pool(**login_data)
-        except IOError as e:
+        except Exception as e:
             logger.error("[DATABASE] An error occurred while connecting to the DB", e)
             exit(1)
 

@@ -1,6 +1,5 @@
 import urllib.parse as urllib
 
-import requests
 import time
 from threading import Timer
 
@@ -22,9 +21,9 @@ class StatusPage:
                    "Authorization": "OAuth " + self.config["statuspage"]["api_key"]}
         value = int(self.client.latency * 1000)
         params = urllib.urlencode({'data[timestamp]': time.time(), 'data[value]': value})
-        r = requests.post(f'{self.api_base}/v1/pages/{self.config["statuspage"]["page_id"]}/metrics/'
-                          f'{self.config["statuspage"]["metric_id"]}'
-                          f'/data.json', headers=headers, data=params)
+        r = await self.client.session.post(f'{self.api_base}/v1/pages/{self.config["statuspage"]["page_id"]}/metrics/'
+                                           f'{self.config["statuspage"]["metric_id"]}'
+                                           f'/data.json', headers=headers, data=params)
         if r.status_code is not 201:
             print(f"Error while sending data to status page {r.text}")
         Timer(60.0, self.init).start()
