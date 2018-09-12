@@ -13,18 +13,34 @@ def setup(bot):
 class Help:
     def __init__(self, bot):
         self.bot = bot
-        self.title = ':information_source: All commands and features'
+        self.info_title = 'ℹ All info-commands'
 
-        self.msg = ':white_small_square: **command** [alias1, alias2, ...] - `description`\n\n'
+        self.info_msg = '▫ **command** [alias1, alias2, ...] - `description`\n\n'
 
-        for cog in cogs.cogs:
+        for cog in cogs.info_cogs:
             aliases = ''
             if len(cog) is 3:
                 aliases += f' [{cog[2]}]'
 
-            self.msg += f':white_small_square: **{cog[0]}**{aliases} - `{cog[1]}`\n'
+            self.info_msg += f'▫ **{cog[0]}**{aliases} - `{cog[1]}`\n'
+
+        self.music_title = '🎶 All music-commands'
+
+        self.music_msg = '▫ **command** [alias1, alias2, ...] - `description`\n\n'
+
+        for cog in cogs.music_cogs:
+            aliases = ''
+            if len(cog) is 3:
+                aliases += f' [{cog[2]}]'
+
+            self.music_msg += f'▫ **{cog[0]}**{aliases} - `{cog[1]}`\n'
 
     @commands.command(aliases=['?'])
     async def help(self, ctx):
-        embed = discord.Embed(title=self.title, description=self.msg, color=ctx.guild.me.top_role.color)
-        await ctx.send(embed=embed)
+        info_embed = discord.Embed(title=self.info_title, description=self.info_msg,
+                                   color=ctx.guild.me.top_role.color)
+        await ctx.send(embed=info_embed)
+
+        music_embed = discord.Embed(title=self.music_title, description=self.music_msg,
+                                    color=ctx.guild.me.top_role.color)
+        await ctx.send(embed=music_embed)
