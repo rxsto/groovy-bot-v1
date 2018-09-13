@@ -3,6 +3,8 @@ import asyncio
 import discord
 from discord.ext import commands
 
+from utilities import logger
+
 
 def setup(bot):
     bot.add_cog(Shard(bot))
@@ -25,15 +27,18 @@ class Shard:
 
         await asyncio.sleep(1.5)
 
-        if self.bot.shard_ids is None:
+        """if self.bot.shard_ids is None:
             embed = discord.Embed(
                 description=f'<:check:449207827026673677> Shard 1 online - {int(self.bot.latency * 1000)} ms'
             )
-            return await message.edit(embed=embed)
+            return await message.edit(embed=embed)"""
 
-        for shard in range(0, len(self.bot.shard_ids)):
-            await self.update_shards_message(message, shard)
-            await asyncio.sleep(1)
+        try:
+            for shard in range(0, len(self.bot.shard_ids)):
+                await self.update_shards_message(message, shard)
+                await asyncio.sleep(1)
+        except ValueError:
+            return logger.error('Error while creating shards message!')
 
     async def update_shards_message(self, message, stage):
 
