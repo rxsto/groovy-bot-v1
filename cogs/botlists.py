@@ -9,7 +9,6 @@ class DiscordLists:
     def __init__(self, bot: Groovy):
         self.bot = bot
         self.auth = {}
-        await self.start_loop()
 
     async def start_loop(self):
         params = self.auth.copy()

@@ -12,11 +12,13 @@ from discord import Message, HTTPException
 from discord.ext import commands
 from discord.ext.commands import context
 from discord.ext.commands.errors import CommandNotFound, UserInputError
-from utilities import logger, status_page
+from utilities import logger
 from utilities.outages import outages
 from utilities.game_animator import GameAnimator
 from utilities.config import Config
 from utilities.database import PostgreClient
+
+from cogs import botlists
 
 from cogs.music import Music
 
