@@ -42,16 +42,12 @@ class Music:
                     await c.send('✅ The queue has ended! Why not queue more songs?')
             await asyncio.sleep(60 * 5)
 
-            if event.player.channel_id == '486765249488224277':
-                return
-
-            if event.player.current is None:
+            if event.player.current is None and event.player.channel_id != '486765249488224277':
                 await event.player.disconnect()
         elif isinstance(event, lavalink.Events.TrackEndEvent):
             loop_queue_status = await event.player.loop_queue
             if loop_queue_status:
                 # Ignore reason 'REPLACED' to do not requeue songs again after they got skipped
-                print(event.reason)
                 if event.reason == 'FINISHED':
                     track = await self.decode_base64_track(event.track)
                     event.player.add(requester=self.bot.user.id, track=track)
