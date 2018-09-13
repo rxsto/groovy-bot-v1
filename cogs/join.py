@@ -1,3 +1,5 @@
+import asyncio
+
 from discord.ext import commands
 from cogs.music import Music
 
@@ -18,5 +20,10 @@ class Join:
         if check is not None:
             return
         await player.connect(ctx.author.voice.channel.id)
-        return await ctx.send(
+        await ctx.send(
             f'✅ I joined the voicechannel **`{ctx.author.voice.channel.name}`**!')
+
+        await asyncio.sleep(60 * 5)
+
+        if player.current is None and player.channel_id != '486765249488224277':
+            await player.disconnect()
