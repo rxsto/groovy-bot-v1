@@ -2,6 +2,7 @@ from threading import Timer
 
 
 from main import Groovy
+from utilities import logger
 
 
 class DiscordLists:
@@ -10,7 +11,7 @@ class DiscordLists:
         self.auth = {}
         self.start_loop()
 
-    def start_loop(self):
+    async def start_loop(self):
         params = self.auth.copy()
         params['server_count'] = len(self.bot.guilds)
         params['bot_id'] = self.bot.user.id
@@ -27,8 +28,13 @@ class DiscordLists:
         headers = {
             'Content-Type': 'application/json'
         }
-        await self.bot.session.post('https://botblock.org/api/count', json=params, headers=headers)
-        Timer(60.0, self.start_loop).start()
+        async with self.bot.session.post('https://botblock.org/api/count', json=params, headers=headers) as r:
+            if r.status is not 200:
+                logger.error(f'[STATS] Could not post stats: {r.text()}')
+        Timer(60.0, self.run_loop).start()
+
+    def run_loop(self):
+        self.bot.loop.create_task(self.start_loop())
 
 
 def setup(bot):
