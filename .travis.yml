@@ -6,7 +6,7 @@ install:
 script:
   - python -m compileall ./main.py
   - python -m compileall ./cogs
-  - python -m compileall ./utilitie
+  - python -m compileall ./utilities
 cache: pip
 notifications:
   email: false
