@@ -21,10 +21,14 @@ class GameAnimator:
             f'groovybot.gq',
             f'groovybot.gq/support',
             f'groovybot.gq/vote',
+            f'groovybot.gq/sponsor',
             f'patreon.com/rxsto',
             f'twitter.com/rxsto_official',
+            f'twitter.com/groovydevs',
             f'github.com/rxsto',
-            f'rxsto.me'
+            f'rxsto.me',
+            f'hosted by deinserverhosting',
+            f'deinserverhosting.de'
         ]
         game = Game(f'{random.choice(games)}')
         self.event_loop.create_task(
