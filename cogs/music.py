@@ -7,6 +7,8 @@ import lavalink
 import re
 import logging
 
+from discord.ext.commands import bot
+
 time_rx = re.compile('[0-9]+')
 url_rx = re.compile("https?://(?:www\.)?.+")
 
@@ -122,6 +124,15 @@ class Music:
             player.add(requester=ctx.author.id, track=track)
         else:
             player.queue.insert(0, lavalink.AudioTrack().build(track, ctx.author.id))
+
+    async def on_voice_state_update(self, member, before, after):
+        if after.channel.id != before.channel.id or after.channel is None:
+            if not before.channel.members:
+                Timer(60.0, self.run_check).start()
+
+    def run_check(self, player, channel):
+        if not channel.members:
+            self.bot.loop.create_task(await player.disconnect())
 
 
 def setup(bot):
