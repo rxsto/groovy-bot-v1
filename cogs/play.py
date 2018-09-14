@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
-from cogs.music import url_rx, Music
+
+from cogs.music import Music
 
 
 def setup(bot):
