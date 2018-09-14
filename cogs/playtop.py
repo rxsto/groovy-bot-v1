@@ -1,6 +1,6 @@
 from discord.ext import commands
-from cogs.music import url_rx, Music
-from lavalink.AudioTrack import AudioTrack
+
+from cogs.music import Music
 
 
 def setup(bot):
@@ -13,7 +13,15 @@ class Playtop:
 
     @commands.command(aliases=['pt', 'addtop'])
     async def playtop(self, ctx, *, query=None):
-        player = self.bot.lavalink.players.get(ctx.guild.id)
+        await self.run_command(ctx, query, False)
+
+    @commands.command(aliases=['ps', 'addskip'])
+    async def playskip(self, ctx, query=None):
+        await self.run_command(ctx, query, True)
+
+    async def run_command(self, ctx, query, force):
+        print(str(self.bot))
+        player = Music.get_player(ctx, self.bot)
 
         if query is None:
             return await ctx.send('🚫 Please specify a query!')
@@ -22,23 +30,14 @@ class Playtop:
         if check is not None:
             return
 
-        query = query.strip('<>')
-
-        if not url_rx.match(query):
-            query = f'ytsearch:{query}'
-
-        results = await self.bot.lavalink.get_tracks(query)
-
-        if not results or not results['tracks']:
-            return await ctx.send('🚫 Nothing found!')
+        results = await Music.get_tracks(self.bot, query, ctx)
 
         if results['loadType'] == "PLAYLIST_LOADED":
             return await ctx.send('🚫 You cannot add a playlist to the top of the queue!')
         else:
-            track = results['tracks'][0]
-            success_message = f'🎶 **Track enqueued:** {track["info"]["title"]}'
-            await ctx.send(success_message)
-            player.queue.insert(0, AudioTrack().build(track, ctx.author.id))
+            await Music.enqueue_songs(player, results, ctx, 0)
 
         if not player.is_playing:
             await player.play()
+        elif force:
+            await player.skip()

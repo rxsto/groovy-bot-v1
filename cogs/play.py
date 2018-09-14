@@ -24,15 +24,7 @@ class Play:
         if check is not None:
             return
 
-        query = query.strip('<>')
-
-        if not url_rx.match(query):
-            query = f'ytsearch:{query}'
-
-        results = await self.bot.lavalink.get_tracks(query)
-
-        if not results or not results['tracks']:
-            return await ctx.send('🚫 Nothing found!')
+        results = await Music.get_tracks(bot=self.bot, query=query, ctx=ctx)
 
         embed = discord.Embed(colour=ctx.guild.me.top_role.colour)
 
@@ -46,10 +38,7 @@ class Play:
             embed.description = f"{results['playlistInfo']['name']} - {len(tracks)} tracks"
             await ctx.send(embed=embed)
         else:
-            track = results['tracks'][0]
-            success_message = f'🎶 **Track enqueued:** {track["info"]["title"]}'
-            await ctx.send(success_message)
-            player.add(requester=ctx.author.id, track=track)
+            await Music.enqueue_songs(player, results, ctx)
 
         if not player.is_playing:
             await player.play()

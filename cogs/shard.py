@@ -27,12 +27,6 @@ class Shard:
 
         await asyncio.sleep(1.5)
 
-        """if self.bot.shard_ids is None:
-            embed = discord.Embed(
-                description=f'<:check:449207827026673677> Shard 1 online - {int(self.bot.latency * 1000)} ms'
-            )
-            return await message.edit(embed=embed)"""
-
         try:
             for shard in range(0, len(self.bot.shard_ids)):
                 await self.update_shards_message(message, shard)
