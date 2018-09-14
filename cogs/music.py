@@ -40,7 +40,7 @@ class Music:
                 c = self.bot.get_channel(c)
                 if c:
                     await c.send('✅ The queue has ended! Why not queue more songs?')
-            Timer(function=self.disconnect, interval=300.0, args=event.player)
+            Timer(function=self.disconnect, interval=300.0, args=event.player).start()
         elif isinstance(event, lavalink.Events.TrackEndEvent):
             loop_queue_status = await event.player.loop_queue
             if loop_queue_status:
