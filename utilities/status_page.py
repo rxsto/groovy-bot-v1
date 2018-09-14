@@ -24,7 +24,7 @@ class StatusPage:
         async with self.client.session.post(f'{self.api_base}/v1/pages/{self.config["statuspage"]["page_id"]}/metrics/'
                                             f'{self.config["statuspage"]["metric_id"]}'
                                             f'/data.json', headers=headers, data=params) as r:
-            if r.status is not 300:
+            if r.status is not 201:
                 reponse = await r.text()
                 print(f"Error while sending data to status page {reponse}")
         Timer(60.0, self.run_loop).start()

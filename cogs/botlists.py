@@ -9,13 +9,14 @@ class DiscordLists:
     def __init__(self, bot: Groovy):
         self.bot = bot
         self.auth = {}
+        self.run_loop()
 
     async def start_loop(self):
         params = self.auth.copy()
         params['server_count'] = len(self.bot.guilds)
         params['bot_id'] = self.bot.user.id
         params['shard_count'] = self.bot.shard_count
-        params['botsfordiscord.com'] = self.bot.get_config()['botlists']['bfd']
+        # params['botsfordiscord.com'] = self.bot.get_config()['botlists']['bfd']
         params['botlist.space'] = self.bot.get_config()['botlists']['bls']
         params['discordbots.org'] = self.bot.get_config()['botlists']['dbl']
         params['discord.services'] = self.bot.get_config()['botlists']['discord.services']
