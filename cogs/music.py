@@ -132,7 +132,7 @@ class Music:
 
     def run_check(self, player, channel):
         if not channel.members:
-            self.bot.loop.create_task(await player.disconnect())
+            self.bot.loop.create_task(player.disconnect())
 
 
 def setup(bot):
