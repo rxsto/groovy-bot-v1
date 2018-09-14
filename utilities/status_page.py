@@ -25,8 +25,8 @@ class StatusPage:
                                             f'{self.config["statuspage"]["metric_id"]}'
                                             f'/data.json', headers=headers, data=params) as r:
             if r.status is not 201:
-                reponse = await r.text()
-                print(f"Error while sending data to status page {reponse}")
+                response = await r.text()
+                print(f"Error while sending data to status page {response}")
         Timer(60.0, self.run_loop).start()
 
     def run_loop(self):
