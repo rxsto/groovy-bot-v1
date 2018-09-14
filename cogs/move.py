@@ -15,8 +15,6 @@ class Move:
 
         moves = move.split(' ')
 
-        global move_song, move_to
-
         try:
             move_song = int(moves[0])
             move_to = int(moves[1])

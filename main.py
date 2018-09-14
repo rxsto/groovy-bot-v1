@@ -18,9 +18,8 @@ from utilities.game_animator import GameAnimator
 from utilities.config import Config
 from utilities.database import PostgreClient
 
-from cogs import botlists
-
 from cogs.music import Music
+from utilities.status_page import StatusPage
 
 if '--test-run' in sys.argv:
     exit(0)
@@ -89,7 +88,8 @@ class Groovy(commands.AutoShardedBot):
         logger.info(f'Successfully logged in as {self.user.name} ...')
         await self.init()
         GameAnimator(self, self.loop).run()
-        # await status_page.StatusPage(self.config, self).init() EDITTTTTTTTTTTTTTTT
+        if not self.debug:
+            await StatusPage(self.config, self).init()
         if not self.is_in_debug_mode():
             player = self.lavalink.players.get(403882830225997825)
             player.store('channel', 486765014976561159)
