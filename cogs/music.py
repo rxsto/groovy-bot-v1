@@ -26,6 +26,7 @@ class Music:
 
     async def track_hook(self, event):
         if isinstance(event, lavalink.Events.TrackStartEvent):
+            await event.player.set_volume(100)
             c = event.player.fetch('channel')
             if c:
                 c = self.bot.get_channel(c)
@@ -112,8 +113,13 @@ class Music:
         return results
 
     @staticmethod
-    def get_player(ctx, bot):
-        return bot.lavalink.players.get(ctx.guild.id)
+    def get_player(bot, guild_id=None, ctx=None):
+        if ctx is None:
+            return bot.lavalink.players.get(guild_id)
+        elif guild_id is None:
+            return bot.lavalink.players.get(ctx.guild.id)
+        else:
+            return -1
 
     @staticmethod
     async def enqueue_songs(player, results, ctx, start=None):
@@ -126,14 +132,16 @@ class Music:
             player.queue.insert(0, lavalink.AudioTrack().build(track, ctx.author.id))
 
     async def on_voice_state_update(self, member, before, after):
-        if member.bot:
+        if before.channel is None:
             return
-        if after.channel.id != before.channel.id or after.channel is None:
-            if not before.channel.members:
-                Timer(60.0, self.run_check).start()
+        if after.channel is None or after.channel.id != before.channel.id:
+            channel = before.channel
+            player = self.get_player(bot=self.bot, ctx=None, guild_id=member.guild.id)
+            if len(before.channel.members) == 1 and player.is_connected:
+                Timer(60.0 * 5, self.run_check, [player, channel]).start()
 
     def run_check(self, player, channel):
-        if not channel.members:
+        if len(channel.members) == 1 and player.is_connected:
             self.bot.loop.create_task(player.disconnect())
 
 
