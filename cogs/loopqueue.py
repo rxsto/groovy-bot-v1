@@ -2,6 +2,7 @@ from discord.ext import commands
 from lavalink import DefaultPlayer
 
 from cogs.music import Music
+from utilities import checks
 
 
 class Loopqueue:
@@ -9,6 +10,7 @@ class Loopqueue:
         self.bot = bot
 
     @commands.command(name='loopqueue', aliases=['lq', 'lqueue', 'loopq'])
+    @checks.premium_only(1)
     async def loopqueue(self, ctx):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 

@@ -1,4 +1,5 @@
 from discord.ext import commands
+from utilities import checks
 
 
 def setup(bot):
@@ -10,6 +11,7 @@ class Shuffle:
         self.bot = bot
 
     @commands.command()
+    @checks.premium_only(2)
     async def shuffle(self, ctx):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 

@@ -126,6 +126,8 @@ class Music:
             player.queue.insert(0, lavalink.AudioTrack().build(track, ctx.author.id))
 
     async def on_voice_state_update(self, member, before, after):
+        if member.bot:
+            return
         if after.channel.id != before.channel.id or after.channel is None:
             if not before.channel.members:
                 Timer(60.0, self.run_check).start()

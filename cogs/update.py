@@ -6,6 +6,8 @@ from discord.ext import commands
 
 from cogs.music import Music
 
+from utilities import checks
+
 
 def setup(bot):
     bot.add_cog(Update(bot))
@@ -16,6 +18,7 @@ class Update:
         self.bot = bot
 
     @commands.command()
+    @checks.owner_only()
     async def update(self, ctx):
         trusted_users = [254892085000405004, 264048760580079616]
         self.bot.set_updating(True)

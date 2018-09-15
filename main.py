@@ -11,8 +11,8 @@ import datetime
 from discord import Message, HTTPException
 from discord.ext import commands
 from discord.ext.commands import context
-from discord.ext.commands.errors import CommandNotFound, UserInputError
-from utilities import logger
+from discord.ext.commands.errors import CommandNotFound, UserInputError, CheckFailure
+from utilities import logger, exceptions
 from utilities.outages import outages
 from utilities.game_animator import GameAnimator
 from utilities.config import Config
@@ -149,6 +149,13 @@ class Groovy(commands.AutoShardedBot):
             await self.process_commands(msg)
         except CommandNotFound:
             return
+        except exceptions.OwnerOnlyException:
+            await msg.channel.send(':no_entry_sign: Only developers are permitted to execute that command')
+        except exceptions.PremiumOnlyException as error:
+            await msg.channel.send(f':no_entry_sign: Only patrons are permitted to execute that command\n'
+                                   f'If you want to be a patreon checkout http://patreon.com/rxsto\n'
+                                   f'If you already are a patreon checkout https://premium.groovybot.gq\n'
+                                   f'Needed pledge: `{error.needed_pledge}`')
 
     async def on_command_completion(self, ctx):
         logger.info(
@@ -160,6 +167,7 @@ class Groovy(commands.AutoShardedBot):
     async def on_command_error(self, ctx, error):
         if isinstance(error, CommandNotFound) or isinstance(error, UserInputError):
             return
+
         embed = discord.Embed(
             title=f'🚫 An internal error occurred! Bot: {self.user.name}',
             timestamp=datetime.datetime.now(),
@@ -286,8 +294,8 @@ class Groovy(commands.AutoShardedBot):
             ).set_thumbnail(url=member.avatar_url))
 
     async def get_hook(self, hook_type, session):
-            return discord.Webhook.from_url(self.config['webhooks'][hook_type],
-                                            adapter=discord.AsyncWebhookAdapter(session))
+        return discord.Webhook.from_url(self.config['webhooks'][hook_type],
+                                        adapter=discord.AsyncWebhookAdapter(session))
 
     def get_config(self):
         return self.config
