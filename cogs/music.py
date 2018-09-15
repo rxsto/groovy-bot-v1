@@ -1,11 +1,13 @@
 import asyncio
 import json
+from threading import Timer
 
 import discord
 import lavalink
 import re
 import logging
 
+from discord.ext.commands import bot
 
 time_rx = re.compile('[0-9]+')
 url_rx = re.compile("https?://(?:www\.)?.+")
@@ -40,10 +42,7 @@ class Music:
                 c = self.bot.get_channel(c)
                 if c:
                     await c.send('✅ The queue has ended! Why not queue more songs?')
-            await asyncio.sleep(60 * 5)
-
-            if event.player.current is None and event.player.channel_id != '486765249488224277':
-                await event.player.disconnect()
+            Timer(function=self.disconnect, interval=300.0, args=event.player).start()
         elif isinstance(event, lavalink.Events.TrackEndEvent):
             loop_queue_status = await event.player.loop_queue
             if loop_queue_status:
@@ -51,6 +50,8 @@ class Music:
                 if event.reason == 'FINISHED':
                     track = await self.decode_base64_track(event.track)
                     event.player.add(requester=self.bot.user.id, track=track)
+                    if not event.player.is_playing:
+                        await event.player.play()
 
     @staticmethod
     async def check_connect(context, player):
@@ -78,11 +79,11 @@ class Music:
         params = f'["{track}"]'
         lavalink_host = self.bot.get_config()['lavalink']['host']
         lavalink_port = 2333
-        track_response = await self.bot.session.post(f'http://{lavalink_host}:{lavalink_port}/decodetracks',
-                                                     data=params,
-                                                     headers=headers)
-        track = json.loads(track_response.text)[0]
-        return track
+        async with self.bot.session.post(f'http://{lavalink_host}:{lavalink_port}/decodetracks', data=params,
+                                         headers=headers) as track_response:
+            track_raw = await track_response.text()
+            track = json.loads(track_raw)[0]
+            return track
 
     @staticmethod
     async def fade_out(player):
@@ -92,6 +93,46 @@ class Music:
     @staticmethod
     async def fade_in(player):
         await player.set_volume(100)
+
+    def disconnect(self, player):
+        if not player.current and player.channel_id != '486765249488224277':
+            self.bot.loop.create_task(player.disconnect())
+
+    @staticmethod
+    async def get_tracks(bot, query, ctx):
+        query = query.strip('<>')
+
+        if not url_rx.match(query):
+            query = f'ytsearch:{query}'
+
+        results = await bot.lavalink.get_tracks(query)
+
+        if not results or not results['tracks']:
+            return await ctx.send('🚫 Nothing found!')
+        return results
+
+    @staticmethod
+    def get_player(ctx, bot):
+        return bot.lavalink.players.get(ctx.guild.id)
+
+    @staticmethod
+    async def enqueue_songs(player, results, ctx, start=None):
+        track = results['tracks'][0]
+        success_message = f'🎶 **Track enqueued:** {track["info"]["title"]}'
+        await ctx.send(success_message)
+        if start is None:
+            player.add(requester=ctx.author.id, track=track)
+        else:
+            player.queue.insert(0, lavalink.AudioTrack().build(track, ctx.author.id))
+
+    async def on_voice_state_update(self, member, before, after):
+        if after.channel.id != before.channel.id or after.channel is None:
+            if not before.channel.members:
+                Timer(60.0, self.run_check).start()
+
+    def run_check(self, player, channel):
+        if not channel.members:
+            self.bot.loop.create_task(player.disconnect())
 
 
 def setup(bot):
