@@ -88,7 +88,7 @@ class Groovy(commands.AutoShardedBot):
         logger.info(f'Successfully logged in as {self.user.name} ...')
         await self.init()
         GameAnimator(self, self.loop).run()
-        if not self.debug:
+        if not self.is_in_debug_mode():
             await StatusPage(self.config, self).init()
         if not self.is_in_debug_mode():
             player = self.lavalink.players.get(403882830225997825)

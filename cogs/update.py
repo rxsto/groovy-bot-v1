@@ -18,6 +18,20 @@ class Update:
     @commands.command()
     async def update(self, ctx):
         trusted_users = [254892085000405004, 264048760580079616]
+
+        msg = await ctx.send('⚠ Do you want to update the bot?')
+        await msg.add_reaction('✅')
+        await msg.add_reaction('❌')
+
+        def check(r, u):
+            return u.id == ctx.author.id and r.message.id == msg.id
+
+        reaction, user = await self.bot.wait_for('reaction_add', check=check)
+        if reaction.emoji == '❌':
+            return await msg.delete()
+        elif reaction.emoji == '✅':
+            await msg.delete()
+
         self.bot.set_updating(True)
         if ctx.author.id not in trusted_users:
             return await ctx.send('🚫 This command is only executable by the devs!')

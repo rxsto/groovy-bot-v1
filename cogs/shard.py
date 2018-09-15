@@ -17,6 +17,7 @@ class Shard:
     @commands.command(aliases=['shards'])
     async def shard(self, ctx):
         embed = discord.Embed(
-            description=f'<:check:449207827026673677> **Shard {ctx.guild.shard_id + 1} online - {self.bot.latency} ms**'
+            description=f'✅ **Shard {ctx.guild.shard_id + 1} online - '
+                        f'{int(self.bot.latency * 1000)} ms**'
         )
         await ctx.send(embed=embed)
