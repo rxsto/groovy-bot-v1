@@ -11,7 +11,7 @@ import datetime
 from discord import Message, HTTPException
 from discord.ext import commands
 from discord.ext.commands import context
-from discord.ext.commands.errors import CommandNotFound, UserInputError, CheckFailure
+from discord.ext.commands.errors import CommandNotFound, UserInputError
 from utilities import logger, exceptions
 from utilities.outages import outages
 from utilities.game_animator import GameAnimator
@@ -137,9 +137,6 @@ class Groovy(commands.AutoShardedBot):
         if not msg.channel:
             return
 
-        if msg.channel is discord.ChannelType.private:
-            return await msg.channel.send(':v: Hey mate, if you want to use me, just invite me to your server! See ya!')
-
         if len(msg.content.split(' ')) == 1 and msg.content.startswith(f'<@{self.user.id}>'):
             prefix = await self.retrieve_prefix(msg.guild.id)
             await msg.channel.send(f':vulcan: Wazzup mate, my name is Groovy and you can control me with '
@@ -150,12 +147,12 @@ class Groovy(commands.AutoShardedBot):
         except CommandNotFound:
             return
         except exceptions.OwnerOnlyException:
-            await msg.channel.send(':no_entry_sign: Only developers are permitted to execute that command')
+            await msg.channel.send('🚫 **Only developers are permitted to execute that command!**')
         except exceptions.PremiumOnlyException as error:
-            await msg.channel.send(f':no_entry_sign: Only patrons are permitted to execute that command\n'
-                                   f'If you want to be a patreon checkout http://patreon.com/rxsto\n'
-                                   f'If you already are a patreon checkout https://premium.groovybot.gq\n'
-                                   f'Needed pledge: `{error.needed_pledge}`')
+            await msg.channel.send(f'🚫 **Only patrons are permitted to execute that command!**\n\n'
+                                   f'If you want to be a patron donate at http://patreon.com/rxsto\n'
+                                   f'If you already are a patron register at https://premium.groovybot.gq\n'
+                                   f'**Needed pledge: `{error.needed_pledge}`**')
 
     async def on_command_completion(self, ctx):
         logger.info(
