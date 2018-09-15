@@ -1,3 +1,4 @@
+psutil
 aiohttp==3.3.2
 async-timeout==3.0.0
 asyncpg==0.17.0
