@@ -1,6 +1,7 @@
-import asyncio
+from threading import Timer
 
 from discord.ext import commands
+
 from cogs.music import Music
 
 
@@ -21,9 +22,10 @@ class Join:
             return
         await player.connect(ctx.author.voice.channel.id)
         await ctx.send(
-            f'✅ I joined the voicechannel **`{ctx.author.voice.channel.name}`**!')
+            f'✅ | I joined the voicechannel **`{ctx.author.voice.channel.name}`**!')
 
-        await asyncio.sleep(60 * 5)
+        Timer(60 * 5, self.check_playing, [player]).start()
 
+    def check_playing(self, player):
         if player.current is None and player.channel_id != '486765249488224277':
-            await player.disconnect()
+            self.bot.loop.create_task(player.disconnect())
