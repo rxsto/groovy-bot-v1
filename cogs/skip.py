@@ -1,5 +1,6 @@
 from discord.ext import commands
-from cogs.music import Music
+
+from utilities import checks
 
 
 class Skip:
@@ -7,36 +8,37 @@ class Skip:
         self.bot = bot
 
     @commands.command()
+    @checks.dj_only()
     async def skip(self, ctx, *, to=None):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:
-            return await ctx.send('🚫 I\'m not playing.')
-
-        await Music.fade_out(player)
-        await ctx.send('⏭ | Skipped.')
+            return await ctx.send('🚫 | I\'m not playing.')
 
         skip_to = 1
         if to is not None:
             try:
                 skip_to = int(to) - 1
             except ValueError:
-                await ctx.send('🚫 Please specify a valid position to skip to!')
+                return await ctx.send('🚫 | Please specify a valid position to skip to!')
 
-        if skip_to < 1:
-            return await ctx.send('🚫 Please specify a valid position to skip to!')
+        if skip_to < 0:
+            return await ctx.send('🚫 | Please specify a valid position to skip to!')
 
-        if len(player.queue) < skip_to:
+        if len(player.queue) < (skip_to + 1):
             player.queue.clear()
             await player.skip()
-            return await ctx.send('✅ There was no track at this position so I cleared the queue!')
+            return await ctx.send('✅ | There was no track at this position so I cleared the queue!')
 
         if to is not None:
-            for x in range(0, skip_to):
-                player.queue.pop(x)
+            del player.queue[:skip_to]
 
         await player.skip()
-        await Music.fade_in(player)
+
+        if to is None:
+            await ctx.send('⏭ | Skipped.')
+        else:
+            await ctx.send(f'⏭ | Skipped to {to}.')
 
 
 def setup(bot):
