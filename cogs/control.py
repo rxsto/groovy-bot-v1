@@ -1,83 +1,82 @@
-import asyncio
+from threading import Timer
+
 import discord
 import lavalink
-
-from discord.ext import commands
 from discord.errors import NotFound
+from discord.ext import commands
 
-from cogs.music import Music
+from utilities import checks
 
 
 class Control:
-    def __init__(self, user, guild, message, player, channel_id):
+    def __init__(self, user, guild, message, player, channel_id, bot):
         self.user = user
         self.guild = guild
         self.message = message
         self.channel_id = channel_id
         self.player = player
+        self.bot = bot
 
     async def handle_reaction(self, reaction):
         emoji = reaction.emoji
         if emoji == '⏯':
-            resume_response = '✅ Successfully resumed the music!' if self.player.paused else \
-                '✅ Successfully paused music!'
+            resume_response = '✅ | Successfully resumed the music!' if self.player.paused else \
+                '✅ | Successfully paused music!'
             await self.player.set_pause(not self.player.paused)
             await self.send_response(resume_response)
         elif emoji == '⏭':
-            await Music.fade_out(self.player)
             await self.player.skip()
-            await Music.fade_in(self.player)
-            await self.send_response('✅ Successfully skipped current song!')
+            await self.send_response('✅ | Successfully skipped current song!')
         elif emoji == '⏹':
             self.player.queue.clear()
-            await Music.fade_out(self.player)
             await self.player.stop()
-            await Music.fade_in(self.player)
-            await self.send_response('✅ Successfully stopped the music!')
+            await self.send_response('✅ | Successfully stopped the music!')
         elif emoji == '🔂':
-            repeat_response = '✅ Successfully enabled loop mode!' if not self.player.repeat else \
-                '✅ Successfully disabled loop mode!'
+            repeat_response = '✅ | Successfully enabled loop mode!' if not self.player.repeat else \
+                '✅ | Successfully disabled loop mode!'
             self.player.repeat = not self.player.repeat
             await self.send_response(repeat_response)
         elif emoji == '🔁':
             loop_queue_status = await self.player.toggle_loop_queue
-            response = '✅ Successfully enabled loopqueue mode!' if not loop_queue_status else\
-                '✅ Successfully disabled loopqueue mode!'
+            response = '✅ | Successfully enabled loopqueue mode!' if not loop_queue_status else\
+                '✅ | Successfully disabled loopqueue mode!'
             await self.send_response(response)
         elif emoji == '🔀':
-            shuffle_response = '✅ Successfully enabled shuffle mode!' if not self.player.shuffle else \
-                '✅ Successfully disabled shuffle mode!'
+            shuffle_response = '✅ | Successfully enabled shuffle mode!' if not self.player.shuffle else \
+                '✅ | Successfully disabled shuffle mode!'
             self.player.shuffle = not self.player.shuffle
             await self.send_response(shuffle_response)
         elif emoji == '🔄':
             await self.player.seek(0)
-            await self.send_response('✅ Successfully reset the current progress!')
+            await self.send_response('✅ | Successfully reset the current progress!')
         elif emoji == '🔊':
             if self.player.volume == 150:
-                return await self.send_response('🚫 The volume is already at the maximum!')
+                return await self.send_response('🚫 | The volume is already at the maximum!')
             elif self.player.volume >= 490:
                 await self.player.set_volume(150)
             else:
                 await self.player.set_volume(self.player.volume + 10)
-            await self.send_response(f'✅ Successfully set volume to `{self.player.volume}`!')
+            await self.send_response(f'✅ | Successfully set volume to `{self.player.volume}`!')
         elif emoji == '🔉':
             if self.player.volume == 0:
-                return await self.send_response('🚫 The volume is already at the minimum!')
+                return await self.send_response('🚫 | The volume is already at the minimum!')
             elif self.player.volume <= 10:
                 await self.player.set_volume(0)
             else:
                 await self.player.set_volume(self.player.volume - 10)
-            await self.send_response(f'✅ Successfully set volume to `{self.player.volume}`!')
+            await self.send_response(f'✅ | Successfully set volume to `{self.player.volume}`!')
         await self.update_message(False)
 
     async def send_response(self, response):
         async with self.channel.typing():
             message = await self.channel.send(response)
-        await asyncio.sleep(2)
-        try:
-            await message.delete()
-        except NotFound:
-            pass
+
+        def del_message():
+            try:
+                self.bot.loop.create_task(message.delete())
+            except NotFound:
+                pass
+        Timer(2, del_message)
 
     async def update_message(self, loop):
         if self.player.current is None:
@@ -105,8 +104,8 @@ class Control:
                f'{self.get_percentage(self.player.position, song.duration)} **[{pos} / {dur}]**'
 
         embed = discord.Embed(
-            colour=self.guild.me.top_role.colour,
-            description=desc,
+            color=0x2C2F33,
+            description=desc
         )
 
         try:
@@ -114,9 +113,10 @@ class Control:
         except NotFound:
             pass
         if loop:
-            await asyncio.sleep(5)
-            if self.message:
-                await self.update_message(True)
+            def up_message():
+                if self.message:
+                    self.bot.loop.create_task(self.update_message(True))
+            Timer(5, up_message)
 
     @property
     def whitelisted_members(self):
@@ -148,9 +148,10 @@ class ControlCommand:
         self.reacts = ['⏯', '⏭', '⏹', '🔂', '🔁', '🔀', '🔄', '🔉', '🔊']
 
     @commands.command(aliases=['cp', 'panel'])
+    @checks.dj_only()
     async def control(self, ctx):
         if ctx.guild.id in self.map.keys():
-            msg = await ctx.send('🚫 You are already using an instance of the control panel on this guild! '
+            msg = await ctx.send('🚫 | You are already using an instance of the control panel on this guild! '
                                  'Dou you want to reset it?')
             await msg.add_reaction('✅')
             await msg.add_reaction('❌')
@@ -162,7 +163,7 @@ class ControlCommand:
                 return await msg.delete()
             elif reaction.emoji == '✅':
                 if user.id not in self.map[ctx.guild.id].whitelisted_members:
-                    return await ctx.send(':no_entry_ You\'re not allowed to use this command')
+                    return await ctx.send('🚫 | You\'re not allowed to use this command')
                 else:
                     await msg.delete()
                     if self.map[ctx.guild.id].message is not None:
@@ -171,10 +172,11 @@ class ControlCommand:
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:
-            return await ctx.send('🚫 I\'m not playing.')
+            return await ctx.send('🚫 | I\'m not playing.')
 
         embed = discord.Embed(
             title=f'Control Panel - Loading',
+            color=0x2C2F33,
             description='<a:groovyloading:487681291010179072> Please wait while the control panel is loading ...'
         )
 
@@ -184,11 +186,11 @@ class ControlCommand:
             for react in self.reacts:
                 await msg.add_reaction(react)
 
-            panel = Control(ctx.message.author, ctx.guild, msg, player, ctx.channel.id)
+            panel = Control(ctx.message.author, ctx.guild, msg, player, ctx.channel.id, self.bot)
             self.map[ctx.guild.id] = panel
             await panel.update_message(True)
         else:
-            panel = Control(ctx.message.author, ctx.guild, msg, player, ctx.channel)
+            panel = Control(ctx.message.author, ctx.guild, msg, player, ctx.channel, self.bot)
             self.map[ctx.guild.id] = panel
             await panel.update_message(False)
 
