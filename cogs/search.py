@@ -65,5 +65,5 @@ class Search:
 
         player.add(requester=ctx.author.id, track=track)
 
-        if not player.is_playing:
+        if not player.is_playing and player.queue:
             await player.play()
