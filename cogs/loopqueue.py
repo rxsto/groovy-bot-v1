@@ -19,9 +19,9 @@ class Loopqueue:
             return
         enabled = await player.toggle_loop_queue
         if enabled:
-            return await ctx.send(':repeat: Successfully enabled loopqueue')
+            return await ctx.send('🔁 | Successfully enabled loopqueue')
         else:
-            await ctx.send(':repeat: Successfully disabled loopqueue')
+            await ctx.send('🔁 | Successfully disabled loopqueue')
 
 
 @property
