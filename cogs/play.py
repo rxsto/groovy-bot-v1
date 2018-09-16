@@ -34,6 +34,14 @@ class Play:
         if results['loadType'] == "PLAYLIST_LOADED":
             tracks = results['tracks']
 
+            if len(tracks) > 20:
+                return await ctx.send(
+                    '🚫 | **You can not queue a playlist that has more than 20 songs!**\n\n'
+                    'If you want to add playlists with more than 20 songs to the queue you need to donate at '
+                    'https://patreon.com/rxsto\n'
+                    'If you already are a patron register at https://premium.groovybot.gq/ '
+                )
+
             for track in tracks:
                 player.add(requester=ctx.author.id, track=track)
 
@@ -43,5 +51,5 @@ class Play:
         else:
             await Music.enqueue_songs(player, results, ctx)
 
-        if not player.is_playing:
+        if not player.is_playing and player.queue:
             await player.play()
