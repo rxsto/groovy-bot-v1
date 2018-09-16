@@ -39,7 +39,7 @@ class Playtop:
         else:
             await Music.enqueue_songs(player, results, ctx, 0)
 
-        if not player.is_playing:
+        if not player.is_playing and player.queue:
             await player.play()
         elif force:
             await player.skip()
