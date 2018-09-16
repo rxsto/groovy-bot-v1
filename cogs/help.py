@@ -1,5 +1,4 @@
 import discord
-
 from discord.ext import commands
 
 from utilities import cogs
@@ -37,10 +36,16 @@ class Help:
 
     @commands.command(aliases=['?'])
     async def help(self, ctx):
-        info_embed = discord.Embed(title=self.info_title, description=self.info_msg,
-                                   color=ctx.guild.me.top_role.color)
+        info_embed = discord.Embed(
+            title=self.info_title,
+            description=self.info_msg,
+            color=0x2C2F33
+        )
         await ctx.send(embed=info_embed)
 
-        music_embed = discord.Embed(title=self.music_title, description=self.music_msg,
-                                    color=ctx.guild.me.top_role.color)
+        music_embed = discord.Embed(
+            title=self.music_title,
+            description=self.music_msg,
+            color=0x2C2F33
+        )
         await ctx.send(embed=music_embed)
