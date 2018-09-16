@@ -6,6 +6,8 @@ shard = ['shard', 'Shows you your current shard id']
 stats = ['stats', 'Shows you Groovys current stats']
 donate = ['donate', 'Shows you some information about donating']
 vote = ['vote', 'Shows you some information about upvoting', 'upvote']
+ping = ['ping', 'Groovy? Are you online?']
+sponsor = ['sponsor', 'Shows you some information about our sponsor']
 
 play = ['play', 'Lets you play any music you want', 'p, add']
 playtop = ['playtop', 'Like play but adds the song to the top', 'addtop, pt']
@@ -27,12 +29,13 @@ loopqueue = ['loopqueue', 'Lets you activate the loopqueue', 'lq']
 move = ['move', 'Lets you move a song from one position to another', 'mv']
 remove = ['remove', 'Lets you remove a specific song', 'rm']
 prefix = ['prefix', 'Lets you change the bots prefix']
+setdj = ['setdj', 'Lets you activate/deactivate the dj-mode', 'dj']
 control = ['control', 'Lets you control the bot with reactions', 'cp, panel']
 clear = ['clear', 'Lets you clear the queue', 'cls, cl']
 reset = ['reset', 'Lets you reset the current progress', 'restart']
 cleanup = ['cleanup', 'Lets you delete all songs from absent users', 'clean']
 
-info_cogs = [info, helpcmd, invite, support, shard, stats, donate, vote]
+info_cogs = [info, helpcmd, invite, support, shard, stats, donate, vote, ping, sponsor]
 
-music_cogs = [play, playtop, playskip, join, leave, search, pause, resume, skip,
-              seek, stop, now, queue, volume, shuffle, loop, loopqueue, move, remove, prefix, control, clear, reset]
+music_cogs = [play, playtop, playskip, join, leave, search, pause, resume, skip, seek, stop, now, queue, volume,
+              shuffle, loop, loopqueue, move, remove, prefix, setdj, control, clear, reset]
