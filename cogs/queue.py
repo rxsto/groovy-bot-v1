@@ -17,7 +17,7 @@ class Queue:
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:
-            return await ctx.send('🚫 There\'s nothing in the queue! Why not queue something?')
+            return await ctx.send('🚫 | There\'s nothing in the queue! Why not queue something?')
 
         items_per_page = 10
         pages = math.ceil(len(player.queue) / items_per_page)
@@ -30,8 +30,10 @@ class Queue:
         for i, track in enumerate(player.queue[start:end], start=start):
             queue_list += f'**{i + 1}.** {self.format_song(track)}'
 
-        embed = discord.Embed(colour=ctx.guild.me.top_role.colour,
-                              description=f'🎶 **Queue** - `{len(player.queue)}` tracks\n\n{queue_list}')
+        embed = discord.Embed(
+            color=0x2C2F33,
+            description=f'🎶 **Queue** - `{len(player.queue)}` tracks\n\n{queue_list}'
+        )
         embed.set_footer(text=f'Page {page}/{pages}')
         await ctx.send(embed=embed)
 
