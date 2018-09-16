@@ -1,6 +1,8 @@
-import threading
 import random
-from discord import Status, Game
+import threading
+
+from discord import Game, Status
+
 from utilities import logger
 
 
@@ -18,6 +20,8 @@ class GameAnimator:
             f'on {self.client.shard_count} shards',
             f'@Groovy',
             f'g!help',
+            f'g!vote',
+            f'g!donate',
             f'groovybot.gq',
             f'groovybot.gq/support',
             f'groovybot.gq/vote',
@@ -27,8 +31,8 @@ class GameAnimator:
             f'twitter.com/groovydevs',
             f'github.com/rxsto',
             f'rxsto.me',
-            f'hosted by deinserverhosting',
-            f'deinserverhosting.de'
+            f'hosted by deinserverhost',
+            f'deinserverhost.de'
         ]
         game = Game(f'{random.choice(games)}')
         self.event_loop.create_task(
