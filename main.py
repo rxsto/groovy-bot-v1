@@ -1,24 +1,23 @@
 #!/usr/bin/python3.7
 
 import asyncio
+import datetime
 import os
 import sys
 
 import aiohttp
 import discord
-import datetime
-
-from discord import Message, HTTPException
+from discord import HTTPException, Message
 from discord.ext import commands
 from discord.ext.commands import context
 from discord.ext.commands.errors import CommandNotFound, UserInputError
-from utilities import logger, exceptions
-from utilities.outages import outages
-from utilities.game_animator import GameAnimator
-from utilities.config import Config
-from utilities.database import PostgreClient
 
 from cogs.music import Music
+from utilities import exceptions, logger
+from utilities.config import Config
+from utilities.database import PostgreClient
+from utilities.game_animator import GameAnimator
+from utilities.outages import outages
 from utilities.status_page import StatusPage
 
 if '--test-run' in sys.argv:
@@ -108,7 +107,7 @@ class Groovy(commands.AutoShardedBot):
             check = await connection.fetchrow(f'SELECT * FROM guilds WHERE id = {guild.id}')
             if check is None:
                 await connection.execute(
-                    f'INSERT INTO guilds (id, prefix, volume) VALUES ({guild.id}, \'g!\', 100)')
+                    f'INSERT INTO guilds (id, prefix, volume, dj_mode) VALUES ({guild.id}, \'g!\', 100, FALSE)')
 
     async def on_guild_remove(self, guild):
         if self.is_in_debug_mode():
@@ -147,12 +146,25 @@ class Groovy(commands.AutoShardedBot):
         except CommandNotFound:
             return
         except exceptions.OwnerOnlyException:
-            await msg.channel.send('🚫 **Only developers are permitted to execute that command!**')
+            await msg.channel.send(
+                '🚫 | **Only developers are permitted to execute that command!**'
+            )
         except exceptions.PremiumOnlyException as error:
-            await msg.channel.send(f'🚫 **Only patrons are permitted to execute that command!**\n\n'
-                                   f'If you want to be a patron donate at http://patreon.com/rxsto\n'
-                                   f'If you already are a patron register at https://premium.groovybot.gq\n'
-                                   f'**Needed pledge: `{error.needed_pledge}`**')
+            await msg.channel.send(
+                f'🚫 | **Only patrons are permitted to execute that command!**\n\n'
+                f'If you want to become a patron donate at https://patreon.com/rxsto\n'
+                f'If you already are a patron register at https://premium.groovybot.gq\n'
+                f'**Needed pledge: `{error.needed_pledge}`**'
+            )
+        except exceptions.AdminOnlyException:
+            await msg.channel.send(
+                '🚫 | **Only Admins are permitted to execute that command!** '
+                'You need at least the permission **`Manage Guild`**!'
+            )
+        except exceptions.DjOnlyException:
+            await msg.channel.send(
+                '🚫 | **Only DJs are permitted to execute that command!** You need the role **`DJ`**!'
+            )
 
     async def on_command_completion(self, ctx):
         logger.info(
