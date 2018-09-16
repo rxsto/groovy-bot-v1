@@ -1,13 +1,12 @@
+import asyncio
 import datetime
 import os
 import time
-import aiohttp
-import asyncio
-import discord
-
-from discord import Webhook, AsyncWebhookAdapter
-
 from enum import Enum
+
+import aiohttp
+import discord
+from discord import AsyncWebhookAdapter, Webhook
 
 from utilities.config import Config
 
