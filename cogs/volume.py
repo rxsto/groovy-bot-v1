@@ -1,5 +1,7 @@
 from discord.ext import commands
 
+from utilities import checks
+
 
 def setup(bot):
     bot.add_cog(Volume(bot))
@@ -10,6 +12,7 @@ class Volume:
         self.bot = bot
 
     @commands.command(aliases=['vol'])
+    @checks.dj_only()
     async def volume(self, ctx, volume: int = None):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
