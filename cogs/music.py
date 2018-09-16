@@ -6,6 +6,8 @@ from threading import Timer
 import discord
 import lavalink
 
+from utilities import checks
+
 time_rx = re.compile('[0-9]+')
 url_rx = re.compile("https?://(?:www\.)?.+")
 
@@ -114,9 +116,30 @@ class Music:
 
     @staticmethod
     async def enqueue_songs(player, results, ctx, start=None):
-        # TODO: Check queue-length
+        if len(player.queue) >= 20:
+            patreon_type = await checks.get_premium_type(ctx.author.id, ctx.bot.postgre_client.get_pool())
+            if patreon_type is None or patreon_type < 2:
+                return await ctx.send(
+                    '🚫 | **The queue reached a total length of 20 or more songs!**\n\n'
+                    'If you want to add more than 20 songs to the queue you need to donate at '
+                    'https://patreon.com/rxsto\n'
+                    'If you already are a patron register at https://premium.groovybot.gq/ '
+                )
+
         track = results['tracks'][0]
-        # TODO: Check track-length
+
+        duration = track['info']['length']
+
+        if duration > 3600000:
+            patreon_type = await checks.get_premium_type(ctx.author.id, ctx.bot.postgre_client.get_pool())
+            if patreon_type is None or patreon_type < 2:
+                return await ctx.send(
+                    '🚫 | **This song is longer than 1 hour!**\n\n'
+                    'If you want to add songs which are longer than 1 hour to the queue you need to donate at '
+                    'https://patreon.com/rxsto\n'
+                    'If you already are a patron register at https://premium.groovybot.gq/ '
+                )
+
         success_message = f'🎶 **Track enqueued:** {track["info"]["title"]}'
         await ctx.send(success_message)
         if start is None:
