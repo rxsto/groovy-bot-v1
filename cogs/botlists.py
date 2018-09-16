@@ -15,7 +15,6 @@ class DiscordLists:
         params['server_count'] = len(self.bot.guilds)
         params['bot_id'] = self.bot.user.id
         params['shard_count'] = self.bot.shard_count
-        # params['botsfordiscord.com'] = self.bot.get_config()['botlists']['bfd']
         params['botlist.space'] = self.bot.get_config()['botlists']['bls']
         params['discordbots.org'] = self.bot.get_config()['botlists']['dbl']
         params['discord.services'] = self.bot.get_config()['botlists']['discord.services']
@@ -29,8 +28,8 @@ class DiscordLists:
         }
         async with self.bot.session.post('https://botblock.org/api/count', json=params, headers=headers) as r:
             if r.status is not 200:
-                logger.error(f'[STATS] Could not post stats: {r.text()}')
-        Timer(60.0, self.run_loop).start()
+                logger.error(f'[STATS] Could not post stats: {await r.text()}')
+        Timer(300, self.run_loop).start()
 
     def run_loop(self):
         self.bot.loop.create_task(self.start_loop())
