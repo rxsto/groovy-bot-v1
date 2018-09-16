@@ -12,7 +12,6 @@ from discord.ext import commands
 from discord.ext.commands import context
 from discord.ext.commands.errors import CommandNotFound, UserInputError
 
-from cogs.music import Music
 from utilities import exceptions, logger
 from utilities.config import Config
 from utilities.database import PostgreClient
@@ -84,7 +83,7 @@ class Groovy(commands.AutoShardedBot):
             self.run(self.config['main_bot']['token'])
 
     async def on_ready(self):
-        logger.info(f'Successfully logged in as {self.user.name} ...')
+        logger.info(f'Successfully logged in as {self.user.name}!')
         await self.init()
         GameAnimator(self, self.loop).run()
         if not self.is_in_debug_mode():
@@ -92,7 +91,8 @@ class Groovy(commands.AutoShardedBot):
         if not self.is_in_debug_mode():
             player = self.lavalink.players.get(403882830225997825)
             player.store('channel', 486765014976561159)
-            await player.connect('486765249488224277')
+            await player.connect(486765249488224277)
+            logger.info(f'Successfully connected to Groovys voicechannel!')
         await self.reconnect()
         await self.update_outage_channel('operational')
 
@@ -212,8 +212,6 @@ class Groovy(commands.AutoShardedBot):
                 player = self.lavalink.players.get(guild['guild_id'])
                 player.store('channel', guild['text_channel_id'])
 
-                await Music.fade_out(player)
-
                 await player.connect(str(guild['channel_id']))
 
                 track = await self.lavalink.get_tracks(guild['current_track'])
@@ -221,8 +219,6 @@ class Groovy(commands.AutoShardedBot):
 
                 await player.play()
                 await player.seek(guild['current_position'])
-
-                await Music.fade_in(player)
 
                 for queue_track in guild['queue'].replace('[', '').replace(']', '').replace('\'', '').split(', '):
                     track_result = await self.lavalink.get_tracks(queue_track)
