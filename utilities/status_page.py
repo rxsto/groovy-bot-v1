@@ -1,6 +1,5 @@
-import urllib.parse as urllib
-
 import time
+import urllib.parse as urllib
 from threading import Timer
 
 from utilities import logger
