@@ -19,7 +19,7 @@ class Play:
             await player.set_pause(False)
             return await ctx.send('⏯ | Resumed')
         elif query is None:
-            return await ctx.send('🚫 Please specify a query!')
+            return await ctx.send('🚫 | Please specify a query!')
 
         check = await Music.check_connect(ctx, player)
         if check is not None:
@@ -27,7 +27,9 @@ class Play:
 
         results = await Music.get_tracks(bot=self.bot, query=query, ctx=ctx)
 
-        embed = discord.Embed(colour=ctx.guild.me.top_role.colour)
+        embed = discord.Embed(
+            color=0x2C2F33
+        )
 
         if results['loadType'] == "PLAYLIST_LOADED":
             tracks = results['tracks']
@@ -35,7 +37,7 @@ class Play:
             for track in tracks:
                 player.add(requester=ctx.author.id, track=track)
 
-            embed.title = "Playlist enqueued!"
+            embed.title = "🎶 Playlist enqueued!"
             embed.description = f"{results['playlistInfo']['name']} - {len(tracks)} tracks"
             await ctx.send(embed=embed)
         else:
