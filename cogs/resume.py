@@ -14,10 +14,10 @@ class Resume:
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:
-            return await ctx.send('🚫 I\'m not playing.')
+            return await ctx.send('🚫 | I\'m not playing.')
 
         if player.paused:
             await player.set_pause(False)
             await ctx.send('▶ | Resumed')
         else:
-            await ctx.send('🚫 I\'m already resumed!')
+            await ctx.send('🚫 | I\'m already resumed!')
