@@ -1,10 +1,7 @@
-import asyncio
-import time
+from threading import Timer
 
-from discord import Status, Game
+from discord import Game, Status
 from discord.ext import commands
-
-from cogs.music import Music
 
 from utilities import checks
 
@@ -20,9 +17,7 @@ class Update:
     @commands.command()
     @checks.owner_only()
     async def update(self, ctx):
-        trusted_users = [254892085000405004, 264048760580079616]
-
-        msg = await ctx.send('⚠ Do you want to update the bot?')
+        msg = await ctx.send('⚠ | Do you want to update the bot?')
         await msg.add_reaction('✅')
         await msg.add_reaction('❌')
 
@@ -36,8 +31,6 @@ class Update:
             await msg.delete()
 
         self.bot.set_updating(True)
-        if ctx.author.id not in trusted_users:
-            return await ctx.send('🚫 This command is only executable by the devs!')
 
         game = Game('Updating!')
         await self.bot.change_presence(status=Status.online, activity=game)
@@ -63,7 +56,7 @@ class Update:
                 return
 
             if player.current is None:
-                await channel.send(':warning: **Groovy is going to restart soon! Please be patient! '
+                await channel.send(':warning: | **Groovy is going to restart soon! Please be patient! '
                                    'For further information check Groovy\'s official support server:** '
                                    'https://groovybot.gq/support')
             else:
@@ -77,18 +70,16 @@ class Update:
                         ' VALUES ($1, $2, $3, $4, $5, $6)')
                     await statement.fetchval(player_tuple[0], player.current.uri, player.position, str(track_list),
                                              int(player.channel_id), channel_id)
-                await Music.fade_out(player)
+                await player.set_volume(0)
                 player.queue.clear()
                 sound = await self.bot.lavalink.get_tracks('https://cdn.groovybot.gq/sounds/update.mp3')
                 player.add(requester=254892085000405004, track=sound['tracks'][0])
                 if player.paused:
                     await player.set_pause(False)
-                await Music.fade_in(player)
+                await player.set_volume(100)
                 await player.skip()
-                await asyncio.sleep(8)
-                await player.disconnect()
-        await status_msg.edit(content='✅ **Groovy is able to be restarted!**')
-        time.sleep(5)
+                Timer(8, self.bot.loop.create_task(player.disconnect()))
+        await status_msg.edit(content='✅ | **Groovy is able to be restarted!**')
 
 
 def get_track_list(tracks):
