@@ -58,3 +58,10 @@ def premium_only(pledge):
             return True
 
     return commands.check(predicate)
+
+
+async def get_premium_type(user_id, pool):
+    async with pool.acquire() as connection:
+        check = await connection.prepare('SELECT type FROM premium WHERE user_id = $1')
+        final_check = await check.fetchval(user_id)
+        return final_check
