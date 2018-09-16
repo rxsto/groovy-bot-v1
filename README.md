@@ -1,4 +1,4 @@
-#Groovy
+# Groovy
 
 [![Build Status](https://travis-ci.org/Rxsto/Groovy.svg?branch=rewrite)](https://travis-ci.org/Rxsto/Groovy)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/99c34ae6ce2343649c246db82a50ea19)](https://www.codacy.com/app/Rxsto/Groovy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Rxsto/Groovy&amp;utm_campaign=Badge_Grade)
@@ -9,7 +9,7 @@ Groovy is a feature-rich, experienced and well maintained Discord-bot. His main 
 
 ---
 
-###Features
+### Features
 
 <table>
     <thead>
@@ -108,13 +108,13 @@ Groovy is a feature-rich, experienced and well maintained Discord-bot. His main 
 
 ---
 
-###Want to support?
+### Want to support?
 
 We'd love to hear about that! You are able to support with money by donating on [patreon](https://patreon.com/rxsto), that would help us a lot, but you are able to support without money by voting for Groovy [here](https://groovybot.gq/vote)! Thank you so much <3
 
 ---
 
-##[License](LICENSE)
+## [License](LICENSE)
 
 [![Discord Bots](https://discordbots.org/api/widget/status/402116404301660181.svg?noavatar=true)](https://discordbots.org/bot/402116404301660181)
 [![Botsfordiscord widtget](https://botsfordiscord.com/api/v1/bots/402116404301660181/embed)](https://botsfordiscord.com/bot/402116404301660181)
