@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+
 from cogs.music import Music
 
 
@@ -16,7 +17,7 @@ class Search:
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not query:
-            return await ctx.send('🚫 Please specify a query!')
+            return await ctx.send('🚫 | Please specify a query!')
 
         if not query.startswith('ytsearch:') and not query.startswith('scsearch:'):
             query = 'ytsearch:' + query
@@ -24,7 +25,7 @@ class Search:
         results = await self.bot.lavalink.get_tracks(query)
 
         if not results or not results['tracks']:
-            return await ctx.send('🚫 Nothing found')
+            return await ctx.send('🚫 | Nothing found')
 
         tracks = results['tracks'][:10]  # First 10 results
 
@@ -32,8 +33,10 @@ class Search:
         for i, t in enumerate(tracks, start=1):
             o += f'**{i}.** [{t["info"]["title"]}]({t["info"]["uri"]})\n'
 
-        embed = discord.Embed(colour=ctx.guild.me.top_role.colour,
-                              description=o)
+        embed = discord.Embed(
+            color=0x2C2F33,
+            description=o
+        )
 
         await ctx.send(embed=embed)
 
@@ -49,7 +52,7 @@ class Search:
         except ValueError:
             error = True
         if song < 1 or song > 10 or error:
-            return await ctx.send('🚫 Please enter a number from `1` to `10`! **Search cancelled!**')
+            return await ctx.send('🚫 | Please enter a number from `1` to `10`! **Search cancelled!**')
 
         check = await Music.check_connect(ctx, player)
         if check is not None:
