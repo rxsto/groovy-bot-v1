@@ -1,9 +1,8 @@
-import time
 import datetime
+import time
 
 import discord
 import psutil
-
 from discord.ext import commands
 
 start_time = time.time()
@@ -21,7 +20,6 @@ class Stats:
     async def stats(self, ctx):
         current_time = time.time()
         difference = int(round(current_time - start_time))
-        # uptime = str(datetime.timedelta(seconds=difference))
         uptime = "{:0>8}".format(str(datetime.timedelta(seconds=difference)))
 
         guilds = len(self.bot.guilds)
