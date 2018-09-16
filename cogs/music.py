@@ -1,13 +1,10 @@
-import asyncio
 import json
+import logging
+import re
 from threading import Timer
 
 import discord
 import lavalink
-import re
-import logging
-
-from discord.ext.commands import bot
 
 time_rx = re.compile('[0-9]+')
 url_rx = re.compile("https?://(?:www\.)?.+")
@@ -31,8 +28,11 @@ class Music:
             if c:
                 c = self.bot.get_channel(c)
                 if c:
-                    embed = discord.Embed(colour=c.guild.me.top_role.colour, title='🎶 Now Playing',
-                                          description=f'{event.track.title} ({event.track.author})')
+                    embed = discord.Embed(
+                        color=0x2C2F33,
+                        title='🎶 Now Playing',
+                        description=f'{event.track.title} ({event.track.author})'
+                    )
                     embed.set_thumbnail(url=event.track.thumbnail)
                     await c.send(embed=embed)
         elif isinstance(event, lavalink.Events.QueueEndEvent):
@@ -42,7 +42,7 @@ class Music:
             if c:
                 c = self.bot.get_channel(c)
                 if c:
-                    await c.send('✅ The queue has ended! Why not queue more songs?')
+                    await c.send('✅ | The queue has ended! Why not queue more songs?')
             Timer(function=self.disconnect, interval=300.0, args=event.player).start()
         elif isinstance(event, lavalink.Events.TrackEndEvent):
             loop_queue_status = await event.player.loop_queue
@@ -58,19 +58,19 @@ class Music:
     async def check_connect(context, player):
         if not player.is_connected:
             if not context.author.voice or not context.author.voice.channel:
-                return await context.send('🚫 Join a voice channel!')
+                return await context.send('🚫 | Join a voice channel!')
 
             permissions = context.author.voice.channel.permissions_for(context.me)
 
             if not permissions.connect or not permissions.speak:
-                return await context.send('🚫 Missing permissions `CONNECT` and/or `SPEAK`.')
+                return await context.send('🚫 | Missing permissions `CONNECT` and/or `SPEAK`.')
 
             player.store('channel', context.channel.id)
             await player.connect(context.author.voice.channel.id)
         else:
             if not context.author.voice or not context.author.voice.channel or player.connected_channel.id \
                     != context.author.voice.channel.id:
-                return await context.send('🚫 Join my voice channel!')
+                return await context.send('🚫 | Join my voice channel!')
 
     async def decode_base64_track(self, track):
         headers = {
@@ -86,15 +86,6 @@ class Music:
             track = json.loads(track_raw)[0]
             return track
 
-    @staticmethod
-    async def fade_out(player):
-        await player.set_volume(0)
-        await asyncio.sleep(2.5)
-
-    @staticmethod
-    async def fade_in(player):
-        await player.set_volume(100)
-
     def disconnect(self, player):
         if not player.current and player.channel_id != '486765249488224277':
             self.bot.loop.create_task(player.disconnect())
@@ -109,7 +100,7 @@ class Music:
         results = await bot.lavalink.get_tracks(query)
 
         if not results or not results['tracks']:
-            return await ctx.send('🚫 Nothing found!')
+            return await ctx.send('🚫 | Nothing found!')
         return results
 
     @staticmethod
@@ -123,7 +114,9 @@ class Music:
 
     @staticmethod
     async def enqueue_songs(player, results, ctx, start=None):
+        # TODO: Check queue-length
         track = results['tracks'][0]
+        # TODO: Check track-length
         success_message = f'🎶 **Track enqueued:** {track["info"]["title"]}'
         await ctx.send(success_message)
         if start is None:
