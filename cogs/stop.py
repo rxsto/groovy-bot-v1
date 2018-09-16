@@ -1,5 +1,6 @@
 from discord.ext import commands
-from cogs.music import Music
+
+from utilities import checks
 
 
 def setup(bot):
@@ -11,15 +12,13 @@ class Temp:
         self.bot = bot
 
     @commands.command()
+    @checks.dj_only()
     async def stop(self, ctx):
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:
-            return await ctx.send('🚫 I\'m not playing.')
+            return await ctx.send('🚫 | I\'m not playing.')
 
         player.queue.clear()
-        if player.current is not None:
-            await Music.fade_out(player)
         await player.stop()
         await ctx.send('⏹ | Stopped.')
-        await Music.fade_in(player)
