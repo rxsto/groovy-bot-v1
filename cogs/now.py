@@ -1,8 +1,6 @@
 import discord
 from discord.ext import commands
 
-from utilities import checks
-
 
 def setup(bot):
     bot.add_cog(Now(bot))
