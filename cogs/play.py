@@ -1,4 +1,5 @@
 import discord
+from discord import Message
 from discord.ext import commands
 
 from cogs.music import Music
@@ -30,7 +31,9 @@ class Play:
         embed = discord.Embed(
             color=0x2C2F33
         )
-
+        if isinstance(results, Message):
+            # Return if there was no result found
+            return
         if results['loadType'] == "PLAYLIST_LOADED":
             tracks = results['tracks']
 

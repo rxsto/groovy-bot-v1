@@ -177,6 +177,10 @@ class ControlCommand:
                     if self.map[ctx.guild.id].message is not None:
                         await self.map[ctx.guild.id].message.delete()
 
+        permissions = ctx.author.voice.channel.permissions_for(ctx.me)
+        if not permissions.manage_messages:
+            return await ctx.send(':no_entry_sign: Please give me the `MESSAGE_MANAGE` permission to use that command')
+
         player = self.bot.lavalink.players.get(ctx.guild.id)
 
         if not player.is_playing:
