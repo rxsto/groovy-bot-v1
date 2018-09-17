@@ -78,7 +78,11 @@ class Update:
                     await player.set_pause(False)
                 await player.set_volume(100)
                 await player.skip()
-                Timer(8, self.bot.loop.create_task(player.disconnect()))
+
+                def disconnect_bot():
+                    self.bot.loop.create_task(player.disconnect())
+
+                Timer(8, disconnect_bot).start()
         await status_msg.edit(content='✅ | **Groovy is able to be restarted!**')
 
 
