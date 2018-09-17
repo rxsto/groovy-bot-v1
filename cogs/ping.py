@@ -11,4 +11,5 @@ class Ping:
 
     @commands.command()
     async def ping(self, ctx):
-        await ctx.send('✅ | Hey, I\'m **online**! My current **average latency** is {int(self.bot.latency * 1000)}ms!')
+        await ctx.send(f'✅ | Hey, I\'m **online**! My current **average latency** is '
+                       f'**{int(self.bot.latency * 1000)}**ms!')
