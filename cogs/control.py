@@ -9,12 +9,13 @@ from utilities import checks
 
 
 class Control:
-    def __init__(self, user, guild, message, player, channel_id, bot):
+    def __init__(self, user, guild, message, player, channel_id, bot, voice_channel_id=None):
         self.user = user
         self.guild = guild
         self.message = message
         self.channel_id = channel_id
         self.player = player
+        self.voice_channel_id = voice_channel_id
         self.bot = bot
 
     async def handle_reaction(self, reaction):
@@ -38,7 +39,7 @@ class Control:
             await self.send_response(repeat_response)
         elif emoji == '🔁':
             loop_queue_status = await self.player.toggle_loop_queue
-            response = '✅ | Successfully enabled loopqueue mode!' if not loop_queue_status else\
+            response = '✅ | Successfully enabled loopqueue mode!' if not loop_queue_status else \
                 '✅ | Successfully disabled loopqueue mode!'
             await self.send_response(response)
         elif emoji == '🔀':
@@ -76,6 +77,7 @@ class Control:
                 self.bot.loop.create_task(message.delete())
             except NotFound:
                 pass
+
         Timer(2, del_message)
 
     async def update_message(self, loop):
@@ -116,18 +118,23 @@ class Control:
             def up_message():
                 if self.message:
                     self.bot.loop.create_task(self.update_message(True))
-            Timer(5, up_message)
+
+            Timer(5.0, up_message).start()
 
     @property
     def whitelisted_members(self):
         out = list({})
-        for member in self.channel.members:
+        for member in self.voice_channel.members:
             out.append(member.id)
         return out
 
     @property
     def channel(self):
         return self.guild.get_channel(self.channel_id)
+
+    @property
+    def voice_channel(self):
+        return self.guild.get_channel(self.voice_channel_id)
 
     @staticmethod
     def get_percentage(progress, full):
@@ -158,6 +165,7 @@ class ControlCommand:
 
             def check(r, u):
                 return u.id == ctx.author.id and r.message.id == msg.id
+
             reaction, user = await self.bot.wait_for('reaction_add', check=check)
             if reaction.emoji == '❌':
                 return await msg.delete()
@@ -182,17 +190,12 @@ class ControlCommand:
 
         msg = await ctx.send(embed=embed)
 
-        if ctx.invoked_with == 'cp' or ctx.invoked_with == 'control' or ctx.invoked_with == 'panel':
-            for react in self.reacts:
-                await msg.add_reaction(react)
+        for react in self.reacts:
+            await msg.add_reaction(react)
 
-            panel = Control(ctx.message.author, ctx.guild, msg, player, ctx.channel.id, self.bot)
-            self.map[ctx.guild.id] = panel
-            await panel.update_message(True)
-        else:
-            panel = Control(ctx.message.author, ctx.guild, msg, player, ctx.channel, self.bot)
-            self.map[ctx.guild.id] = panel
-            await panel.update_message(False)
+        panel = Control(ctx.message.author, ctx.guild, msg, player, ctx.channel.id, self.bot, ctx.guild.me.voice.channel.id)
+        self.map[ctx.guild.id] = panel
+        await panel.update_message(True)
 
     async def on_reaction_add(self, reaction, user):
         if user.bot:

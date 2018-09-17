@@ -150,7 +150,7 @@ class Music:
     async def on_voice_state_update(self, member, before, after):
         if before.channel is None:
             return
-        if member.guild.me not in before.members:
+        if member.guild.me not in before.channel.members:
             return
         if after.channel is None or after.channel.id != before.channel.id:
             channel = before.channel
