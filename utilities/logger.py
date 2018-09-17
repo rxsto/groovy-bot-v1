@@ -1,7 +1,9 @@
 import asyncio
 import datetime
 import os
+import sys
 import time
+import traceback
 from enum import Enum
 
 import aiohttp
@@ -56,10 +58,9 @@ def log(level, message, exception: Exception = None):
     print(formatted_message)
     file.write(formatted_message + '\n')
     if exception is not None:
-        exception_string = f'{exception.__class__.__name__}: {exception}'
-        print(exception_string)
-        file.write(exception_string + '\n')
-        get_loop().create_task(log_exception(exception_string))
+        str(traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr))
+        str(traceback.print_exception(type(exception), exception, exception.__traceback__, file=file))
+        get_loop().create_task(log_exception(f'{exception.__class__.__name__}: {exception}'))
     file.close()
 
 
