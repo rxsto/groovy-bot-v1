@@ -15,7 +15,7 @@ class Skip:
         if not player.is_playing:
             return await ctx.send('🚫 | I\'m not playing.')
 
-        skip_to = 1
+        skip_to = 0
         if to is not None:
             try:
                 skip_to = int(to) - 1
