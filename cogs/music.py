@@ -150,9 +150,11 @@ class Music:
     async def on_voice_state_update(self, member, before, after):
         if before.channel is None:
             return
+        if member.guild.me not in before.members:
+            return
         if after.channel is None or after.channel.id != before.channel.id:
             channel = before.channel
-            player = self.get_player(bot=self.bot, ctx=None, guild_id=member.guild.id)
+            player = self.get_player(bot=self.bot, guild_id=member.guild.id)
             if len(before.channel.members) == 1 and player.is_connected:
                 Timer(60.0 * 5, self.run_check, [player, channel]).start()
 
