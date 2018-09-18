@@ -117,14 +117,14 @@ class Groovy(commands.AutoShardedBot):
             await connection.execute(f'DELETE FROM guilds WHERE id = {guild.id}')
 
     async def on_member_join(self, member):
-        if self.is_in_debug_mode():
-            return
-        await self.log_member(True, member)
+        if not self.is_in_debug_mode():
+            if member.guild.id == 403882830225997825:
+                await self.log_member(True, member)
 
     async def on_member_remove(self, member):
-        if self.is_in_debug_mode():
-            return
-        await self.log_member(False, member)
+        if not self.is_in_debug_mode():
+            if member.guild.id == 403882830225997825:
+                await self.log_member(False, member)
 
     async def on_message(self, msg: Message):
         if self.updating:
