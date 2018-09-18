@@ -106,8 +106,7 @@ venv.bak/
 .mypy_cache/
 
 /config.json
+/config.yml
 /logs/
-/lavalink/
 /.idea/
 /.vscode/
-/config.yml
