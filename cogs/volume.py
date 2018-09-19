@@ -24,6 +24,8 @@ class Volume:
 
         old_volume = player.volume
         await player.set_volume(volume)
+        guild = await self.bot.guild_cache.get(ctx.guild.id)
+        await guild.set_volume(volume)
 
         if old_volume > volume:
             await ctx.send(f'🔉 | Set to {player.volume}%')

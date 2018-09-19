@@ -23,7 +23,7 @@ class Playtop:
         await self.run_command(ctx, query, True)
 
     async def run_command(self, ctx, query, force):
-        player = Music.get_player(ctx=ctx, bot=self.bot, guild_id=None)
+        player = await Music.get_player(ctx=ctx, bot=self.bot, guild_id=None)
 
         if query is None:
             return await ctx.send('🚫 | Please specify a query!')

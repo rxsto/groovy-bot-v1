@@ -5,11 +5,9 @@ from utilities import exceptions
 
 def dj_only():
     async def predicate(ctx):
-        async with ctx.bot.get_postgre_client().get_pool().acquire() as connection:
-            statement = await connection.prepare('SELECT dj_mode FROM guilds WHERE id = $1')
-            dj_mode = await statement.fetchval(ctx.guild.id)
-            if dj_mode is False:
-                return True
+        guild = await ctx.bot.guild_cache.get(ctx.guild.id)
+        if guild.dj_mode is False:
+            return True
         if check_owner(ctx):
             return True
         if ctx.author.guild_permissions.administrator or ctx.author.guild_permissions.manage_guild:

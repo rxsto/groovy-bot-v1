@@ -24,10 +24,11 @@ class Update:
         def check(r, u):
             return u.id == ctx.author.id and r.message.id == msg.id
 
-        reaction, user = await self.bot.wait_for('reaction_add', check=check)
-        if reaction.emoji == '❌':
+        reaction = await self.bot.wait_for('reaction_add', check=check)
+        emoji = reaction[0].emoji
+        if emoji == '❌':
             return await msg.delete()
-        elif reaction.emoji == '✅':
+        elif emoji == '✅':
             await msg.delete()
 
         self.bot.set_updating(True)

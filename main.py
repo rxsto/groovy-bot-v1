@@ -12,6 +12,7 @@ from discord.ext import commands
 from discord.ext.commands import context
 from discord.ext.commands.errors import CommandNotFound, UserInputError
 
+from entities.guild import GuildCache
 from utilities import exceptions, logger
 from utilities.config import Config
 from utilities.database import PostgreClient
@@ -33,15 +34,8 @@ class Groovy(commands.AutoShardedBot):
         return result
 
     async def retrieve_prefix(self, guild_id):
-        async with self.postgre_client.get_pool().acquire() as connection:
-            response = await connection.fetchrow(
-                f'SELECT prefix FROM guilds WHERE id = {guild_id}')
-            if response is None:
-                await connection.execute(
-                    f'INSERT INTO guilds (id, prefix, volume) VALUES ({guild_id}, \'g!\', 100)')
-                return self.prefix
-            else:
-                return response["prefix"]
+        guild = await self.guild_cache.get(guild_id)
+        return guild.prefix
 
     async def process_commands(self, message: Message):
         ctx = await self.get_context(message, cls=context.Context)
@@ -76,6 +70,8 @@ class Groovy(commands.AutoShardedBot):
         asyncio.get_event_loop().run_until_complete(self.postgre_client.connect())
         logger.info('Successfully connected to database!')
 
+        self.guild_cache = GuildCache(self)
+
         logger.info('Logging in ...')
         if self.debug is True:
             self.run(self.config['test_bot']['token'])
@@ -103,11 +99,8 @@ class Groovy(commands.AutoShardedBot):
         if self.is_in_debug_mode():
             return
         await self.log_guild(True, guild)
-        async with self.postgre_client.get_pool().acquire() as connection:
-            check = await connection.fetchrow(f'SELECT * FROM guilds WHERE id = {guild.id}')
-            if check is None:
-                await connection.execute(
-                    f'INSERT INTO guilds (id, prefix, volume, dj_mode) VALUES ({guild.id}, \'g!\', 100, FALSE)')
+        # Add guild to cache and to DB
+        await self.guild_cache.get(guild.id)
 
     async def on_guild_remove(self, guild):
         if self.is_in_debug_mode():
@@ -115,6 +108,7 @@ class Groovy(commands.AutoShardedBot):
         await self.log_guild(False, guild)
         async with self.postgre_client.get_pool().acquire() as connection:
             await connection.execute(f'DELETE FROM guilds WHERE id = {guild.id}')
+        del self.guild_cache.cache[guild.id]
 
     async def on_member_join(self, member):
         if self.is_in_debug_mode():

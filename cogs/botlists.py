@@ -1,11 +1,10 @@
 from threading import Timer
 
-from main import Groovy
 from utilities import logger
 
 
 class DiscordLists:
-    def __init__(self, bot: Groovy):
+    def __init__(self, bot):
         self.bot = bot
         self.auth = {}
         self.run_loop()
