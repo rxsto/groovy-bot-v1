@@ -39,7 +39,7 @@ class Update:
         players = self.bot.lavalink.players
 
         status_msg = await ctx.send('<a:groovyloading:487681291010179072> Announcing **Update** - '
-                                    'Please **wait** until the process has **finished**!')
+                                    'Please wait until the process has finished!')
 
         await self.bot.update_outage_channel(outage='restart')
 
@@ -74,7 +74,7 @@ class Update:
                 await player.set_volume(0)
                 player.queue.clear()
                 sound = await self.bot.lavalink.get_tracks('https://cdn.groovybot.gq/sounds/update.mp3')
-                player.add(requester=254892085000405004, track=sound['tracks'][0])
+                player.add(requester=user.id, track=sound['tracks'][0])
                 if player.paused:
                     await player.set_pause(False)
                 await player.set_volume(100)
