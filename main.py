@@ -107,6 +107,7 @@ class Groovy(commands.AutoShardedBot):
             return
         await self.log_guild(False, guild)
         await self.guild_cache.delete(guild.id)
+        self.lavalink.remove(guild.id)
 
     async def on_member_join(self, member):
         if not self.is_in_debug_mode():
