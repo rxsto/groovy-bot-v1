@@ -45,3 +45,9 @@ class GuildCache:
             new_guild = Guild(guild_id, self, prefix, volume, dj_mode)
             self.cache[guild_id] = new_guild
         return self.cache[guild_id]
+
+    async def delete(self, guild_id):
+        if guild_id in self.cache:
+            del self.cache[guild_id]
+        async with self.bot.postgre_client.get_pool().acquire() as connection:
+            await connection.execute(f'DELETE FROM guilds WHERE ID = {guild_id}')

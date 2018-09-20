@@ -106,9 +106,7 @@ class Groovy(commands.AutoShardedBot):
         if self.is_in_debug_mode():
             return
         await self.log_guild(False, guild)
-        async with self.postgre_client.get_pool().acquire() as connection:
-            await connection.execute(f'DELETE FROM guilds WHERE id = {guild.id}')
-        del self.guild_cache.cache[guild.id]
+        await self.guild_cache.delete(guild.id)
 
     async def on_member_join(self, member):
         if not self.is_in_debug_mode():
