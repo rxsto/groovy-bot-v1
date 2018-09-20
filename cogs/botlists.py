@@ -21,6 +21,7 @@ class DiscordLists:
         params['discordbots.group'] = self.bot.get_config()['botlists']['discordbots.group']
         params['discordbotlist.com'] = self.bot.get_config()['botlists']['discordlist.com']
         params['bots.ondiscord.xyz'] = self.bot.get_config()['botlists']['ondiscord.xyz']
+        params['discordboats.xyz'] = self.bot.get_config()['botlists']['discordboats.xyz']
 
         headers = {
             'Content-Type': 'application/json'
