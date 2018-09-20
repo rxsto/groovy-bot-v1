@@ -30,10 +30,8 @@ class Skip:
             await player.skip()
             return await ctx.send('✅ | There was no track at this position so I cleared the queue!')
 
-        if to is not None:
-            del player.queue[:skip_to]
-
-        await player.skip()
+        for x in range(0, skip_to):
+            await player.skip()
 
         if to is None:
             await ctx.send('⏭ | Skipped.')
